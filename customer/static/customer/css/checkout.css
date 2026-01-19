@@ -1,0 +1,860 @@
+/* --- Base and Variables --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #000000;
+  --secondary-color: #d11c5b;
+  /* Or your theme color */
+  --text-color: #333;
+  --text-light-color: #666;
+  --border-color: #e0e0e0;
+  --background-light: #f9f9f9;
+  --active-step-color: #4CAF50;
+  /* Green for active step */
+  --font-family: 'Poppins', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: #fff;
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  margin-top: 20px;
+}
+
+h2 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+a {
+  text-decoration: none;
+  color: var(--primary-color);
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-family);
+}
+
+input,
+select {
+  font-family: var(--font-family);
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+select {
+  appearance: none;
+  /* Basic styling for select */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23666'%3E%3Cpath d='M8 11.414l-4.707-4.707a1 1 0 0 1 1.414-1.414L8 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414L8 11.414z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 30px;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: var(--text-light-color);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+@media (min-width: 576px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+/* --- Utility --- */
+.hidden {
+  display: none !important;
+}
+
+/* --- Checkout Progress Bar --- */
+.checkout-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 600px;
+  margin: 0 auto 40px auto;
+  padding: 0 10px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.step-indicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #ccc;
+  /* Inactive color */
+  border: 2px solid #ccc;
+  margin-bottom: 8px;
+  z-index: 1;
+}
+
+.step.active .step-indicator {
+  background-color: var(--active-step-color);
+  border-color: var(--active-step-color);
+}
+
+/* Style for completed steps */
+.step.completed .step-indicator {
+  background-color: var(--active-step-color);
+  border-color: var(--active-step-color);
+}
+
+
+.step span {
+  font-size: 0.85rem;
+  color: var(--text-light-color);
+  font-weight: 500;
+}
+
+.step.active span,
+.step.completed span {
+  /* Completed step text also darker */
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.step-line {
+  flex-grow: 1;
+  height: 2px;
+  background-color: #ccc;
+  margin: 0 -2px;
+  transform: translateY(-12px);
+}
+
+/* Style line for active/completed */
+.step.completed+.step-line {
+  background-color: var(--active-step-color);
+}
+
+/* Make line green if previous step is completed and current is active */
+.step.completed+.step-line+.step.active+.step-line {
+  background-color: #ccc;
+  /* Line after active step is grey */
+}
+
+
+/* --- Checkout Layout --- */
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+@media (min-width: 992px) {
+  .checkout-layout {
+    grid-template-columns: 6fr 4fr;
+    gap: 50px;
+    align-items: flex-start;
+  }
+}
+
+/* --- Left Section Container --- */
+.checkout-steps-container {
+  /* Styles if needed, e.g., border */
+}
+
+/* Individual Step Sections */
+.checkout-step-section {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  /* Space between steps if shown together */
+}
+
+/* --- Cart Details Section (Left) --- */
+/* .cart-details-section defined in checkout-step-section */
+
+.cart-items-table {
+  width: 100%;
+}
+
+.cart-table-header {
+  display: none;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  color: var(--text-light-color);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .cart-table-header {
+    display: grid;
+    grid-template-columns: minmax(200px, 2fr) repeat(3, 1fr) auto;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .col-product {
+    grid-column: 1;
+  }
+
+  .col-price {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .col-quantity {
+    grid-column: 3;
+    text-align: center;
+  }
+
+  .col-total {
+    grid-column: 4;
+    text-align: right;
+  }
+
+  .col-remove {
+    grid-column: 5;
+    text-align: right;
+  }
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 15px;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-item-image {
+  width: 60px;
+  height: 75px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.cart-item-info {
+  /* Grid column 2 */
+}
+
+.cart-item-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.cart-item-meta {
+  font-size: 0.85rem;
+  color: var(--text-light-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background-color: #999;
+  vertical-align: middle;
+}
+
+.cart-item-actions {
+  /* Grid column 3 on mobile */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.cart-item-price-mobile,
+.cart-item-total-mobile {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.quantity-btn {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--text-light-color);
+}
+
+.item-quantity {
+  padding: 4px 6px;
+  font-weight: 500;
+  min-width: 25px;
+  text-align: center;
+}
+
+.remove-item-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-light-color);
+  padding: 5px;
+  margin-top: 5px;
+}
+
+.remove-item-btn:hover {
+  color: var(--secondary-color);
+}
+
+.empty-cart-message {
+  text-align: center;
+  color: var(--text-light-color);
+  padding: 30px 0;
+}
+
+/* Desktop layout for cart item */
+@media (min-width: 768px) {
+  .cart-item {
+    grid-template-columns: 60px minmax(150px, 2fr) 1fr 1fr 1fr auto;
+    /* Adjusted */
+    gap: 15px;
+  }
+
+  .cart-item-image {
+    grid-column: 1;
+  }
+
+  .cart-item-info {
+    grid-column: 2;
+  }
+
+  .cart-item-price-desktop {
+    grid-column: 3;
+    text-align: right;
+    font-weight: 500;
+  }
+
+  .quantity-control {
+    grid-column: 4;
+    justify-self: center;
+  }
+
+  .cart-item-total-desktop {
+    grid-column: 5;
+    text-align: right;
+    font-weight: 500;
+  }
+
+  .remove-item-btn {
+    grid-column: 6;
+    margin-top: 0;
+  }
+
+  /* Hide mobile-specific price displays and action column */
+  .cart-item-price-mobile,
+  .cart-item-total-mobile,
+  .cart-item-actions {
+    display: none;
+  }
+
+  /* Hide mobile column */
+
+  /* Show desktop prices */
+  .cart-item-price-desktop,
+  .cart-item-total-desktop {
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+
+  /* Hide desktop prices on mobile */
+  .cart-item-price-desktop,
+  .cart-item-total-desktop {
+    display: none;
+  }
+}
+
+
+.continue-shopping-link {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.continue-shopping-link i {
+  margin-right: 5px;
+}
+
+/* --- Billing Address Section --- */
+/* .billing-address-section defined in checkout-step-section */
+
+.billing-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.back-button:hover {
+  text-decoration: underline;
+}
+
+.proceed-button {
+  padding: 12px 25px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.proceed-button:hover {
+  background-color: #333;
+}
+
+/* --- Order Summary Section (Right) --- */
+.order-summary-section {
+  background-color: var(--background-light);
+  border-radius: 8px;
+  padding: 25px;
+  height: fit-content;
+  /* Stick to top on desktop */
+}
+
+@media (min-width: 992px) {
+  .order-summary-section {
+    position: sticky;
+    top: 20px;
+    /* Adjust based on header height if sticky */
+  }
+}
+
+.summary-details {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.summary-row,
+.summary-total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+
+.summary-row span:first-child,
+.summary-total-row span:first-child {
+  color: var(--text-light-color);
+}
+
+.summary-row span:last-child,
+.summary-total-row span:last-child {
+  font-weight: 500;
+}
+
+.summary-total-row {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 15px;
+}
+
+.summary-total-row span:first-child {
+  color: var(--text-color);
+}
+
+.summary-total-row span:last-child {
+  color: var(--secondary-color);
+}
+
+.vat-note {
+  font-size: 0.8rem;
+  color: var(--text-light-color);
+  text-align: right;
+  margin-top: -5px;
+}
+
+.discount-wrapper {
+  margin-top: 15px;
+}
+
+.discount-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#discount-code {
+  flex: 1;
+  /* Take available space */
+  width: auto;
+  /* Override default 100% */
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  height: 48px;
+  /* Fixed height for alignment */
+}
+
+#apply-discount-btn {
+  padding: 0 25px;
+  height: 48px;
+  /* Match input height */
+  border: 1px solid var(--border-color);
+  background-color: #333;
+  /* Darker for better contrast or match theme */
+  color: #fff;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+#apply-discount-btn:hover {
+  background-color: #000;
+}
+
+/* General Checkout Action Button (in summary section) */
+.checkout-button {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.checkout-button:hover {
+  background-color: #333;
+}
+
+.checkout-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Payment Section Styles */
+.payment-options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  /* Space between options */
+  margin-bottom: 30px;
+  /* Space before action buttons */
+}
+
+/* Hide the actual radio button */
+.payment-radio {
+  display: none;
+}
+
+.payment-option-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Style for when the radio button is checked */
+.payment-radio:checked+.payment-option-card {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.payment-option-card:hover {
+  border-color: #aaa;
+}
+
+.payment-radio:checked+.payment-option-card:hover {
+  border-color: var(--primary-color);
+  /* Keep border color when checked and hovered */
+}
+
+
+.payment-option-text strong {
+  font-size: 1rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.payment-option-text p {
+  font-size: 0.85rem;
+  color: var(--text-light-color);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.payment-logos {
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  /* Vertically align icons/logos */
+  gap: 8px;
+  margin-left: 15px;
+  /* Space between text and logos */
+}
+
+/* --- MODIFICATION START: Styles for Interac logo --- */
+.payment-logos .interac-logo {
+  height: 28px;
+  /* Adjust size to match FontAwesome icons */
+  width: auto;
+  border-radius: 4px;
+  /* Slightly round the corners */
+}
+
+/* --- MODIFICATION END --- */
+
+
+/* Brand colors for icons */
+.payment-logos .fa-paypal {
+  color: #00457C;
+}
+
+.payment-logos .fa-cc-visa {
+  color: #1A1F71;
+}
+
+.payment-logos .fa-cc-mastercard {
+  color: #EB001B;
+}
+
+.payment-logos .fa-money-bill-wave {
+  color: #006400;
+}
+
+/* A generic green for cash */
+
+
+/* --- MODIFICATION START: Delivery Section Styles --- */
+.delivery-options-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-bottom: 30px;
+  /* Space before Payment H2 */
+}
+
+@media (min-width: 576px) {
+  .delivery-options-container {
+    grid-template-columns: 1fr 1fr;
+    /* Two columns on wider screens */
+  }
+}
+
+@media (min-width: 992px) {
+  .delivery-options-container {
+    /* You can decide if 3 columns is too cramped or just keep 2 */
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+
+/* Hide the actual radio button */
+.delivery-radio {
+  display: none;
+}
+
+.delivery-option-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 100%;
+  /* Make cards in a row equal height */
+}
+
+.delivery-radio:checked+.delivery-option-card {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.delivery-option-card:hover {
+  border-color: #aaa;
+}
+
+.delivery-radio:checked+.delivery-option-card:hover {
+  border-color: var(--primary-color);
+}
+
+.delivery-option-icon {
+  font-size: 1.5rem;
+  color: var(--text-color);
+  flex-shrink: 0;
+  width: 30px;
+  text-align: center;
+}
+
+.delivery-option-text {
+  flex-grow: 1;
+}
+
+.delivery-option-text strong {
+  font-size: 1rem;
+  font-weight: 600;
+  display: block;
+}
+
+.delivery-option-text p {
+  font-size: 0.85rem;
+  color: var(--text-light-color);
+  margin: 0;
+}
+
+.delivery-option-price {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-left: auto;
+  /* Push price to the right */
+}
+
+/* --- MODIFICATION END --- */
+
+
+/* --- MODIFICATION START: Styles for Collapsible Card Form --- */
+.payment-details-form {
+  /* Hidden by default */
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 20px;
+  /* Padding will apply when opened */
+  margin-top: 0;
+  transition: max-height 0.4s ease-out, margin-top 0.4s ease-out, padding 0.4s ease-out;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  /* Rounded bottom corners */
+}
+
+/* Show when the associated radio button is checked */
+.payment-radio:checked+.payment-option-card+.payment-details-form {
+  max-height: 500px;
+  /* Animate open */
+  margin-top: -8px;
+  /* Pull up to meet the card */
+  padding-top: 25px;
+  /* Add padding on top */
+  padding-bottom: 10px;
+  /* Add padding on bottom */
+  border: 1px solid var(--primary-color);
+  /* Match the checked card border */
+  border-top: none;
+  /* Remove top border */
+  background-color: #fff;
+  /* Ensure it has a background */
+}
+
+/* Adjust labels inside the form */
+.payment-details-form .form-group label {
+  font-size: 0.8rem;
+  color: #333;
+  /* Make labels darker */
+}
+
+/* --- MODIFICATION END --- */
+
+
+/* Header Overrides */
+.main-header .header-logo-img {
+  height: 50px;
+}
+
+.main-header .header-icons-right {
+  gap: 10px;
+}
+
+@media (min-width: 992px) {
+  .main-header .header-icons-right {
+    gap: 20px;
+  }
+}

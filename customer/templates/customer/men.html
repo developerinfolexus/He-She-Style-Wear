@@ -1,0 +1,692 @@
+{% load static %}
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HE SHE STYLES - Men's Collection</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'customer/css/men.css' %}">
+    <style>
+      .price-range-filter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 0 10px 0; /* Adjusted padding */
+        margin-top: 10px; /* Space above inputs */
+        border-top: 1px dashed var(--border-color); /* Separator */
+      }
+      .price-range-filter label {
+        flex-shrink: 0;
+        font-size: 0.9rem;
+      }
+      .price-range-filter input[type="number"] {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 0.9rem;
+        /* Hide spinner buttons */
+        -moz-appearance: textfield;
+      }
+       .price-range-filter input[type="number"]::-webkit-outer-spin-button,
+       .price-range-filter input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+       /* Ensure filter content padding allows space */
+      .filter-content ul {
+          padding: 5px 0 5px 0; /* Reduced bottom padding */
+      }
+    </style>
+  </head>
+  <body data-header-url="{% url 'api_header' %}">
+    <div class="promo-bar">
+      <div class="promo-slides">
+        <div class="promo-slide">Free Shipping On All Men's Orders</div>
+        <div class="promo-slide">New Kurtas: Up to 30% Off</div>
+      </div>
+    </div>
+
+    <header class="main-header container" style="max-width: 1500px">
+      <div class="logo">
+         <a href="{% url 'index' %}">
+            <img src="ChatGPT Image Oct 23, 2025, 11_48_27 AM.jpg" alt="HE SHE STYLE WEAR Logo" class="header-logo-img">
+            <h1>HE SHE STYLE WEAR</h1> </a>
+      </div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="{% url 'index' %}">HOME</a></li>
+          <li><a href="{% url 'women' %}">WOMEN</a></li>
+          <li class="active"><a href="men.html">MEN</a></li>
+          <li><a href="{% url 'kids' %}">KIDS</a></li>
+        </ul>
+      </nav>
+      <div class="header-icons-right">
+        <form class="header-icon search-container" id="header-search-form">
+          <i class="fas fa-search search-icon-trigger"></i>
+          <input type="text" id="header-search-input" placeholder="Search..." />
+          <div id="search-results-popup"></div>
+        </form>
+        <div class="header-icon"><i class="far fa-user"></i></div>
+        <div class="header-icon cart-icon">
+          <a href="{% url 'cart' %}">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-count" id="cartCount">0</span>
+          </a>
+        </div>
+        <div class="header-icon wishlist-icon-wrapper" id="wishlistIcon">
+          <a href="{% url 'wishlist' %}"> <i class="far fa-heart"></i> </a>
+          <span class="wishlist-count" id="wishlistCount">0</span>
+        </div>
+      </div>
+    </header>
+
+    {/* Rest of men.html content */}
+    <main>
+      <section class="promo-banner">
+        <div class="banner-image">
+          <img
+            src="https://www.thefashionisto.com/wp-content/uploads/2015/02/Canali-Spring-Summer-2015-Campaign-001-800x450.jpg"
+            alt="Two men modelling elegant, embroidered sherwanis"
+          />
+        </div>
+        <div class="banner-content">
+          <h2>Sherwani Saga</h2>
+          <a href="#" class="shop-now-btn">Shop Now</a>
+        </div>
+      </section>
+
+      <div class="product-listing container">
+        <div class="listing-header">
+          <h2>MEN'S COLLECTIONS</h2>
+        </div>
+
+        <div class="mobile-filter-sort">
+          <button><i class="fas fa-filter"></i> Filter</button>
+          <select>
+            <option>Sort: Featured</option>
+            <option>Price: Low to High</option>
+            <option>Price: High to Low</option>
+          </select>
+        </div>
+
+        <div class="product-listing-content">
+          <aside class="filter-sidebar"> <div class="sidebar-title">FILTERS</div>
+
+            <div class="filter-accordion-item open"> <div class="filter-header">
+                Price
+                <i class="fas fa-plus"></i>
+              </div>
+              <div class="filter-content" style="max-height: initial;"> <ul>
+                  <li>
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="price_range" value="under_2000"
+                      />
+                      Under ₹2000</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="price_range" value="2000_5000"
+                      />
+                      ₹2000 - ₹5000</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="price_range" value="over_5000" /> Over ₹5000</label
+                    >
+                  </li>
+                </ul>
+                 <div class="price-range-filter">
+                   <label for="price-from">From ₹</label>
+                   <input type="number" id="price-from" name="price_from" placeholder="Min" min="0">
+                   <label for="price-to">To ₹</label>
+                   <input type="number" id="price-to" name="price_to" placeholder="Max" min="0">
+                 </div>
+              </div>
+            </div>
+            <div class="filter-accordion-item open">
+              <div class="filter-header">
+                Sub Categories
+                <i class="fas fa-plus"></i>
+              </div>
+              <div class="filter-content">
+                <ul>
+                  <li>
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="category"
+                        value="kurtas"
+                      />
+                      Kurtas & Kurta Sets</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="category"
+                        value="sherwani"
+                      />
+                      Sherwani</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="category"
+                        value="jackets"
+                      />
+                      Nehru Jackets</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="category"
+                        value="indowestern"
+                      />
+                      Indo-Western</label
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="filter-accordion-item">
+              <div class="filter-header">
+                Size
+                <i class="fas fa-plus"></i>
+              </div>
+              <div class="filter-content">
+                <ul>
+                  <li>
+                    <label><input type="checkbox" name="size" value="s" /> S</label>
+                  </li>
+                  <li>
+                    <label><input type="checkbox" name="size" value="m" /> M</label>
+                  </li>
+                  <li>
+                    <label><input type="checkbox" name="size" value="l" /> L</label>
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="size" value="xl" /> XL</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="size" value="xxl" /> XXL</label
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="filter-accordion-item">
+              <div class="filter-header">
+                Color
+                <i class="fas fa-plus"></i>
+              </div>
+              <div class="filter-content">
+                <ul>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="color" value="black" />
+                      Black</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="color" value="white" />
+                      White</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="color" value="blue" />
+                      Blue</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="color" value="red" />
+                      Red</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="color" value="beige" />
+                      Beige</label
+                    >
+                  </li>
+                   <li>
+                    <label
+                      ><input type="checkbox" name="color" value="green" />
+                      Green</label
+                    >
+                  </li>
+                   <li>
+                    <label
+                      ><input type="checkbox" name="color" value="gold" />
+                      Gold</label
+                    >
+                  </li>
+                   <li>
+                    <label
+                      ><input type="checkbox" name="color" value="grey" />
+                      Grey</label
+                    >
+                  </li>
+                     <li>
+                    <label
+                      ><input type="checkbox" name="color" value="yellow" />
+                      Yellow</label
+                    >
+                  </li>
+                     <li>
+                    <label
+                      ><input type="checkbox" name="color" value="maroon" />
+                      Maroon</label
+                    >
+                  </li>
+                     <li>
+                    <label
+                      ><input type="checkbox" name="color" value="mustard" />
+                      Mustard</label
+                    >
+                  </li>
+                      <li>
+                    <label
+                      ><input type="checkbox" name="color" value="navy" />
+                      Navy</label
+                    >
+                  </li>
+                      <li>
+                    <label
+                      ><input type="checkbox" name="color" value="teal" />
+                      Teal</label
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="filter-accordion-item">
+              <div class="filter-header">
+                Fabric
+                <i class="fas fa-plus"></i>
+              </div>
+              <div class="filter-content">
+                <ul>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="fabric" value="cotton" />
+                      Cotton</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="fabric" value="silk" />
+                      Silk</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="fabric" value="linen" />
+                      Linen</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="fabric" value="brocade" />
+                      Brocade</label
+                    >
+                  </li>
+                    <li>
+                    <label
+                      ><input type="checkbox" name="fabric" value="velvet" />
+                      Velvet</label
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="filter-accordion-item">
+              <div class="filter-header">
+                Work
+                <i class="fas fa-plus"></i>
+              </div>
+              <div class="filter-content">
+                <ul>
+                  <li>
+                    <label
+                      ><input
+                        type="checkbox"
+                        name="work"
+                        value="embroidered"
+                      />
+                      Embroidered</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="work" value="zari" /> Zari
+                      Work</label
+                    >
+                  </li>
+                  <li>
+                    <label
+                      ><input type="checkbox" name="work" value="printed" />
+                      Printed</label
+                    >
+                  </li>
+                   <li>
+                    <label
+                      ><input type="checkbox" name="work" value="solid" />
+                      Solid</label
+                    >
+                  </li>
+                   <li>
+                    <label
+                      ><input type="checkbox" name="work" value="brocade" />
+                      Brocade</label> </li>
+                </ul>
+              </div>
+            </div>
+
+            </aside>
+
+          <section class="products-area">
+            <div class="product-grid">
+              <article class="product-card" data-product-id="men-P001" data-category="kurtas" data-color="beige" data-price="4199" data-work="embroidered" data-fabric="silk">
+                <a href="{% url 'product' 'men-P001' %}">
+                  <div class="product-image-container">
+                    <img src="https://tse3.mm.bing.net/th/id/OIP.Zie1jdfpnN9B1zqYg_DaUQAAAA?w=320&h=480&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Beige Kurta Set" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Embroidered Art Silk Kurta Set</h3>
+                    <p class="product-price">₹4,199</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P002" data-category="indowestern" data-color="black" data-price="7999" data-work="solid" data-fabric="brocade">
+                 <a href="{% url 'product' 'men-P002' %}">
+                  <div class="product-image-container">
+                    <img src="https://tse3.mm.bing.net/th/id/OIP.54VEjESx7ckb1-8TScnAmgHaLG?w=683&h=1024&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Black Indo-Western Set" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Black Indo-Western Set</h3>
+                    <p class="product-price">₹7,999</p>
+                  </div>
+                </a>
+              </article>
+               <article class="product-card" data-product-id="men-P003" data-category="kurtas" data-color="white" data-price="1499" data-work="printed" data-fabric="cotton">
+                 <a href="{% url 'product' 'men-P003' %}">
+                  <div class="product-image-container">
+                    <img src="https://www.thefashionisto.com/wp-content/uploads/2015/01/Brunello-Cucinelli-Fall-Winter-2015-Menswear-Collection-Look-Book-023.jpg" alt="Printed Short Kurta" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Printed Cotton Short Kurta</h3>
+                    <p class="product-price">₹1,499</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P004" data-category="jackets" data-color="blue" data-price="3499" data-work="brocade" data-fabric="silk">
+                 <a href="{% url 'product' 'men-P004' %}">
+                  <div class="product-image-container">
+                    <img src="https://www.thefashionisto.com/wp-content/uploads/2015/01/Brunello-Cucinelli-Fall-Winter-2015-Menswear-Collection-Look-Book-023.jpg" alt="Blue Nehru Jacket" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button> </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Blue Brocade Nehru Jacket</h3>
+                    <p class="product-price">₹3,499</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P005" data-category="indowestern" data-color="black" data-price="12499" data-work="embroidered" data-fabric="brocade">
+                 <a href="{% url 'product' 'men-P005' %}">
+                  <div class="product-image-container">
+                    <img src="https://tse3.mm.bing.net/th/id/OIP.49d8Hqm6cPUsB8D-5yn_RwHaJ4?w=1080&h=1440&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Black Indo-Western Set" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Black Designer Bandhgala Set</h3>
+                    <p class="product-price">₹12,499</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P006" data-category="kurtas" data-color="white" data-price="1999" data-work="solid" data-fabric="cotton">
+                 <a href="{% url 'product' 'men-P006' %}">
+                  <div class="product-image-container">
+                    <img src="https://tse2.mm.bing.net/th/id/OIP.Z3_muMQPruehPI-yntyIWgAAAA?rs=1&pid=ImgDetMain&o=7&rm=3" alt="White Kurta" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">White Cotton Blend Kurta</h3>
+                    <p class="product-price">₹1,999</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P007" data-category="sherwani" data-color="blue" data-price="15999" data-work="embroidered" data-fabric="silk">
+                 <a href="{% url 'product' 'men-P007' %}">
+                  <div class="product-image-container">
+                    <img src="https://assets.myntassets.com/h_200,w_200,c_fill,g_auto/h_1440,q_100,w_1080/v1/assets/images/26936900/2024/1/16/c005f8b7-5337-4f0d-8b22-b7b776470dec1705387096406KISAHMenSelf-DesignMandarinCollarSherwaniSet1.jpg" alt="Blue Designer Sherwani" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Royal Blue Silk Sherwani</h3>
+                    <p class="product-price">₹15,999</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P008" data-category="kurtas" data-color="red" data-price="2599" data-work="solid" data-fabric="linen">
+                 <a href="{% url 'product' 'men-P008' %}">
+                  <div class="product-image-container">
+                    <img src="https://i.pinimg.com/474x/db/f5/e4/dbf5e45dff4ceb32efe0d46bf720efcd--banana-republic-looks-men-fashion.jpg" alt="Burgundy Kurta" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Burgundy Linen Kurta</h3>
+                    <p class="product-price">₹2,599</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P009" data-category="jackets" data-color="black" data-price="4500" data-work="printed" data-fabric="linen">
+                 <a href="{% url 'product' 'men-P009' %}">
+                  <div class="product-image-container">
+                    <img src="https://tse3.mm.bing.net/th/id/OIP.Zie1jdfpnN9B1zqYg_DaUQAAAA?w=320&h=480&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Printed Nehru Jacket" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Printed Black Nehru Jacket</h3>
+                    <p class="product-price">₹4,500</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P010" data-category="kurtas" data-color="beige" data-price="3100" data-work="embroidered" data-fabric="cotton">
+                 <a href="{% url 'product' 'men-P010' %}">
+                  <div class="product-image-container">
+                    <img src="https://assets.myntassets.com/h_200,w_200,c_fill,g_auto/h_1440,q_100,w_1080/v1/assets/images/17332278/2022/5/30/eff4b83e-d4c4-48f4-bea5-407d6b7ad06e1653901867350KISAHMenMaroonWovenDesignCottonSherwani6.jpg" alt="Embroidered Kurta Set" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Beige Embroidered Kurta</h3>
+                    <p class="product-price">₹3,100</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P011" data-category="kurtas" data-color="green" data-price="2899" data-work="solid" data-fabric="cotton">
+                 <a href="{% url 'product' 'men-P011' %}">
+                  <div class="product-image-container">
+                    <img src="https://tse2.mm.bing.net/th/id/OIP.TiopE81ZXfWu7ShfEqCiWwHaJP?w=734&h=916&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Pastel Green Kurta" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Pastel Green Cotton Kurta</h3>
+                    <p class="product-price">₹2,899</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P012" data-category="sherwani" data-color="gold" data-price="18500" data-work="zari" data-fabric="silk">
+                 <a href="{% url 'product' 'men-P012' %}">
+                  <div class="product-image-container">
+                    <img src="https://tse4.mm.bing.net/th/id/OIP.qdgczKMoDJcGwFL4ItVWsQHaJQ?w=1080&h=1350&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Gold Sherwani" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Golden Zari Work Sherwani</h3>
+                    <p class="product-price">₹18,500</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P013" data-category="jackets" data-color="red" data-price="3999" data-work="solid" data-fabric="linen">
+                 <a href="{% url 'product' 'men-P013' %}">
+                  <div class="product-image-container">
+                    <img src="https://www.tiptopgents.com/wp-content/uploads/2023/01/Picsart_22-12-31_21-43-54-733.webp" alt="Maroon Nehru Jacket" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Maroon Linen Nehru Jacket</h3>
+                    <p class="product-price">₹3,999</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P014" data-category="indowestern" data-color="beige" data-price="9500" data-work="embroidered" data-fabric="silk">
+                 <a href="{% url 'product' 'men-P014' %}">
+                  <div class="product-image-container">
+                    <img src="https://i.pinimg.com/originals/85/22/34/8522346c05525356198706df30c7ebe0.png" alt="Cream Indo-Western" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Cream Embroidered Indo-Western</h3>
+                    <p class="product-price">₹9,500</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P015" data-category="kurtas" data-color="yellow" data-price="1899" data-work="printed" data-fabric="cotton">
+                 <a href="{% url 'product' 'men-P015' %}">
+                  <div class="product-image-container">
+                    <img src="https://i.pinimg.com/236x/5f/86/26/5f8626fef5118e9c77b4064022a634c2.jpg" alt="Yellow Printed Kurta" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Yellow Floral Print Kurta</h3>
+                    <p class="product-price">₹1,899</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P016" data-category="indowestern" data-color="white" data-price="11500" data-work="solid" data-fabric="silk">
+                 <a href="{% url 'product' 'men-P016' %}">
+                  <div class="product-image-container">
+                    <img src="https://i.pinimg.com/736x/dd/7e/bb/dd7ebbce04b57700bf5927b0d917bdcf.jpg" alt="White Asymmetric Indo-Western" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Asymmetric White Kurta Jacket Set</h3>
+                    <p class="product-price">₹11,500</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P017" data-category="sherwani" data-color="black" data-price="25000" data-work="embroidered" data-fabric="velvet">
+                 <a href="{% url 'product' 'men-P017' %}">
+                  <div class="product-image-container">
+                    <img src="https://i.pinimg.com/originals/09/8e/04/098e04af0ab6959bc544269e37bf3b88.png" alt="Black Velvet Sherwani" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Black Velvet Embellished Sherwani</h3>
+                    <p class="product-price">₹25,000</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P018" data-category="kurtas" data-color="blue" data-price="4999" data-work="zari" data-fabric="silk">
+                 <a href="{% url 'product' 'men-P018' %}">
+                  <div class="product-image-container">
+                    <img src="https://vogueymen.com/wp-content/uploads/2022/05/avramov.zoran-___CPBM6lOAdQt___-.jpg" alt="Blue Silk Kurta" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Royal Blue Silk Blend Kurta</h3>
+                    <p class="product-price">₹4,999</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P019" data-category="jackets" data-color="multi" data-price="4200" data-work="printed" data-fabric="brocade">
+                 <a href="{% url 'product' 'men-P019' %}">
+                  <div class="product-image-container">
+                    <img src="https://wallpaperaccess.com/full/1448075.jpg" alt="Floral Print Jacket" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Multi-Color Floral Print Jacket</h3>
+                    <p class="product-price">₹4,200</p>
+                  </div>
+                </a>
+              </article>
+              <article class="product-card" data-product-id="men-P020" data-category="kurtas" data-color="grey" data-price="2350" data-work="solid" data-fabric="linen">
+                 <a href="{% url 'product' 'men-P020' %}">
+                  <div class="product-image-container">
+                    <img src="https://i.pinimg.com/originals/01/7b/06/017b06a125a10b22a1d8643cf22dd4be.jpg" alt="Grey Linen Kurta" />
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name">Light Grey Linen Kurta</h3>
+                    <p class="product-price">₹2,350</p>
+                  </div>
+                </a>
+              </article>
+
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    {% include 'customer/footer.html' %}
+
+    <nav class="bottom-nav">
+      <a href="{% url 'index' %}" class="nav-item"
+        ><i class="fas fa-home"></i><span>HOME</span></a
+      >
+      <a href="#" class="nav-item"
+        ><i class="fas fa-th-large"></i><span>CATEGORY</span></a
+      >
+      <a href="#" class="nav-item"
+        ><i class="fas fa-tags"></i><span>SALE</span></a
+      >
+      <a href="{% url 'login' %}" class="nav-item"
+        ><i class="fas fa-user-circle"></i><span>PROFILE</span></a
+      >
+    </nav>
+
+     <div class="mobile-filter-overlay" id="mobile-filter-overlay"></div>
+    <div class="mobile-filter-drawer" id="mobile-filter-drawer">
+      <div class="mobile-filter-header">
+        <h3>Filters</h3>
+        <button class="close-filter-btn" id="close-filter-btn">&times;</button>
+      </div>
+      <div class="mobile-filter-content" id="mobile-filter-content">
+        </div>
+       <div class="mobile-filter-footer">
+            <button class="apply-filters-btn" id="apply-filters-btn">Apply Filters</button>
+        </div>
+    </div>
+    <script src="{% static 'customer/js/men.js' %}"></script>
+  </body>
+</html> -->

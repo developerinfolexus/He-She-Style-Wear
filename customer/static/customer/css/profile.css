@@ -1,0 +1,300 @@
+/* --- Profile Page Specific Styles --- */
+
+.profile-page-container {
+    padding-top: 15px;
+    padding-bottom: 40px;
+    background-color: #f1f3f6; /* Light background for the page content area */
+}
+
+/* Breadcrumbs */
+.profile-breadcrumb {
+    margin-bottom: 25px;
+    font-size: 0.85rem;
+    color: #666;
+    padding: 10px 0;
+}
+.profile-breadcrumb ol { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; align-items: center; }
+.profile-breadcrumb li { margin-right: 5px; }
+.profile-breadcrumb li:not(:last-child)::after { content: '>'; margin-left: 5px; color: #999; }
+.profile-breadcrumb a { color: var(--secondary-color); text-decoration: none; }
+.profile-breadcrumb a:hover { text-decoration: underline; }
+.profile-breadcrumb span,
+.profile-breadcrumb li[aria-current="page"] { font-weight: 500; color: var(--text-color); }
+
+/* Main Layout */
+.profile-layout {
+    display: grid;
+    grid-template-columns: 1fr; /* Stacked by default */
+    gap: 20px;
+}
+@media (min-width: 768px) {
+    .profile-layout {
+        grid-template-columns: 280px 1fr; /* Sidebar and main content */
+        gap: 30px;
+        align-items: start;
+    }
+
+    /* --- FIX: Added sticky positioning to the sidebar --- */
+    .profile-sidebar {
+        position: sticky;
+        top: 20px; /* Space from the top of the viewport */
+        align-self: start;
+    }
+    /* --- END FIX --- */
+}
+
+/* Sidebar */
+.profile-sidebar {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+}
+.user-greeting {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.user-name-greeting span {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+}
+.user-name-greeting strong {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212121;
+}
+
+.profile-nav ul { list-style: none; margin: 0; padding: 0; }
+.profile-nav li { margin-bottom: 5px; }
+.profile-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #444;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+    text-decoration: none;
+}
+.profile-nav a i {
+    width: 20px; /* Align icons */
+    text-align: center;
+    color: #888;
+    transition: color 0.2s;
+}
+.profile-nav a:hover {
+    background-color: #f8f8f8;
+    color: var(--primary-color);
+}
+.profile-nav a:hover i {
+    color: var(--primary-color);
+}
+.profile-nav a.active {
+    background-color: #fef5f8; /* Light pink background */
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+.profile-nav a.active i {
+    color: var(--secondary-color);
+}
+
+
+/* Main Content Area */
+.profile-main-content {
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color);
+    padding: 15px 25px 25px 25px; /* Adjust padding */
+}
+
+.profile-section {
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 1px dashed var(--border-color);
+}
+.profile-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.section-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212121;
+    margin: 0;
+}
+.edit-btn, .save-btn, .cancel-btn {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px; /* Add padding for easier clicking */
+}
+.save-btn, .cancel-btn {
+    padding: 8px 18px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+.save-btn {
+    background-color: var(--primary-color);
+    color: white;
+    margin-right: 10px;
+}
+.save-btn:hover { background-color: #333; }
+.cancel-btn {
+    background-color: #f0f0f0;
+    color: #555;
+    border: 1px solid #ccc;
+}
+.cancel-btn:hover { background-color: #e0e0e0; }
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+@media (min-width: 576px) {
+    .form-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label { /* Style labels if needed */
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* --- FIX: Added .form-group textarea to this rule --- */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    background-color: #f8f8f8; /* Indicate read-only */
+    transition: background-color 0.2s, border-color 0.2s;
+    outline: none;
+    font-family: 'Poppins', sans-serif; /* Ensure textarea inherits font */
+    resize: vertical; /* Allow vertical resize for textarea */
+    min-height: 44px; /* Match input height */
+}
+/* --- END FIX --- */
+
+.form-group input:read-only,
+.form-group textarea:read-only { /* Added textarea */
+    cursor: default;
+    color: #555;
+}
+.form-group input:not(:read-only),
+.form-group textarea:not(:read-only) { /* Added textarea */
+    background-color: #fff;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 1px var(--secondary-color); /* Focus ring */
+}
+
+/* Gender styles */
+.gender-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #666;
+}
+.gender-options {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+.gender-options label {
+    font-size: 0.95rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+.gender-options input[type="radio"] {
+    accent-color: var(--primary-color);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+.gender-options input[type="radio"]:disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.form-actions {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+.form-actions.hidden {
+    display: none;
+}
+
+/* --- ADDED: Select styles (were missing) --- */
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    background-color: #f8f8f8; /* Read-only style */
+    transition: background-color 0.2s, border-color 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23666'%3E%3Cpath d='M8 11.414l-4.707-4.707a1 1 0 0 1 1.414-1.414L8 8.586l3.293-3.293a1 1 0 1 1 1.414 1.414L8 11.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 30px;
+}
+.form-group select:disabled {
+    cursor: default;
+    color: #555;
+    opacity: 1; /* Override default disabled opacity */
+}
+.form-group select:not(:disabled) {
+    background-color: #fff;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 1px var(--secondary-color);
+    cursor: pointer;
+}
+/* --- END ADDED Select --- */

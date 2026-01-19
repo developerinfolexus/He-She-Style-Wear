@@ -1,0 +1,1169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discount Management</title>
+
+    <!-- Use same static folder name as in dashboard (adminpanel/css) -->
+    <link rel="stylesheet" href="{% static 'adminpanel/css/global.css' %}" />
+    <link rel="stylesheet" href="{% static 'adminpanel/css/discount.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+
+    <body>
+        <div class="admin-panel">
+
+            <!-- Sidebar (unchanged) -->
+            {% include 'adminpanel/includes/sidebar.html' %}
+
+            <!-- ⭐ MAIN CONTENT WITH HEADER -->
+            <main class="main-content">
+
+                <!-- ⭐ HEADER (THIS WAS MISSING) -->
+                <header class="main-header">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+
+                    <!-- <h1>Discounts</h1> -->
+                    <h1>Promotions & Offers</h1>
+
+                    <!-- <div class="user-profile">
+                        <img src="https://i.pravatar.cc/50" alt="User Avatar">
+                    </div> -->
+                </header>
+
+                <!-- ⭐ DISCOUNT PAGE CONTENT (unchanged) -->
+                <div class="container" style="margin-top: 20px;">
+
+                    <!-- <h2>Discount & Offers Management</h2> -->
+                    <h2>Promotions & Offers Management</h2>
+
+                    <!-- Top Buttons -->
+                    <div class="discount-tabs">
+                        <button class="tab-btn active" onclick="showTab('runningBannerTab', this)">
+                            Running Banner
+                        </button>
+
+                        <button class="tab-btn" onclick="showTab('rotatingBannerTab', this)">
+                            Rotating Banners
+                        </button>
+
+                        <button class="tab-btn" onclick="showTab('traditionalLookTab', this)">
+                            Traditional Look
+                        </button>
+
+                        <button class="tab-btn" onclick="showTab('couponTab', this)">
+                            Coupon Code
+                        </button>
+                        <button class="tab-btn" onclick="showTab('manageSubcatTab', this)">
+                            Manage Subcategories
+                        </button>
+                    </div>
+
+                    <!-- Running Banner Section -->
+                    <div id="runningBannerTab" class="tab-section active">
+                        <style>
+                            /* Scoped CSS for banner management */
+                            .banner-manager-container {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 20px;
+                            }
+
+                            .add-banner-card {
+                                background: #fff;
+                                padding: 20px;
+                                border-radius: 8px;
+                                border: 1px solid #e0e0e0;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                            }
+
+                            .add-banner-card h3 {
+                                margin-top: 0;
+                                margin-bottom: 15px;
+                                color: #333;
+                                font-size: 1.1rem;
+                            }
+
+                            .banner-input-group {
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            }
+
+                            .banner-input-group input {
+                                flex-grow: 1;
+                                padding: 10px;
+                                border: 1px solid #ccc;
+                                border-radius: 4px;
+                                font-size: 1rem;
+                            }
+
+                            .btn-primary {
+                                background-color: #007bff;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                font-weight: 500;
+                                transition: background-color 0.2s;
+                            }
+
+                            .btn-primary:hover {
+                                background-color: #0056b3;
+                            }
+
+                            .banner-list-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                background: #fff;
+                                border-radius: 8px;
+                                overflow: hidden;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                            }
+
+                            .banner-list-table th,
+                            .banner-list-table td {
+                                padding: 15px;
+                                text-align: left;
+                                border-bottom: 1px solid #eee;
+                            }
+
+                            .banner-list-table th {
+                                background-color: #f8f9fa;
+                                font-weight: 600;
+                                color: #555;
+                            }
+
+                            .banner-status-badge {
+                                padding: 5px 10px;
+                                border-radius: 20px;
+                                font-size: 0.85rem;
+                                font-weight: 500;
+                            }
+
+                            .status-active {
+                                background-color: #e6f4ea;
+                                color: #1e7e34;
+                            }
+
+                            .status-inactive {
+                                background-color: #feeced;
+                                color: #d93025;
+                            }
+
+                            .action-btn {
+                                border: none;
+                                background: none;
+                                cursor: pointer;
+                                font-size: 1rem;
+                                padding: 5px;
+                                margin-right: 5px;
+                                transition: opacity 0.2s;
+                            }
+
+                            .action-btn:hover {
+                                opacity: 0.7;
+                            }
+
+                            .btn-edit {
+                                color: #fbbc04;
+                            }
+
+                            .btn-toggle {
+                                color: #1a73e8;
+                            }
+
+                            .btn-delete {
+                                color: #ea4335;
+                            }
+
+                            /* Toast Notification */
+                            #toast-container {
+                                position: fixed;
+                                bottom: 20px;
+                                right: 20px;
+                                z-index: 9999;
+                            }
+
+                            .toast {
+                                background: #333;
+                                color: #fff;
+                                padding: 12px 24px;
+                                border-radius: 4px;
+                                margin-top: 10px;
+                                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                min-width: 250px;
+                                animation: slideIn 0.3s ease-out;
+                            }
+
+                            .toast.success {
+                                background: #34a853;
+                            }
+
+                            .toast.error {
+                                background: #ea4335;
+                            }
+
+                            @keyframes slideIn {
+                                from {
+                                    transform: translateY(100%);
+                                    opacity: 0;
+                                }
+
+                                to {
+                                    transform: translateY(0);
+                                    opacity: 1;
+                                }
+                            }
+                        </style>
+
+                        <div class="banner-manager-container">
+                            <!-- Add/Edit Form -->
+                            <div class="add-banner-card">
+                                <h3 id="formTitle">Add New Banner</h3>
+                                <form id="bannerForm" method="POST" action="{% url 'save_running_banner' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="bannerId" name="banner_id">
+                                    <div class="banner-input-group">
+                                        <input type="text" id="bannerTextInput" name="bannerText"
+                                            placeholder="Enter banner text here..." required>
+                                        <button type="submit" class="btn-primary" id="saveBannerBtn">Save
+                                            Banner</button>
+                                        <button type="button" class="btn-secondary" id="cancelEditBtn"
+                                            style="display:none; margin-left:10px; padding:10px; cursor:pointer;">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Banner List -->
+                            <table class="banner-list-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60%;">Banner Text</th>
+                                        <th style="width: 15%;">Status</th>
+                                        <th style="width: 25%;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for banner in banners %}
+                                    <tr id="row-{{ banner.id }}">
+                                        <td class="banner-text">{{ banner.text }}</td>
+                                        <td>
+                                            {% if banner.enabled %}
+                                            <span class="banner-status-badge status-active">Active</span>
+                                            {% else %}
+                                            <span class="banner-status-badge status-inactive">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="action-btn btn-edit"
+                                                onclick="editBanner('{{ banner.id }}', '{{ banner.text|escapejs }}')"
+                                                title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn btn-toggle"
+                                                onclick="toggleRunningBanner('{{ banner.id }}')" title="Toggle Status">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                            <button class="action-btn btn-delete"
+                                                onclick="deleteRunningBanner('{{ banner.id }}')" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="3" style="text-align:center; padding: 20px; color: #888;">No
+                                            banners found. Add one above!</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Toast Container -->
+                        <div id="toast-container"></div>
+
+                        <script>
+                            // Inline JS for Banner Management to avoid external file deps for this specific feature
+                            function showToast(message, type = 'success') {
+                                const container = document.getElementById('toast-container');
+                                const toast = document.createElement('div');
+                                toast.className = `toast ${type}`;
+                                toast.innerHTML = `<span>${message}</span>`;
+
+                                container.appendChild(toast);
+
+                                setTimeout(() => {
+                                    toast.style.opacity = '0';
+                                    setTimeout(() => toast.remove(), 300);
+                                }, 3000);
+                            }
+
+                            function editBanner(id, text) {
+                                document.getElementById('formTitle').innerText = 'Edit Banner';
+                                document.getElementById('bannerId').value = id;
+                                document.getElementById('bannerTextInput').value = text;
+                                document.getElementById('saveBannerBtn').innerText = 'Update Banner';
+                                document.getElementById('cancelEditBtn').style.display = 'inline-block';
+                                document.getElementById('bannerTextInput').focus();
+                            }
+
+                            document.getElementById('cancelEditBtn').addEventListener('click', function () {
+                                document.getElementById('formTitle').innerText = 'Add New Banner';
+                                document.getElementById('bannerId').value = '';
+                                document.getElementById('bannerTextInput').value = '';
+                                document.getElementById('saveBannerBtn').innerText = 'Save Banner';
+                                this.style.display = 'none';
+                            });
+
+                            function toggleRunningBanner(id) {
+                                fetch(`/adminpanel/discount/toggle-banner/${id}/`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            showToast('Banner status updated');
+                                            location.reload(); // Simple reload to reflect state, can be optimized later
+                                        } else {
+                                            showToast('Failed to toggle banner', 'error');
+                                        }
+                                    })
+                                    .catch(err => showToast('Error connecting to server', 'error'));
+                            }
+
+                            function deleteRunningBanner(id) {
+                                if (!confirm('Are you sure you want to delete this banner?')) return;
+
+                                fetch(`/adminpanel/discount/delete-banner/${id}/`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            showToast('Banner deleted successfully');
+                                            document.getElementById(`row-${id}`).remove();
+                                        } else {
+                                            showToast('Failed to delete banner', 'error');
+                                        }
+                                    })
+                                    .catch(err => showToast('Error connecting to server', 'error'));
+                            }
+                        </script>
+                    </div>
+
+                    <!-- Rotating Banner Section -->
+                    <div id="rotatingBannerTab" class="tab-section">
+                        <div class="banner-manager-container">
+                            <!-- Add/Edit Form -->
+                            <div class="add-banner-card">
+                                <h3 id="rotatingFormTitle">Add New Rotating Banner</h3>
+                                <form id="rotatingBannerForm" method="POST" action="{% url 'save_rotating_banner' %}"
+                                    enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="rotatingBannerId" name="banner_id">
+
+                                    <div class="form-group">
+                                        <label>Banner Image (Required)</label>
+                                        <input type="file" id="rotatingImage" name="image" accept="image/*">
+                                        <div id="imagePreviewContainer" style="display:none; margin-top:10px;">
+                                            <img id="imagePreview" src=""
+                                                style="max-height: 100px; border: 1px solid #ddd; padding: 2px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="banner-input-group" style="flex-wrap: wrap;">
+                                        <input type="text" id="rotatingTitle" name="title" placeholder="Title"
+                                            style="flex: 1 1 45%;">
+                                        <input type="text" id="rotatingSubtitle" name="subtitle" placeholder="Subtitle"
+                                            style="flex: 1 1 45%;">
+                                        <input type="text" id="rotatingLink" name="link"
+                                            placeholder="Redirect Link (e.g. women or kids)" style="flex: 1 1 45%;">
+
+                                        <select id="rotatingPage" name="page"
+                                            style="flex: 1 1 20%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                                            <option value="home">Home Page</option>
+                                            <option value="women">Women Page</option>
+                                            <option value="kids">Kids Page</option>
+                                        </select>
+
+                                        <input type="number" id="rotatingOrder" name="order" value="0"
+                                            placeholder="Order" style="flex: 1 1 10%;">
+
+                                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                            <input type="checkbox" id="rotatingActive" name="is_active" checked
+                                                style="width: auto;"> Active
+                                        </label>
+                                    </div>
+
+                                    <div style="margin-top: 15px;">
+                                        <button type="submit" class="btn-primary" id="saveRotatingBtn">Save
+                                            Banner</button>
+                                        <button type="button" class="btn-secondary" id="cancelRotatingBtn"
+                                            style="display:none; margin-left:10px; padding:10px; cursor:pointer; background:#eee; border:none; border-radius:4px;">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Rotating Banner List -->
+                            <table class="banner-list-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%;">Image</th>
+                                        <th style="width: 25%;">Title / Page</th>
+                                        <th style="width: 30%;">Link</th>
+                                        <th style="width: 10%;">Order</th>
+                                        <th style="width: 10%;">Status</th>
+                                        <th style="width: 15%;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for banner in rotating_banners %}
+                                    <tr id="r-row-{{ banner.id }}">
+                                        <td>
+                                            {% if banner.image %}
+                                            <img src="{{ banner.image.url }}" alt="Banner"
+                                                style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                            {% else %}
+                                            No Img
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <strong>{{ banner.title }}</strong><br>
+                                            <small style="color:#666;">{{ banner.subtitle }}</small><br>
+                                            <span
+                                                style="font-size:0.8rem; background:#eee; padding:2px 5px; border-radius:3px; margin-top:2px; display:inline-block;">{{
+                                                banner.get_page_display }}</span>
+                                        </td>
+                                        <td style="word-break: break-all; font-size: 0.9rem;">{{ banner.link }}</td>
+                                        <td>{{ banner.order }}</td>
+                                        <td>
+                                            {% if banner.is_active %}
+                                            <span class="banner-status-badge status-active">Active</span>
+                                            {% else %}
+                                            <span class="banner-status-badge status-inactive">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="action-btn btn-edit"
+                                                onclick="editRotatingBanner('{{ banner.id }}', '{{ banner.title|escapejs }}', '{{ banner.subtitle|escapejs }}', '{{ banner.link|escapejs }}', '{{ banner.page }}', '{{ banner.order }}', '{{ banner.is_active|yesno:'true,false' }}', '{% if banner.image %}{{ banner.image.url }}{% endif %}')"
+                                                title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn btn-toggle"
+                                                onclick="toggleRotatingBanner('{{ banner.id }}')" title="Toggle Status">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                            <button class="action-btn btn-delete"
+                                                onclick="deleteRotatingBanner('{{ banner.id }}')" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" style="text-align:center; padding: 20px; color: #888;">No
+                                            rotating banners found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <script>
+                            function editRotatingBanner(id, title, subtitle, link, page, order, isActive, imageUrl) {
+                                document.getElementById('rotatingFormTitle').innerText = 'Edit Rotating Banner';
+                                document.getElementById('rotatingBannerId').value = id;
+                                document.getElementById('rotatingTitle').value = title;
+                                document.getElementById('rotatingSubtitle').value = subtitle;
+                                document.getElementById('rotatingLink').value = link;
+                                document.getElementById('rotatingPage').value = page;
+                                document.getElementById('rotatingOrder').value = order;
+                                document.getElementById('rotatingActive').checked = (isActive === 'true');
+
+                                if (imageUrl) {
+                                    document.getElementById('imagePreview').src = imageUrl;
+                                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                                } else {
+                                    document.getElementById('imagePreviewContainer').style.display = 'none';
+                                }
+
+                                document.getElementById('saveRotatingBtn').innerText = 'Update Banner';
+                                document.getElementById('cancelRotatingBtn').style.display = 'inline-block';
+                                document.getElementById('rotatingImage').scrollIntoView({ behavior: 'smooth' });
+                            }
+
+                            document.getElementById('cancelRotatingBtn').addEventListener('click', function () {
+                                document.getElementById('rotatingFormTitle').innerText = 'Add New Rotating Banner';
+                                document.getElementById('rotatingBannerForm').reset();
+                                document.getElementById('rotatingBannerId').value = '';
+                                document.getElementById('imagePreviewContainer').style.display = 'none';
+                                document.getElementById('saveRotatingBtn').innerText = 'Save Banner';
+                                this.style.display = 'none';
+                            });
+
+                            function toggleRotatingBanner(id) {
+                                fetch(`/adminpanel/discount/rotating-banner/toggle/${id}/`, {
+                                    method: 'POST',
+                                    headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value }
+                                })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) { showToast('Status updated'); location.reload(); }
+                                        else showToast('Failed to toggle', 'error');
+                                    });
+                            }
+
+                            function deleteRotatingBanner(id) {
+                                if (!confirm('Delete this banner?')) return;
+                                fetch(`/adminpanel/discount/rotating-banner/delete/${id}/`, {
+                                    method: 'POST',
+                                    headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value }
+                                })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            showToast('Deleted successfully');
+                                            document.getElementById(`r-row-${id}`).remove();
+                                        } else {
+                                            showToast('Failed to delete', 'error');
+                                        }
+                                    });
+                            }
+                        </script>
+                    </div>
+
+                </div>
+
+                <!-- Traditional Look Section -->
+                <div id="traditionalLookTab" class="tab-section">
+                    <style>
+                        /* Scoped CSS for Product Selection Modal in Traditional Look */
+                        .product-modal {
+                            display: none;
+                            position: fixed;
+                            z-index: 10000;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            height: 100%;
+                            overflow: auto;
+                            background-color: rgba(0, 0, 0, 0.5);
+                        }
+
+                        .product-modal-content {
+                            background-color: #fefefe;
+                            margin: 10% auto;
+                            padding: 20px;
+                            border: 1px solid #888;
+                            width: 80%;
+                            max-width: 900px;
+                            border-radius: 8px;
+                            max-height: 80vh;
+                            display: flex;
+                            flex-direction: column;
+                        }
+
+                        .product-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                            gap: 15px;
+                            margin-top: 15px;
+                            overflow-y: auto;
+                            max-height: 60vh;
+                        }
+
+                        .product-card {
+                            border: 1px solid #ddd;
+                            padding: 10px;
+                            border-radius: 4px;
+                            text-align: center;
+                            cursor: pointer;
+                            transition: box-shadow 0.2s;
+                        }
+
+                        .product-card:hover {
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                        }
+
+                        .product-card img {
+                            width: 100%;
+                            height: 120px;
+                            object-fit: cover;
+                            border-radius: 4px;
+                            margin-bottom: 8px;
+                        }
+
+                        .product-card h4 {
+                            font-size: 0.9rem;
+                            margin: 5px 0;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+
+                        .product-card p {
+                            font-size: 0.85rem;
+                            color: #666;
+                            margin: 0;
+                        }
+
+                        .selected-product-preview {
+                            display: flex;
+                            align-items: center;
+                            gap: 15px;
+                            padding: 10px;
+                            border: 1px solid #ccc;
+                            border-radius: 4px;
+                            margin-top: 5px;
+                            background: #f9f9f9;
+                        }
+
+                        .selected-product-preview img {
+                            width: 50px;
+                            height: 50px;
+                            object-fit: cover;
+                            border-radius: 4px;
+                        }
+
+                        .close-modal-btn {
+                            color: #aaa;
+                            float: right;
+                            font-size: 28px;
+                            font-weight: bold;
+                            cursor: pointer;
+                        }
+
+                        .close-modal-btn:hover {
+                            color: black;
+                        }
+                    </style>
+
+                    <div class="banner-manager-container">
+                        <!-- Add/Edit Form -->
+                        <div class="add-banner-card">
+                            <h3 id="traditionalFormTitle">Add Traditional Look Item</h3>
+                            <form id="traditionalLookForm" method="POST" action="{% url 'save_traditional_look' %}"
+                                enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" id="traditionalLookId" name="look_id">
+
+                                <div class="form-group">
+                                    <label>Image (Required)</label>
+                                    <input type="file" id="traditionalImage" name="image" accept="image/*">
+                                    <div id="traditionalPreviewContainer" style="display:none; margin-top:10px;">
+                                        <img id="traditionalPreview" src=""
+                                            style="max-height: 100px; border: 1px solid #ddd; padding: 2px;">
+                                    </div>
+                                </div>
+
+                                <div class="banner-input-group" style="flex-wrap: wrap;">
+                                    <input type="text" id="traditionalTitle" name="title" placeholder="Title (Optional)"
+                                        style="flex: 1 1 45%;">
+
+                                    <!-- Replaced Link Input with Product Selection -->
+                                    <div style="flex: 1 1 45%;">
+                                        <input type="hidden" id="selectedProductId" name="product_id">
+                                        <button type="button" class="btn-secondary" onclick="openProductModal()"
+                                            style="padding: 10px; width: 100%;">Select Product to Redirect</button>
+                                        <div id="selectedProductDisplay" class="selected-product-preview"
+                                            style="display:none;">
+                                            <img id="selProdImg" src="" alt="">
+                                            <div>
+                                                <strong id="selProdName"></strong><br>
+                                                <small id="selProdPrice"></small>
+                                            </div>
+                                            <button type="button" onclick="clearSelectedProduct()"
+                                                style="margin-left:auto; border:none; background:none; cursor:pointer; color:red;">&times;</button>
+                                        </div>
+                                    </div>
+
+                                    <input type="number" id="traditionalOrder" name="order" value="0"
+                                        placeholder="Order" style="flex: 1 1 10%;">
+
+                                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="checkbox" id="traditionalActive" name="is_active" checked
+                                            style="width: auto;"> Active
+                                    </label>
+                                </div>
+
+                                <div style="margin-top: 15px;">
+                                    <button type="submit" class="btn-primary" id="saveTraditionalBtn">Save Item</button>
+                                    <button type="button" class="btn-secondary" id="cancelTraditionalBtn"
+                                        style="display:none; margin-left:10px; padding:10px; cursor:pointer; background:#eee; border:none; border-radius:4px;">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Traditional Look List -->
+                        <table class="banner-list-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%;">Image</th>
+                                    <th style="width: 25%;">Title</th>
+                                    <th style="width: 30%;">Redirect Product</th>
+                                    <th style="width: 10%;">Order</th>
+                                    <th style="width: 10%;">Status</th>
+                                    <th style="width: 10%;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for look in traditional_looks %}
+                                <tr id="t-row-{{ look.id }}">
+                                    <td>
+                                        {% if look.image %}
+                                        <img src="{{ look.image.url }}" alt="Look"
+                                            style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                        {% else %}
+                                        No Img
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>{{ look.title }}</strong></td>
+                                    <td>
+                                        {% if look.product %}
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <img src="{{ look.product.image.url }}"
+                                                style="width:30px; height:30px; object-fit:cover; border-radius:2px;">
+                                            <span>{{ look.product.name }}</span>
+                                        </div>
+                                        {% else %}
+                                        <span style="color:#999;">No Product Selected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ look.order }}</td>
+                                    <td>
+                                        {% if look.is_active %}
+                                        <span class="banner-status-badge status-active">Active</span>
+                                        {% else %}
+                                        <span class="banner-status-badge status-inactive">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="action-btn btn-edit"
+                                            onclick="editTraditionalLook('{{ look.id }}', '{{ look.title|escapejs }}', '{% if look.product %}{{ look.product.id }}{% endif %}', '{{ look.order }}', '{{ look.is_active|yesno:'true,false' }}', '{% if look.image %}{{ look.image.url }}{% endif %}', '{% if look.product %}{{ look.product.name|escapejs }}{% endif %}', '{% if look.product %}{{ look.product.image.url }}{% endif %}', '{% if look.product %}{{ look.product.discount_price|default:look.product.price }}{% endif %}')"
+                                            title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn btn-toggle"
+                                            onclick="toggleTraditionalLook('{{ look.id }}')" title="Toggle Status">
+                                            <i class="fas fa-power-off"></i>
+                                        </button>
+                                        <button class="action-btn btn-delete"
+                                            onclick="deleteTraditionalLook('{{ look.id }}')" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" style="text-align:center; padding: 20px; color: #888;">No
+                                        traditional look items found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Product Selection Modal -->
+                    <div id="productSelectionModal" class="product-modal">
+                        <div class="product-modal-content">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h2>Select Product</h2>
+                                <span class="close-modal-btn" onclick="closeProductModal()">&times;</span>
+                            </div>
+                            <input type="text" id="productSearchInput" placeholder="Search products..."
+                                onkeyup="filterProducts()"
+                                style="padding:10px; margin-top:10px; width:100%; box-sizing:border-box;">
+                            <div id="modalProductGrid" class="product-grid">
+                                <p style="text-align:center; width:100%;">Loading products...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        let allProducts = [];
+
+                        function openProductModal() {
+                            document.getElementById('productSelectionModal').style.display = 'block';
+                            if (allProducts.length === 0) {
+                                fetchProducts();
+                            }
+                        }
+
+                        function closeProductModal() {
+                            document.getElementById('productSelectionModal').style.display = 'none';
+                        }
+
+                        function fetchProducts() {
+                            fetch('/adminpanel/api/products/')
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.products) {
+                                        allProducts = data.products;
+                                        renderProductGrid(allProducts);
+                                    }
+                                })
+                                .catch(err => console.error("Error fetching products:", err));
+                        }
+
+                        function renderProductGrid(products) {
+                            const grid = document.getElementById('modalProductGrid');
+                            grid.innerHTML = '';
+                            if (products.length === 0) {
+                                grid.innerHTML = '<p style="text-align:center; width:100%;">No products found.</p>';
+                                return;
+                            }
+                            products.forEach(p => {
+                                const card = document.createElement('div');
+                                card.className = 'product-card';
+                                const price = p.discount_price ? p.discount_price : p.price;
+                                card.innerHTML = `
+                                    <img src="${p.image_url || '/static/customer/images/placeholder.jpg'}" alt="${p.name}">
+                                    <h4>${p.name}</h4>
+                                    <p>$${price}</p>
+                                    <button class="btn-primary" style="margin-top:5px; padding:5px 10px; font-size:0.8rem;" type="button">Select</button>
+                                `;
+                                card.onclick = () => selectProduct(p);
+                                grid.appendChild(card);
+                            });
+                        }
+
+                        function filterProducts() {
+                            const query = document.getElementById('productSearchInput').value.toLowerCase();
+                            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
+                            renderProductGrid(filtered);
+                        }
+
+                        function selectProduct(product) {
+                            document.getElementById('selectedProductId').value = product.id;
+
+                            // Update Display
+                            const disp = document.getElementById('selectedProductDisplay');
+                            document.getElementById('selProdImg').src = product.image_url || '/static/customer/images/placeholder.jpg';
+                            document.getElementById('selProdName').innerText = product.name;
+                            const price = product.discount_price ? product.discount_price : product.price;
+                            document.getElementById('selProdPrice').innerText = '₹' + price;
+
+                            disp.style.display = 'flex';
+                            closeProductModal();
+                        }
+
+                        function clearSelectedProduct() {
+                            document.getElementById('selectedProductId').value = '';
+                            document.getElementById('selectedProductDisplay').style.display = 'none';
+                        }
+
+                        function editTraditionalLook(id, title, productId, order, isActive, imageUrl, prodName, prodImg, prodPrice) {
+                            document.getElementById('traditionalFormTitle').innerText = 'Edit Item';
+                            document.getElementById('traditionalLookId').value = id;
+                            document.getElementById('traditionalTitle').value = title;
+                            document.getElementById('traditionalOrder').value = order;
+                            document.getElementById('traditionalActive').checked = (isActive === 'true');
+
+                            if (imageUrl) {
+                                document.getElementById('traditionalPreview').src = imageUrl;
+                                document.getElementById('traditionalPreviewContainer').style.display = 'block';
+                            } else {
+                                document.getElementById('traditionalPreviewContainer').style.display = 'none';
+                            }
+
+                            // Set Selected Product
+                            if (productId) {
+                                document.getElementById('selectedProductId').value = productId;
+                                document.getElementById('selProdImg').src = prodImg;
+                                document.getElementById('selProdName').innerText = prodName;
+                                document.getElementById('selProdPrice').innerText = '₹' + prodPrice;
+                                document.getElementById('selectedProductDisplay').style.display = 'flex';
+                            } else {
+                                clearSelectedProduct();
+                            }
+
+                            document.getElementById('saveTraditionalBtn').innerText = 'Update Item';
+                            document.getElementById('cancelTraditionalBtn').style.display = 'inline-block';
+                            document.getElementById('traditionalImage').scrollIntoView({ behavior: 'smooth' });
+                        }
+
+                        document.getElementById('cancelTraditionalBtn').addEventListener('click', function () {
+                            document.getElementById('traditionalFormTitle').innerText = 'Add Traditional Look Item';
+                            document.getElementById('traditionalLookForm').reset();
+                            document.getElementById('traditionalLookId').value = '';
+                            document.getElementById('traditionalPreviewContainer').style.display = 'none';
+                            clearSelectedProduct();
+                            document.getElementById('saveTraditionalBtn').innerText = 'Save Item';
+                            this.style.display = 'none';
+                        });
+
+                        function toggleTraditionalLook(id) {
+                            fetch(`/adminpanel/discount/traditional-look/toggle/${id}/`, {
+                                method: 'POST',
+                                headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value }
+                            })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) { showToast('Status updated'); location.reload(); }
+                                    else showToast('Failed to toggle', 'error');
+                                });
+                        }
+
+                        function deleteTraditionalLook(id) {
+                            if (!confirm('Delete this item?')) return;
+                            fetch(`/adminpanel/discount/traditional-look/delete/${id}/`, {
+                                method: 'POST',
+                                headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value }
+                            })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        showToast('Deleted successfully');
+                                        document.getElementById(`t-row-${id}`).remove();
+                                    } else {
+                                        showToast('Failed to delete', 'error');
+                                    }
+                                });
+                        }
+
+                        // Close modal on outside click
+                        window.onclick = function (event) {
+                            const modal = document.getElementById('productSelectionModal');
+                            if (event.target == modal) {
+                                modal.style.display = "none";
+                            }
+                        }
+                    </script>
+                </div>
+
+                <div id="couponTab" class="tab-section">
+
+                    <!-- ⭐ Women + Kids Buttons -->
+                    <div class="coupon-extra-btns">
+                        <button class="gender-btn" onclick="openWomenCategories()">Women</button>
+                        <button class="gender-btn" onclick="openKidsCategories()">Kids</button>
+                    </div>
+
+                    <!-- Women Subcategories + Coupon Form -->
+                    <div id="womenCategoryBox" class="women-box hidden">
+                        <h3>Select Women Subcategory</h3>
+                        <select id="womenSubcatSelect" class="coupon-code-input">
+                            <option value="" disabled selected>Select subCategory</option>
+                            {% for cat in women_categories %}
+                            <option value="{{ cat|escape }}">{{ cat }}</option>
+                            {% empty %}
+                            <option disabled>No categories found</option>
+                            {% endfor %}
+                        </select>
+
+                        <h3 style="margin-top:15px;">Add Coupon</h3>
+                        <div class="women-coupon-entry">
+                            <input type="text" id="womenCouponCode" class="coupon-code-input" placeholder="Coupon Code">
+                            <input type="number" id="womenDiscount" class="coupon-amount-input" placeholder="Discount">
+                            <select id="womenDiscountUnit" class="coupon-unit-select">
+                                <option value="%">%</option>
+                                <option value="INR">₹</option>
+                            </select>
+                            <button class="save-btn" onclick="addWomenCoupon()">Add</button>
+                        </div>
+                        <!-- Added Coupons List -->
+                        <div id="womenCouponList" class="coupon-list"></div>
+                    </div>
+
+                    <!-- Kids Subcategories + Coupon Form -->
+                    <div id="kidsCategoryBox" class="kids-box kids-hidden">
+                        <h3>Select Kids Subcategory</h3>
+                        <select id="kidsSubcatSelect" class="kids-code-input">
+                            <option value="" disabled selected>Select Category</option>
+                            <option value="Boys Wear">Boys Wear</option>
+                            <option value="Girls Wear">Girls Wear</option>
+                            <option value="Infant Wear">Infant Wear</option>
+                            <option value="School Wear">School Wear</option>
+                            <option value="Winter Wear">Winter Wear</option>
+                        </select>
+                        <h3 style="margin-top:15px;">Add Kids Coupon</h3>
+                        <div class="kids-coupon-entry">
+                            <input type="text" id="kidsCouponCode" class="kids-code-input" placeholder="Coupon Code">
+                            <input type="number" id="kidsDiscount" class="kids-amount-input" placeholder="Discount">
+                            <select id="kidsDiscountUnit" class="kids-unit-select">
+                                <option value="%">%</option>
+                                <option value="INR">₹</option>
+                            </select>
+                            <button class="save-btn" onclick="addKidsCoupon()">Add</button>
+                        </div>
+                        <!-- Kids Coupon List -->
+                        <div id="kidsCouponList" class="kids-coupon-list"></div>
+                    </div>
+                </div>
+
+                <!-- NEW: Manage Subcategories Section -->
+                <div id="manageSubcatTab" class="tab-section">
+                    <div class="card">
+                        <h2>Manage Subcategories</h2>
+
+                        <div class="subcat-controls" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <button class="gender-btn active" id="subcatWomenBtn"
+                                onclick="toggleSubcatGender('women')">Women</button>
+                            <button class="gender-btn" id="subcatKidsBtn"
+                                onclick="toggleSubcatGender('kids')">Kids</button>
+                            <div style="flex-grow: 1;"></div>
+                            <button class="save-btn" onclick="openSubcatModal()">+ Add Subcategory</button>
+                        </div>
+
+                        <div id="subcatList" class="subcat-list-grid">
+                            <!-- Populated via JS -->
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subcategory Modal -->
+                <div id="subcatModal" class="custom-modal hidden">
+                    <div class="modal-content">
+                        <span class="close-modal" onclick="closeSubcatModal()">&times;</span>
+                        <h3 id="subcatModalTitle">Add Subcategory</h3>
+                        <form id="subcatForm" onsubmit="saveSubcategory(event)">
+                            <input type="hidden" id="editSubcatId">
+                            <input type="hidden" id="editSubcatGender" value="women">
+
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" id="subcatName" required placeholder="e.g. Saree">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Image</label>
+                                <input type="file" id="subcatImage" accept="image/*">
+                                <img id="subcatPreview" src=""
+                                    style="max-width: 100px; display: none; margin-top: 10px; border-radius: 5px;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="subcatActive" checked> Active
+                                </label>
+                            </div>
+
+                            <button type="submit" class="save-btn" style="width: 100%; margin-top: 10px;">Save</button>
+                        </form>
+                    </div>
+                </div>
+
+                <style>
+                    /* CSS for the new section */
+                    .subcat-list-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                        gap: 20px;
+                    }
+
+                    .subcat-card {
+                        background: #fff;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        padding: 10px;
+                        text-align: center;
+                        position: relative;
+                    }
+
+                    .subcat-card img {
+                        width: 100%;
+                        height: 150px;
+                        object-fit: cover;
+                        border-radius: 4px;
+                        margin-bottom: 10px;
+                    }
+
+                    .subcat-card h4 {
+                        margin: 5px 0;
+                        font-size: 16px;
+                    }
+
+                    .subcat-actions {
+                        display: flex;
+                        justify-content: center;
+                        gap: 10px;
+                        margin-top: 10px;
+                    }
+
+                    .custom-modal {
+                        position: fixed;
+                        z-index: 1000;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: rgba(0, 0, 0, 0.5);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    .custom-modal.hidden {
+                        display: none;
+                    }
+
+                    .modal-content {
+                        background: #fff;
+                        padding: 20px;
+                        border-radius: 8px;
+                        width: 400px;
+                        position: relative;
+                    }
+
+                    .close-modal {
+                        position: absolute;
+                        right: 15px;
+                        top: 10px;
+                        font-size: 24px;
+                        cursor: pointer;
+                    }
+
+                    .form-group {
+                        margin-bottom: 15px;
+                        text-align: left;
+                    }
+
+                    .form-group label {
+                        display: block;
+                        margin-bottom: 5px;
+                        font-weight: bold;
+                    }
+
+                    .form-group input[type="text"] {
+                        width: 100%;
+                        padding: 8px;
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                    }
+                </style>
+
+
+
+            </main>
+        </div>
+
+        <script src="{% static 'adminpanel/js/discount.js' %}"></script>
+        <script src="{% static 'adminpanel/js/global.js' %}"></script>
+
+    </body>
+
+</html>

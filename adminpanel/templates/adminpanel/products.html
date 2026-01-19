@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Admin Panel - Products</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/products.css' %}">
+</head>
+
+<body>
+    <div class="admin-panel">
+        {% include 'adminpanel/includes/sidebar.html' %}
+
+        <main class="main-content">
+            <header class="main-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+                <h1>Products</h1>
+                <!-- <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://i.pravatar.cc/40" alt="User Avatar">
+                </div> -->
+            </header>
+
+            <div class="page-content active" id="products-page">
+                <section class="recent-orders">
+                    <div class="content-header">
+                        <h2>All Products</h2>
+                        <div class="header-actions">
+                            <a href="{% url 'admin_add_product' %}" class="btn btn-primary" id="addProductBtn">Add New
+                                Product</a>
+                            {% comment %} <a href="{% url 'admin_addmedia' %}" class="btn btn-primary">Add Media</a>
+                            {% endcomment %}
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product ID</th>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Regular Price</th>
+                                    <th>Offer Price</th>
+                                    <th>Customer Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-list-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div id="deleteConfirmModal" class="modal">
+                <div class="modal-content" style="max-width: 450px;">
+                    <div class="modal-header">
+                        <h2>Delete Product</h2>
+                        <span class="modal-close" id="deleteModalCloseBtn">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this product? This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
+                        <button id="confirmDeleteBtn" class="btn btn-danger">Delete Product</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="productViewModal" class="modal">
+                <div class="modal-content modal-content-lg">
+                    <div class="modal-header">
+                        <h2 id="modalProductName">Product Details</h2>
+                        <span class="modal-close" id="productModalCloseBtn">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="product-details-layout">
+
+                            <div id="modalProductImageContainer" class="info-section full-width modal-image-container">
+                            </div>
+
+                            <div class="info-section">
+                                <h3>Pricing & Stock</h3>
+                                <div class="payment-summary">
+                                    <span>Regular Price:</span>
+                                    <span id="modalProductPrice"></span>
+                                </div>
+                                <div class="payment-summary">
+                                    <span>Sale Price:</span>
+                                    <span id="modalProductSalePrice"></span>
+                                </div>
+                                <div class="payment-summary">
+                                    <span>Status:</span>
+                                    <span id="modalProductStatus"></span>
+                                </div>
+                                <div class="payment-summary total">
+                                    <span>Quantity in Stock:</span>
+                                    <span id="modalProductQuantity"></span>
+                                </div>
+                                <hr>
+                                <p><strong>SKU:</strong> <span id="modalProductSku"></span></p>
+                                <p><strong>Code:</strong> <span id="modalProductCode"></span></p>
+                            </div>
+
+                            <div class="info-section">
+                                <h3>Details</h3>
+                                <p><strong>Description:</strong> <span id="modalProductDesc"></span></p>
+                                <hr>
+                                <p><strong>Category:</strong> <span id="modalProductCategory"></span></p>
+                                <p><strong>Gender:</strong> <span id="modalProductGender"></span></p>
+                                <p><strong>Sizes:</strong> <span id="modalProductSizes"></span></p>
+                                <p><strong>Tags:</strong> <span id="modalProductTags"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="modalEditBtn" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Edit Product
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="imageLightbox" class="lightbox">
+                <span class="lightbox-close" id="lightboxCloseBtn">&times;</span>
+                <img class="lightbox-content" id="lightboxImage" src="" alt="Full-screen product image">
+            </div>
+
+        </main>
+    </div>
+
+    <script src="{% static 'adminpanel/js/products.js' %}"></script>
+    <script src="{% static 'adminpanel/js/global.js' %}"></script>
+</body>
+
+</html>

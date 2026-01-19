@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Results - HE SHE STYLES</title>
+  <link rel="icon" href="{% static 'customer/images/logo.png' %}" type="image/png">
+  <link rel="stylesheet" href="{% static 'customer/css/search.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <style>
+    /* --- START OF MODIFICATION --- */
+    /* Override search.css max-width to match full-width layout in images */
+    .product-listing-content {
+      max-width: none;
+      /* Remove the 1200px constraint */
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    /* Ensure the main container has the 1500px max-width and centering */
+    main.container {
+      max-width: 1500px;
+      /* Match header max-width */
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* --- END OF MODIFICATION --- */
+  </style>
+</head>
+
+<body data-header-url="{% url 'api_header' %}">
+  <div id="header-placeholder"></div>
+
+  <main class="container">
+    <div class="listing-header" id="results-header">
+    </div>
+
+    <div class="product-listing-content">
+      <aside class="filter-sidebar">
+        <div class="sidebar-title">FILTERS</div>
+        <div class="filter-accordion-item open">
+          <div class="filter-header">Price<i class="fas fa-plus"></i></div>
+          <div class="filter-content" style="max-height: initial;">
+            <ul>
+              <li><label><input type="checkbox" name="price" value="under_80" /> Under CA$80</label></li>
+              <li><label><input type="checkbox" name="price" value="80_160" /> CA$80 - CA$160</label></li>
+              <li><label><input type="checkbox" name="price" value="over_160" /> Over CA$160</label></li>
+            </ul>
+          </div>
+        </div>
+        <div class="filter-accordion-item open">
+          <div class="filter-header">Category<i class="fas fa-plus"></i></div>
+          <div class="filter-content" style="max-height: initial;">
+            <ul>
+              <li><label><input type="checkbox" name="category" value="sarees" /> Sarees</label></li>
+              <li><label><input type="checkbox" name="category" value="kurtis" /> Kurtis & Kurta Sets</label></li>
+              <li><label><input type="checkbox" name="category" value="lehengas" /> Lehengas</label></li>
+              <li><label><input type="checkbox" name="category" value="dresses" /> Dresses</label></li>
+              <li><label><input type="checkbox" name="category" value="gowns" /> Gowns</label></li>
+              <li><label><input type="checkbox" name="category" value="western" /> Western Wear</label></li>
+              <li><label><input type="checkbox" name="category" value="dupatta" /> Dupatta</label></li>
+
+
+              <li><label><input type="checkbox" name="category" value="onesie" />Onesie(kids)</label></li>
+              <li><label><input type="checkbox" name="category" value="party_wear" /> Party Wear(kids)</label></li>
+              <li><label><input type="checkbox" name="category" value="shorts" /> Shorts(kids)</label></li>
+              <li><label><input type="checkbox" name="category" value="winter_wear" /> Winter Wear(kids)</label></li>
+              <li><label><input type="checkbox" name="category" value="t-shirts" /> T-Shirts (kids)</label></li>
+              <li><label><input type="checkbox" name="category" value="jeans" /> Jeans (kids)</label></li>
+              <li><label><input type="checkbox" name="category" value="traditional_wear" /> Traditional Wear
+                  (kids)</label></li>
+            </ul>
+          </div>
+        </div>
+
+        {% comment %} <div class="filter-accordion-item">
+          <div class="filter-header">Color<i class="fas fa-plus"></i></div>
+          <div class="filter-content">
+            <ul>
+              <li><label><input type="checkbox" name="color" value="pink" /> Pink</label></li>
+              <li><label><input type="checkbox" name="color" value="blue" /> Blue</label></li>
+              <li><label><input type="checkbox" name="color" value="green" /> Green</label></li>
+              <li><label><input type="checkbox" name="color" value="red" /> Red</label></li>
+              <li><label><input type="checkbox" name="color" value="gold" /> Gold</label></li>
+              <li><label><input type="checkbox" name="color" value="yellow" /> Yellow</label></li>
+              <li><label><input type="checkbox" name="color" value="black" /> Black</label></li>
+              <li><label><input type="checkbox" name="color" value="white" /> White</label></li>
+              <li><label><input type="checkbox" name="color" value="beige" /> Beige/Cream</label></li>
+              <li><label><input type="checkbox" name="color" value="grey" /> Grey</label></li>
+              <li><label><input type="checkbox" name="color" value="purple" /> Purple</label></li>
+              <li><label><input type="checkbox" name="color" value="orange" /> Orange</label></li>
+              <li><label><input type="checkbox" name="color" value="teal" /> Teal</label></li>
+              <li><label><input type="checkbox" name="color" value="multi" /> Multi-Color</label></li>
+            </ul>
+          </div>
+        </div> {% endcomment %}
+      </aside>
+
+      <section class="products-area">
+        <div class="mobile-filter-sort">
+          <button id="mobile-filter-trigger"><i class="fas fa-filter"></i> Filter</button>
+          <select id="mobile-sort-select">
+            <option value="relevance">Sort: Relevance</option>
+            <option value_asc">Price: Low to High</option>
+            <option value_desc">Price: High to Low</option>
+          </select>
+        </div>
+        <div class="desktop-sort-bar">
+          <label for="desktop-sort-select">Sort By:</label>
+          <select id="desktop-sort-select">
+            <option value="relevance">Relevance</option>
+            <option value_asc">Price: Low to High</option>
+            <option value_desc">Price: High to Low</option>
+            <option value="newest">Newest Arrivals</option>
+          </select>
+        </div>
+
+        <div class="product-grid" id="product-grid">
+          {% if products %}
+          {% for p in products %}
+          <div class="product-card">
+            <a href="/product/{{ p.id }}/">
+              <img src="{{ p.image.url }}" alt="{{ p.name }}">
+              <h3>{{ p.name }}</h3>
+              <p>CA${{ p.price }}</p>
+            </a>
+          </div>
+          {% endfor %}
+          {% else %}
+          <p>No items found for "{{ query }}"</p>
+          {% endif %}
+        </div>
+
+
+        <div class="mobile-filter-overlay" id="mobile-filter-overlay"></div>
+        <div class="mobile-filter-drawer" id="mobile-filter-drawer">
+          <div class="mobile-filter-header">
+            <h3>Filters</h3>
+            <button class="close-filter-btn" id="close-filter-btn">&times;</button>
+          </div>
+          <div class="mobile-filter-content" id="mobile-filter-content">
+          </div>
+          <div class="mobile-filter-footer">
+            <button class="apply-filters-btn" id="apply-filters-btn">Apply Filters</button>
+          </div>
+        </div>
+
+  </main>
+
+  <div class="whatsapp-container">
+    <div class="whatsapp-tooltip">Need More Information</div>
+    <a href="https://wa.me/17808864821" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </div>
+  {% include 'customer/footer.html' %}
+
+  <div id="reviews-modal-overlay" class="reviews-modal-overlay">
+    <div class="reviews-modal">
+      <div class="reviews-modal-header">
+        <h2>Customer Reviews</h2>
+        <button id="close-reviews-modal" class="close-reviews-modal">&times;</button>
+      </div>
+      <div class="reviews-modal-body">
+        <div class="reviews-grid">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="{% static 'customer/js/search.js' %}"></script>
+
+  <script>
+    const headerUrl = document.body.dataset.headerUrl || '/api/header/';
+    fetch(headerUrl)
+      .then(response => {
+        if (!response.ok) { throw new Error('Network response was not ok loading header'); }
+        return response.text();
+      })
+      .then(data => {
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        if (headerPlaceholder) {
+          headerPlaceholder.innerHTML = data;
+
+          // Re-initialize all dynamic header parts.
+          // These functions are all defined in the js/search.js file
+          // which was loaded just before this script block.
+
+          if (typeof setupSearchFunctionality === 'function') {
+            setupSearchFunctionality();
+          }
+          if (typeof setupProfileDropdown === 'function') {
+            setupProfileDropdown();
+          }
+          if (typeof setupMobileMenuToggle === 'function') {
+            setupMobileMenuToggle();
+          }
+
+          // --- THIS IS THE FIX ---
+          // This function (defined in js/search.js) initializes the region flag.
+          if (typeof setupRegionFlagAndListeners === 'function') {
+            setupRegionFlagAndListeners();
+          }
+          // --- END FIX ---
+
+          // Update counts (also defined in js/search.js)
+          if (typeof updateCartCount === 'function') {
+            updateCartCount();
+          }
+          if (typeof updateWishlistCount === 'function') {
+            updateWishlistCount();
+          }
+
+          // Remove active class from nav links on this page
+          const navLinks = headerPlaceholder.querySelectorAll(".main-nav li");
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+          });
+
+        } else {
+          console.error('Header placeholder element (#header-placeholder) not found.');
+        }
+      })
+      .catch(error => console.error('Error loading header:', error));
+  </script>
+</body>
+
+</html>

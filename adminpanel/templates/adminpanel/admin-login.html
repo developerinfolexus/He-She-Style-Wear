@@ -1,0 +1,471 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>He She Style Wear | Admin Access</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa, #e6ebf1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 35px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo img {
+            height: 90px;
+            margin-bottom: 6px;
+        }
+
+        .logo h2 {
+            font-size: 20px;
+            letter-spacing: 2px;
+            color: #111;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .heading h1 {
+            font-size: 22px;
+            color: #111;
+        }
+
+        .heading p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.6);
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #000;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: #000;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .link {
+            margin-top: 14px;
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .link a {
+            color: #444;
+            text-decoration: none;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: #d9534f;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* Custom Modal */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .custom-modal {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .custom-modal h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .custom-modal p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .custom-modal button {
+            padding: 10px 20px;
+            border: none;
+            background: #000;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .custom-modal.error h3 {
+            color: #d9534f;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- LOGO -->
+        <div class="logo">
+            <img src="{% static 'adminpanel/images/he_she.png' %}">
+            <h2>He She Style Wear</h2>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="loginForm">
+            <div class="heading">
+                <h1>Admin Login</h1>
+                <p>Sign in to manage your boutique</p>
+            </div>
+
+            <form action="{% url 'admin_login' %}" method="POST" autocomplete="off">
+                {% csrf_token %}
+                {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+                <div class="input-group">
+                    <label>Username / Email</label>
+                    <input type="text" name="username" placeholder="Enter username or email" autocomplete="off"
+                        required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Enter admin password" autocomplete="off"
+                        required>
+                </div>
+
+                <button class="btn">Login</button>
+
+                <div class="link">
+                    <a href="#" onclick="showForgot()">Forgot password?</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- FORGOT PASSWORD -->
+        <div id="forgotForm" class="hidden">
+            <div class="heading">
+                <h1>Forgot Password</h1>
+                <p>Enter email to receive OTP</p>
+            </div>
+
+            <form onsubmit="showOtp(event)">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" required>
+                </div>
+
+                <button class="btn">Send OTP</button>
+
+                <div class="link">
+                    <a href="#" onclick="showLogin()">← Back to login</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- OTP -->
+        <div id="otpForm" class="hidden">
+            <div class="heading">
+                <h1>Verify OTP</h1>
+                <p>Enter the code sent to email</p>
+            </div>
+
+            <form onsubmit="showReset(event)">
+                <div class="input-group">
+                    <label>OTP</label>
+                    <input type="text" maxlength="6" required>
+                </div>
+
+                <button class="btn">Verify</button>
+            </form>
+        </div>
+
+        <!-- RESET PASSWORD -->
+        <div id="resetForm" class="hidden">
+            <div class="heading">
+                <h1>Reset Password</h1>
+                <p>Create a new password</p>
+            </div>
+
+            <form>
+                <div class="input-group">
+                    <label>New Password</label>
+                    <input type="password" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" required>
+                </div>
+
+                <button class="btn">Update Password</button>
+
+                <div class="link">
+                    <a href="#" onclick="showLogin()">← Back to login</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div id="customModal" class="custom-modal-overlay">
+        <div class="custom-modal">
+            <h3 id="modalTitle">Title</h3>
+            <p id="modalMsg">Message</p>
+            <button onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Custom Modal
+        const modal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMsg = document.getElementById('modalMsg');
+        const modalBox = modal.querySelector('.custom-modal');
+
+        function showModal(title, msg, isError = false) {
+            modalTitle.textContent = title;
+            modalMsg.textContent = msg;
+            if (isError) {
+                modalBox.classList.add('error');
+            } else {
+                modalBox.classList.remove('error');
+            }
+            modal.style.display = 'flex';
+        }
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Forms
+        const loginForm = document.getElementById('loginForm');
+        const forgotForm = document.getElementById('forgotForm');
+        const otpForm = document.getElementById('otpForm');
+        const resetForm = document.getElementById('resetForm');
+        let resetEmail = '';
+
+        function showForgot() {
+            loginForm.classList.add('hidden');
+            forgotForm.classList.remove('hidden');
+            if (forgotForm.querySelector('input')) forgotForm.querySelector('input').value = '';
+        }
+        function showLogin() {
+            forgotForm.classList.add('hidden');
+            otpForm.classList.add('hidden');
+            resetForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        }
+
+        async function showOtp(e) {
+            e.preventDefault();
+            const emailInput = forgotForm.querySelector('input[type="email"]') || forgotForm.querySelector('input');
+            resetEmail = emailInput.value;
+
+            if (!resetEmail) {
+                showModal('Error', 'Please enter your email', true);
+                return;
+            }
+
+            const btn = forgotForm.querySelector('button');
+            const originalText = btn.textContent;
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/adminpanel/api/forgot-password/generate/', {
+                    method: 'POST',
+                    body: JSON.stringify({ email: resetEmail })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showModal('OTP Sent', data.message);
+                    forgotForm.classList.add('hidden');
+                    otpForm.classList.remove('hidden');
+                    if (otpForm.querySelector('input')) otpForm.querySelector('input').value = '';
+                } else {
+                    showModal('Error', data.message, true);
+                }
+            } catch (err) {
+                showModal('Error', 'Network error. Please try again.', true);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function showReset(e) {
+            e.preventDefault();
+            const otpInput = otpForm.querySelector('input').value;
+            if (!otpInput || otpInput.length < 6) {
+                showModal('Error', 'Enter valid 6-digit OTP', true);
+                return;
+            }
+
+            const btn = otpForm.querySelector('button');
+            btn.textContent = 'Verifying...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/adminpanel/api/forgot-password/verify/', {
+                    method: 'POST',
+                    body: JSON.stringify({ email: resetEmail, otp: otpInput })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    otpForm.classList.add('hidden');
+                    resetForm.classList.remove('hidden');
+                } else {
+                    showModal('Error', data.message, true);
+                }
+            } catch (err) {
+                showModal('Error', 'Network error', true);
+            } finally {
+                btn.textContent = 'Verify';
+                btn.disabled = false;
+            }
+        }
+
+        // Reset Form Handler
+        const resetBtn = resetForm.querySelector('button');
+        if (resetBtn) {
+            resetBtn.onclick = async (e) => {
+                e.preventDefault();
+                const inputs = resetForm.querySelectorAll('input');
+                const newPass = inputs[0].value;
+                const confirmPass = inputs[1].value;
+
+                if (newPass.length < 6) {
+                    showModal('Error', 'Password must be at least 6 characters', true);
+                    return;
+                }
+                if (newPass !== confirmPass) {
+                    showModal('Error', 'Passwords do not match', true);
+                    return;
+                }
+
+                const btn = e.target;
+                btn.textContent = 'Updating...';
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch('/adminpanel/api/forgot-password/reset/', {
+                        method: 'POST',
+                        body: JSON.stringify({ email: resetEmail, password: newPass })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        showModal('Success', 'Password reset successfully! Please login.');
+                        showLogin();
+                    } else {
+                        showModal('Error', data.message, true);
+                    }
+                } catch (err) {
+                    showModal('Error', 'Network error', true);
+                } finally {
+                    btn.textContent = 'Update Password';
+                    btn.disabled = false;
+                }
+            };
+        }
+    </script>
+
+</body>
+
+</html>

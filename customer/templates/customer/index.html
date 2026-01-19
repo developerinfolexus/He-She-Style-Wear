@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>He She Style Wear</title>
+  <link rel="icon" href="{% static 'customer/images/logo 3.png' %}" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'customer/css/index.css' %}?v=4">
+  <style>
+
+  </style>
+</head>
+{% comment %}
+
+<body data-header-url="{% url 'api_header' %}">
+  <div class="promo-bar">
+    <div class="promo-slides">
+      <div class="promo-slide">Free Shipping within Canada</div>
+      <div class="promo-slide">New Arrivals: Up to 30% Off</div>
+      <div class="promo-slide">Weekend Flash Sale!</div>
+    </div>
+  </div> {% endcomment %}
+
+  <div id="header-placeholder"></div>
+  <div class="main-banner-carousel">
+    <div class="carousel-slide" id="carouselSlide">
+      {% for banner in banners %}
+      <div class="carousel-item">
+        <img src="{{ banner.image.url }}" alt="{{ banner.title }}" />
+        <div class="carousel-overlay">
+          {% if banner.title %}<h2>{{ banner.title }}</h2>{% endif %}
+          {% if banner.subtitle %}<p>{{ banner.subtitle }}</p>{% endif %}
+          {% if banner.link %}
+          <button onclick="window.location.href='{{ banner.link }}';">Explore Now</button>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <!-- Fallback if no banners are set -->
+      <div class="carousel-item">
+        <img
+          src="https://th.bing.com/th/id/R.50b94a56c60c3338b38a6cd5c8ae31e6?rik=95PZRm4q8Hh0Rw&riu=http%3a%2f%2fwww.koskii.com%2fcdn%2fshop%2fproducts%2fkoskii-parrot-green-zariwork-pure-silk-designer-saree-saus0018490_parrot_green_1.jpg%3fv%3d1633866827&ehk=GDDoYmiGru%2fLaYvUYFKP83QMDxDMQbM4rsuQAZgY9%2bU%3d&risl=&pid=ImgRaw&r=0"
+          alt="Woman looking at fabrics, new arrivals" />
+        <div class="carousel-overlay">
+          <h2>Women's New Arrivals</h2>
+          <p>Check out the latest collection of trendy outfits</p>
+          <button onclick="window.location.href='{% url 'women' %}?';">Shop Now</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="carousel-dots" id="carouselDots"></div>
+
+    <button class="carousel-arrow prev-arrow" id="prevArrow">&#10094;</button>
+    <button class="carousel-arrow next-arrow" id="nextArrow">&#10095;</button>
+  </div>
+
+  <!-- ✅ Restored Horizontal Category Bar -->
+  <style>
+    .sub-categories-bar {
+      width: 100%;
+      max-width: 1500px;
+      margin: 20px auto;
+      padding: 0 15px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      /* Firefox */
+      display: flex;
+      gap: 15px;
+      justify-content: flex-start;
+      /* Start align for scrolling */
+    }
+
+    .sub-categories-bar::-webkit-scrollbar {
+      display: none;
+      /* Chrome/Safari */
+    }
+
+    .sub-cat-pill {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #f5f5f5;
+      color: #333;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: capitalize;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+      flex-shrink: 0;
+    }
+
+    .sub-cat-pill:hover {
+      background-color: var(--secondary-color, #d11c5b);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+
+  <!-- <div class="sub-categories-bar">
+    {% for sub in header_women_subcats %}
+    <a href="{% url 'women' %}?subcategory={{ sub|urlencode }}" class="sub-cat-pill">{{ sub|title }}</a>
+    {% endfor %}
+    Also showing Kids categories for completeness if desired, or just women as requested in screenshot -->
+  <!-- {% for sub in header_kids_subcats %}
+    <a href="{% url 'kids' %}?subcategory={{ sub|urlencode }}" class="sub-cat-pill">{{ sub|title }} (Kids)</a>
+    {% endfor %}
+  </div> -->
+
+  <div class="listing-header">
+    <h2>Traditional Look</h2>
+  </div>
+
+  <section class="carousel-section-container">
+    <div class="card-carousel-wrapper">
+      <div class="card-carousel" id="cardCarousel">
+        {% for look in traditional_looks %}
+        <a href="{% if look.product %}{% url 'product' look.product.slug %}{% else %}#{% endif %}"
+          class="card-link-wrapper" {% if not look.product %}onclick="return false;" {% endif %}>
+          <div class="card" data-index="{{ forloop.counter0 }}">
+            <img src="{{ look.image.url }}" alt="{{ look.title }}" />
+            <div class="card-overlay">
+              <div class="card-header">
+                <span>{{ look.title }}</span>
+                <div class="icons"></div>
+              </div>
+            </div>
+          </div>
+        </a>
+        {% empty %}
+        <!-- Fallback if no items managed -->
+        <p style="text-align:center; color:#fff;">No Traditional Look items to display.</p>
+        {% endfor %}
+      </div>
+      <button id="prevBtn" class="nav-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z">
+          </path>
+        </svg>
+      </button>
+      <button id="nextBtn" class="nav-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M13.1716 12.0007L8.22183 7.05093L9.63604 5.63672L16 12.0007L9.63604 18.3646L8.22183 16.9504L13.1716 12.0007Z">
+          </path>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <main class="product-listing container">
+    <div class="listing-header">
+      <h2>Collections</h2>
+    </div>
+    <div class="product-grid">
+      <!-- Products will be dynamically loaded here -->
+    </div>
+
+  </main>
+
+  {% include 'customer/footer.html' %}
+
+  <div id="reviews-modal-overlay" class="reviews-modal-overlay">
+    <div class="reviews-modal">
+      <div class="reviews-modal-header">
+        <h2>Customer Reviews</h2>
+        <button id="close-reviews-modal" class="close-reviews-modal">&times;</button>
+      </div>
+      <div class="reviews-modal-body">
+        <div class="reviews-grid">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <nav class="bottom-nav">
+      <a href="index.html" class="nav-item"> <i class="fas fa-home"></i><span>HOME</span>
+      </a>
+      <a href="women.html" class="nav-item">
+          <i class="fas fa-th-large"></i><span>CATEGORY</span>
+      </a>
+      <a href="#" class="nav-item">
+          <i class="fas fa-tags"></i><span>SALE</span>
+      </a>
+      <a href="login.html" class="nav-item">
+          <i class="fas fa-user-circle"></i><span>PROFILE</span>
+      </a>
+    </nav>
+ -->
+
+  <script src="{% static 'customer/js/index.js' %}">
+  </script>
+
+  <div class="whatsapp-container">
+    <div class="whatsapp-tooltip">Need More Information</div>
+    <a href="https://wa.me/17808864821" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </div>
+
+</body>
+
+</html>

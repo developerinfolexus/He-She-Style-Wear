@@ -1,0 +1,284 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Admin Panel - Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/global.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/orders.css' %}?v={% now 'U' %}">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</head>
+
+<body>
+    <div class="admin-panel">
+        {% include 'adminpanel/includes/sidebar.html' %}
+
+        <main class="main-content">
+            <header class="main-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <h1>Orders</h1>
+                <!-- <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://i.pravatar.cc/40" alt="User Avatar">
+                </div> -->
+            </header>
+
+            <div class="page-content active" id="orders-page">
+
+                <section class="order-filters form-card">
+                    <div class="form-group search-bar">
+                        <input type="text" id="orderSearch" placeholder="Search by Order ID, Customer...">
+                    </div>
+                    <div class="form-group">
+                        <input type="date" id="dateFrom" placeholder="From Date">
+                    </div>
+                    <div class="form-group">
+                        <input type="date" id="dateTo" placeholder="To Date">
+                    </div>
+                    <div class="form-group">
+                        <select id="orderStatusFilter">
+                            <option value="">All Order Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="shipping">Shipping</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="return_requested">Return Requested</option>
+                            <option value="returned">Returned</option>
+                            <option value="fulfilled">Order Fulfilled</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select id="paymentStatusFilter">
+                            <option value="">All Payment Status</option>
+                            <option value="paid">Paid</option>
+                            <option value="pending">Pending</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section class="recent-orders">
+                    <div class="content-header">
+                        <h2>All Orders</h2>
+                        <button id="downloadOrdersBtn" class="btn btn-primary download-btn">
+                            Download Orders
+                        </button>
+                    </div>
+
+
+                    <!-- START: FIX - Added table-wrapper -->
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Pay Status</th>
+                                    <th>Order Status</th>
+                                    <th>Status Change Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="orders-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- END: FIX -->
+                </section>
+            </div>
+
+            <div id="orderDetailsModal" class="modal">
+                <div class="modal-content modal-content-lg">
+                    <div class="modal-header">
+                        <h2 id="modalOrderId">Order Details</h2>
+                        <span class="modal-close" id="orderModalCloseBtn">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="order-details-layout">
+                            <div class="info-section">
+                                <h3>Customer Info</h3>
+                                <p><strong>Name:</strong> <span id="modalCustomerName"></span></p>
+                                <p><strong>Email:</strong> <span id="modalCustomerEmail"></span></p>
+                                <p><strong>Phone:</strong> <span id="modalCustomerPhone"></span></p>
+                                <hr>
+                                <h3>Shipping Address</h3>
+                                <p id="modalShippingAddress"></p>
+                                <hr>
+                                <h3>Billing Address</h3>
+                                <p id="modalBillingAddress"></p>
+                            </div>
+                            <div class="info-section">
+                                <h3>Payment Details</h3>
+                                <div class="payment-summary"><span>Subtotal:</span><span id="modalPaySubtotal"></span>
+                                </div>
+                                <div class="payment-summary"><span>Discount:</span><span id="modalPayDiscount"></span>
+                                </div>
+                                <div class="payment-summary"><span>Tax:</span><span id="modalPayTax"></span></div>
+                                <div class="payment-summary"><span>Shipping:</span><span id="modalPayShipping"></span>
+                                </div>
+                                <div class="payment-summary total"><span>Total Amount:</span><span
+                                        id="modalPayTotal"></span></div>
+                                <p><strong>Method:</strong> <span id="modalPayMethod"></span></p>
+                                <p><strong>Transaction ID:</strong> <span id="modalPayTransId"></span></p>
+                                <hr>
+                                <h3>Delivery Details</h3>
+                                <p><strong>Partner:</strong> <span id="modalDeliveryPartner"></span></p>
+                                <p><strong>Tracking #:</strong> <span id="modalDeliveryTracking"></span></p>
+                                <p><strong>Est. Delivery:</strong> <span id="modalDeliveryEst"></span></p>
+                            </div>
+                            <div class="info-section full-width">
+                                <h3>Order Items</h3>
+                                <!-- START: FIX - Added table-wrapper -->
+                                <div class="table-wrapper">
+                                    <table class="items-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>SKU</th>
+                                                <th>Quantity</th>
+                                                <th>Price</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="modalItemsTableBody"></tbody>
+                                    </table>
+                                </div>
+                                <!-- END: FIX -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="modalPrintBtn" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg"
+                                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg> Download Invoice</button>
+
+                        <div class="form-group-inline">
+                            <label for="modalUpdateStatus">Update Status:</label>
+                            <select id="modalUpdateStatus">
+                                <option value="pending">Pending</option>
+                                <option value="shipping">Shipping</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="return_requested">Return Requested</option>
+                                <option value="returned">Returned</option>
+                                <option value="fulfilled">Order Fulfilled</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group-inline" id="trackingCodeGroup" style="display:none; margin-left:10px;">
+                            <label for="modalTrackingCode">Tracking Code:</label>
+                            <input type="text" id="modalTrackingCode" class="form-control"
+                                placeholder="Enter tracking code"
+                                style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+                        </div>
+                        <button id="modalUpdateBtn" class="btn btn-primary">Update</button>
+                    </div>
+                </div>
+            </div>
+            <div id="cancelConfirmModal" class="modal">
+                <div class="modal-content" style="max-width: 450px;">
+                    <div class="modal-header">
+                        <h2>Cancel Order</h2>
+                        <span class="modal-close" id="cancelModalCloseBtn">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to cancel order <strong id="cancelOrderId"></strong>? This may trigger
+                            notifications and cannot always be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="cancelActionBtn" class="btn btn-secondary">Keep Order</button>
+                        <button id="confirmCancelBtn" class="btn btn-danger">Confirm Cancellation</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- START: Tracking Code Input Modal -->
+            <div id="trackingInputModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Ship Order</h2>
+                        <span class="modal-close" id="trackingModalCloseBtn">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <p>Enter tracking details for <strong id="trackingOrderIdDisplay"></strong>:</p>
+                        <div class="form-group">
+                            <label for="modalInputCourierName">Shipped Via / Courier Name <span
+                                    style="color: var(--status-cancelled-text);">*</span></label>
+                            <input type="text" id="modalInputCourierName" placeholder="e.g. FedEx, DHL, BlueDart">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalInputTrackingCode">Tracking Code <span
+                                    style="color: var(--status-cancelled-text);">*</span></label>
+                            <input type="text" id="modalInputTrackingCode" placeholder="e.g. TRK-882194">
+                            <small id="trackingInputError">Please enter a valid tracking code.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="cancelTrackingBtn" class="btn btn-secondary">Cancel</button>
+                        <button id="confirmTrackingBtn" class="btn btn-primary">Confirm Shipment</button>
+                    </div>
+                </div>
+            </div>
+            <!-- END: Tracking Code Input Modal -->
+
+            <!-- START: Return Package Modal -->
+            <div id="returnPackageModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Confirm Return</h2>
+                        <span class="modal-close" id="returnModalCloseBtn">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <p>Enter package number/return code for <strong id="returnOrderIdDisplay"></strong>:</p>
+                        <div class="form-group">
+                            <label for="modalReturnPackageNumber">Package Number <span
+                                    style="color:red">*</span></label>
+                            <input type="text" id="modalReturnPackageNumber" class="form-control"
+                                placeholder="e.g. PKG-12345">
+                            <small id="returnInputError" style="color:red; display:none;">Package number is
+                                required.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="cancelReturnBtn" class="btn btn-secondary">Cancel</button>
+                        <button id="confirmReturnBtn" class="btn btn-primary">Confirm Return</button>
+                    </div>
+                </div>
+            </div>
+            <!-- END: Return Package Modal -->
+        </main>
+    </div>
+    {% block extra_js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Add cache busting -->
+    <script src="{% static 'adminpanel/js/orders.js' %}?v={% now 'U' %}"></script>
+    <script src="{% static 'adminpanel/js/global.js' %}?v={% now 'U' %}"></script>
+    {% endblock %}
+</body>
+
+</html>

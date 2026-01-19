@@ -1,0 +1,289 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders | HE SHE STYLES</title>
+
+  <link rel="icon" href="{% static 'customer/images/logo.png' %}" type="image/png">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <link rel="stylesheet" href="{% static 'customer/css/index.css' %}">
+  <link rel="stylesheet" href="{% static 'customer/css/orders.css' %}">
+
+  <style>
+    /* Ensure header consistency */
+    #header-placeholder .main-header {
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    /* MODIFICATION: Hide the sidebar by default as this is an order list */
+    .order-summary-sidebar {
+      display: none;
+    }
+  </style>
+</head>
+
+<body data-header-url="{% url 'api_header' %}" data-single-order-id="{{ order_id|default:'' }}">
+
+  <div id="header-placeholder"></div>
+
+  <main class="order-detail-layout container">
+
+    <div class="breadcrumb"><a href="{% url 'index' %}">Home</a> <a href="{% url 'profile' %}">▸ My Account</a> <a
+        href="#"> ▸Orders</a></div>
+
+    <div class="order-detail-main">
+      <!-- List View Container (Default) -->
+      <div id="orders-list-container">
+        <!-- Order cards will be injected here by JS -->
+      </div>
+    </div>
+
+    <!-- Dedicated Single Order Detail View (Hidden by default) -->
+    <div id="single-order-detail-view"
+      style="display: none; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+
+      <!-- Header -->
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+        <h2 style="margin: 0; font-size: 1.8rem; color: #333;">Order Details <span id="detail-order-id"
+            style="color: #666; font-size: 1.2rem;"></span></h2>
+        <div id="detail-order-status"></div>
+      </div>
+
+      <!-- Customer & Order Info Grid -->
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 30px;">
+
+        <!-- Customer Details -->
+        <div class="detail-section">
+          <h3
+            style="font-size: 1.1rem; margin-bottom: 15px; color: #555; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px;">
+            Customer Information</h3>
+          <p><strong>Name:</strong> <span id="detail-customer-name"></span></p>
+          <p><strong>Email:</strong> <span id="detail-customer-email"></span></p>
+          <p><strong>Phone:</strong> <span id="detail-customer-phone"></span></p>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="detail-section">
+          <h3
+            style="font-size: 1.1rem; margin-bottom: 15px; color: #555; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px;">
+            Shipping Address</h3>
+          <p id="detail-shipping-address" style="line-height: 1.6;"></p>
+          <p><span id="detail-shipping-city"></span>, <span id="detail-shipping-pincode"></span></p>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="detail-section">
+          <h3
+            style="font-size: 1.1rem; margin-bottom: 15px; color: #555; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px;">
+            Payment Details</h3>
+          <p><strong>Method:</strong> <span id="detail-payment-method"></span></p>
+          <p><strong>Status:</strong> <span id="detail-payment-status"></span></p>
+          <p><strong>Date:</strong> <span id="detail-order-date"></span></p>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: #333;">Ordered Products</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+          <thead>
+            <tr style="background: #f9f9f9; text-align: left;">
+              <th style="padding: 12px; border-bottom: 2px solid #eee;">Product</th>
+              <th style="padding: 12px; border-bottom: 2px solid #eee;">Price</th>
+              <th style="padding: 12px; border-bottom: 2px solid #eee;">Quantity</th>
+              <th style="padding: 12px; border-bottom: 2px solid #eee; text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody id="detail-items-body">
+            <!-- Items -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Financial Breakdown -->
+      <div style="display: flex; justify-content: flex-end;">
+        <div style="width: 300px; background: #fdfdfd; padding: 20px; border-radius: 6px; border: 1px solid #eee;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span>Subtotal:</span>
+            <span id="detail-subtotal"></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span>Shipping:</span>
+            <span id="detail-shipping-cost"></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span>Tax:</span>
+            <span id="detail-tax"></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span>Discount:</span>
+            <span id="detail-discount" style="color: green;"></span>
+          </div>
+          <div style="border-top: 2px solid #eee; margin: 10px 0;"></div>
+          <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem;">
+            <span>Grand Total:</span>
+            <span id="detail-grand-total"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="order-summary-sidebar">
+
+      <div class="summary-card card">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Item</span>
+          <span id="summary-subtotal">$0.00</span>
+        </div>
+        <div class="summary-row discount">
+          <span>Discount <span id="discount-percent">(0%)</span></span>
+          <span id="summary-discount">-$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Delivery</span>
+          <span id="summary-delivery">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax <i class="fas fa-info-circle"></i></span>
+          <span id="summary-tax">+$0.00</span>
+        </div>
+        <hr class="summary-divider">
+        <div class="summary-row total">
+          <span>Order</span>
+          <strong id="summary-total">$0.00</strong>
+        </div>
+      </div>
+
+      <div class="delivery-details-card card">
+        <h4>Delivery</h4>
+        <p>
+          <i class="fas fa-home"></i>
+          <span>
+          </span>
+        </p>
+      </div>
+
+      <div class="payment-method-card card">
+        <h4>Payment</h4>
+        <p><i class="fab fa-cc-visa"></i> Visa **56 💳</p>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <div class="whatsapp-container">
+    <div class="whatsapp-tooltip">Need More Information</div>
+    <a href="https://wa.me/17808864821" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </div>
+  {% include 'customer/footer.html' %}
+
+  <div id="reviews-modal-overlay" class="reviews-modal-overlay">
+    <div class="reviews-modal">
+      <div class="reviews-modal-header">
+        <h2>Customer Reviews</h2>
+        <button id="close-reviews-modal" class="close-reviews-modal">&times;</button>
+      </div>
+      <div class="reviews-modal-body">
+        <div class="reviews-grid">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="review-submission-modal-overlay" class="review-modal-overlay">
+    <div class="review-modal">
+      <div class="review-modal-header">
+        <h2 id="review-modal-product-name">Write a Review for...</h2>
+        <button id="close-review-submit-modal" class="close-reviews-modal">&times;</button>
+      </div>
+      <div class="review-modal-body">
+        <form id="review-submission-form">
+          <input type="hidden" id="review-product-id" />
+          <input type="hidden" id="review-product-image" />
+          <div class="review-form-product-preview">
+            <img id="review-modal-product-image" src="" alt="Product Preview" />
+            <p>Please share your experience with this product.</p>
+          </div>
+          <div class="review-form-group">
+            <label>Your Rating:</label>
+            <div class="rating-stars-input" id="review-modal-stars">
+              <i class="far fa-star" data-value="1"></i>
+              <i class="far fa-star" data-value="2"></i>
+              <i class="far fa-star" data-value="3"></i>
+              <i class="far fa-star" data-value="4"></i>
+              <i class="far fa-star" data-value="5"></i>
+            </div>
+            <input type="hidden" id="review-modal-rating" value="0" required />
+          </div>
+          <div class="review-form-group">
+            <label for="review-modal-comment">Your Review:</label>
+            <textarea id="review-modal-comment" rows="4" placeholder="What did you like or dislike?"
+              required></textarea>
+          </div>
+          <div class="review-form-group">
+            <label>Add Photos (Optional):</label>
+            <div class="review-image-upload">
+              <input type="file" id="review-image-1" accept="image/*" />
+              <input type="file" id="review-image-2" accept="image/*" />
+              <input type="file" id="review-image-3" accept="image/*" />
+            </div>
+          </div>
+          <div class="review-form-group">
+            <button type="submit" id="submit-review-button">Submit Review</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="{% static 'customer/js/index.js' %}"></script>
+  <script src="{% static 'customer/js/orders.js' %}"></script>
+
+  <script>
+    const headerUrl = document.body.dataset.headerUrl || '/api/header/';
+    fetch(headerUrl)
+      .then(response => response.text())
+      .then(data => {
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        if (headerPlaceholder) {
+          headerPlaceholder.innerHTML = data;
+
+          // Re-initialize dynamic header parts handled by index.js:
+          if (typeof setupSearchFunctionality === 'function') setupSearchFunctionality();
+          if (typeof setupProfileDropdown === 'function') setupProfileDropdown();
+          if (typeof setupNavDropdowns === 'function') setupNavDropdowns();
+          if (typeof setupRegionFlagDropdown === 'function') setupRegionFlagDropdown();
+          if (typeof updateCartCount === 'function') updateCartCount();
+          if (typeof updateWishlistCount === 'function') updateWishlistCount();
+
+          // --- THIS IS THE FIX ---
+          if (typeof setupMobileMenuToggle === 'function') setupMobileMenuToggle();
+          // --- END FIX ---
+
+          // Remove active class from all nav links on this page
+          const navLinks = document.querySelectorAll(".main-nav li");
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+          });
+        } else {
+          console.error('Header placeholder element not found.');
+        }
+      })
+      .catch(error => console.error('Error loading header:', error));
+  </script>
+
+</body>
+
+</html>

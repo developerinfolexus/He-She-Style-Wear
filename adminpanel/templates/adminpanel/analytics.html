@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Admin Panel - Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/analytics.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="admin-panel">
+        {% include 'adminpanel/includes/sidebar.html' %}
+
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Analytics</h1>
+                <!-- <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://i.pravatar.cc/40" alt="User Avatar">
+                </div> -->
+            </header>
+
+            <div class="page-content active" id="analytics-page">
+                <section class="charts-section">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Sales Overview</h3>
+                            <select id="salesOverviewFilter" class="chart-filter">
+                                <option value="6months" selected>Last 6 Months</option>
+                                <option value="30days">Last 30 Days</option>
+                                <option value="7days">Last 7 Days</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                        <div class="chart-date-filter" id="salesOverviewDateFilter">
+                            <label for="salesOverviewFrom">From:</label>
+                            <input type="date" id="salesOverviewFrom" class="chart-date-input">
+                            <label for="salesOverviewTo">To:</label>
+                            <input type="date" id="salesOverviewTo" class="chart-date-input">
+                            <button id="salesOverviewApplyBtn" class="btn btn-secondary btn-small">Apply</button>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="salesOverviewChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="background: transparent; border: none; box-shadow: none;">
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="{% static 'adminpanel/js/analytics.js' %}"></script>
+    <script src="{% static 'adminpanel/js/global.js' %}"></script>
+</body>
+
+</html>

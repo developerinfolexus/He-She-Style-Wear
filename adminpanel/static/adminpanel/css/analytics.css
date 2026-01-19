@@ -1,0 +1,98 @@
+/* --- Charts Section --- */
+.charts-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+.chart-container {
+    /* --- Glassmorphism Effect (Copied from dashboard.css) --- */
+    background-color: var(--bg-glass);
+    backdrop-filter: blur(var(--backdrop-blur));
+    -webkit-backdrop-filter: blur(var(--backdrop-blur));
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 24px var(--shadow-color);
+    /* --- --- */
+    padding: 24px;
+    border-radius: 16px; /* Matched dashboard's 16px radius */
+}
+.chart-container h3 {
+    margin: 0; /* Removed bottom margin */
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* START: New Styles for Filter (Copied from dashboard.css) */
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px; /* Moved margin from h3 to here */
+}
+
+.chart-filter {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    padding: 6px 12px;
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px; /* Make space for arrow */
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.chart-filter:hover {
+    border-color: var(--text-secondary);
+}
+
+.chart-date-filter {
+    display: none; /* Hidden by default */
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.chart-date-filter.visible {
+    display: flex; /* Show when 'custom' is selected */
+}
+.chart-date-filter label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+.chart-date-input {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    padding: 6px 10px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+.chart-date-input::-webkit-calendar-picker-indicator {
+    filter: var(--text-secondary) invert(0.5);
+    cursor: pointer;
+}
+.btn-small {
+    padding: 7px 12px;
+    font-size: 0.8125rem;
+}
+/* END: New Date Filter Styles */
+
+.chart-wrapper {
+    position: relative;
+    height: 250px; /* Default height */
+}
+
+
+/* --- Make Inventory Chart Full Width --- */
+.charts-section:last-of-type .chart-container:first-child { 
+    grid-column: 1 / -1; /* Span all columns */
+}

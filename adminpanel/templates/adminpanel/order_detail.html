@@ -1,0 +1,629 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order #{{ order.order_number }} - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/orders.css' %}"> <!-- Reuse orders CSS -->
+    <style>
+        .order-detail-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-header h1 {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+        }
+
+        .detail-section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .detail-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .detail-card h3 {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-card p {
+            margin-bottom: 8px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .detail-card strong {
+            color: #222;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .items-table th {
+            text-align: left;
+            padding: 15px;
+            background: #f4f4f4;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .items-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .financial-box {
+            background: #fdfdfd;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 25px;
+            width: 350px;
+            margin-left: auto;
+        }
+
+        .financial-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            color: #555;
+        }
+
+        .financial-row.grand-total {
+            border-top: 2px solid #eee;
+            padding-top: 15px;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #222;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background-color: #f39c12;
+        }
+
+        .status-shipping {
+            background-color: #3498db;
+        }
+
+        .status-shipped {
+            background-color: #2980b9;
+        }
+
+        .status-delivered {
+            background-color: #27ae60;
+        }
+
+        .status-cancelled {
+            background-color: #c0392b;
+        }
+
+        .status-returned {
+            background-color: #8e44ad;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            color: #333;
+        }
+
+        /* Status Select Styling */
+        .status-select {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            /* Hide default arrow */
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .status-select option {
+            color: black;
+            background: white;
+        }
+
+        /* Modal Styles (Copied from orders.css/global.css approximation) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #ddd;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-panel">
+        {% include 'adminpanel/includes/sidebar.html' %}
+
+        <!-- Main Content -->
+        <main style="flex: 1; padding: 20px; overflow-y: auto;">
+            <a href="{% url 'admin_orders' %}" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Orders List
+            </a>
+
+            <div class="order-detail-container">
+                <div class="detail-header">
+                    <div>
+                        <h1>Order #{{ order.order_number }}</h1>
+                        <p style="color: #777; margin-top: 5px;">Placed on {{ order.created_at|date:"M d, Y, h:i A" }}
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="orderStatusSelect" class="status-select status-{{ order.status|lower }}">
+                            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="shipping" {% if order.status == 'shipping' %}selected{% endif %}>Shipping
+                            </option>
+                            <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered
+                            </option>
+                            <option value="return_requested" {% if order.status == 'return_requested' %}selected{% endif %}>Return Requested</option>
+                            <option value="returned" {% if order.status == 'returned' %}selected{% endif %}>Returned
+                            </option>
+                            <option value="fulfilled" {% if order.status == 'fulfilled' %}selected{% endif %}>Order
+                                Fulfilled</option>
+                            <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled
+                            </option>
+                        </select>
+                        <span id="statusUpdateMsg" style="font-size: 14px; font-weight: 500; display: none;"></span>
+                    </div>
+                </div>
+
+                <!-- Modals for Status Updates -->
+                <!-- Tracking Modal -->
+                <div id="trackingInputModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Ship Order</h2>
+                            <span class="modal-close" id="trackingModalCloseBtn">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <p>Enter tracking details for <strong>Order #{{ order.order_number }}</strong>:</p>
+                            <div class="form-group">
+                                <label for="modalInputCourierName">Shipped Via / Courier Name <span
+                                        style="color: red;">*</span></label>
+                                <input type="text" id="modalInputCourierName" class="form-control"
+                                    placeholder="e.g. FedEx, DHL">
+                            </div>
+                            <div class="form-group">
+                                <label for="modalInputTrackingCode">Tracking Code <span
+                                        style="color: red;">*</span></label>
+                                <input type="text" id="modalInputTrackingCode" class="form-control"
+                                    placeholder="e.g. TRK-12345">
+                                <small id="trackingInputError" style="color: red; display: none;">Both fields are
+                                    required.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cancelTrackingBtn" class="btn btn-secondary">Cancel</button>
+                            <button id="confirmTrackingBtn" class="btn btn-primary">Confirm Shipment</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Return Modal -->
+                <div id="returnPackageModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Confirm Return</h2>
+                            <span class="modal-close" id="returnModalCloseBtn">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <p>Enter package number for <strong>Order #{{ order.order_number }}</strong>:</p>
+                            <div class="form-group">
+                                <label for="modalReturnPackageNumber">Package Number <span
+                                        style="color: red;">*</span></label>
+                                <input type="text" id="modalReturnPackageNumber" class="form-control"
+                                    placeholder="e.g. PKG-999">
+                                <small id="returnInputError" style="color: red; display: none;">Package number is
+                                    required.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cancelReturnBtn" class="btn btn-secondary">Cancel</button>
+                            <button id="confirmReturnBtn" class="btn btn-primary">Confirm Return</button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const selectEl = document.getElementById('orderStatusSelect');
+                        const orderId = "{{ order.id }}";
+                        const orderNumber = "{{ order.order_number }}";
+                        let oldStatus = selectEl.value;
+
+                        // Modals
+                        const trackingModal = document.getElementById('trackingInputModal');
+                        const returnModal = document.getElementById('returnPackageModal');
+                        const confirmTrackingBtn = document.getElementById('confirmTrackingBtn');
+                        const confirmReturnBtn = document.getElementById('confirmReturnBtn');
+
+                        // Helper to get CSRF
+                        function getCookie(name) {
+                            let cookieValue = null;
+                            if (document.cookie && document.cookie !== '') {
+                                const cookies = document.cookie.split(';');
+                                for (let i = 0; i < cookies.length; i++) {
+                                    const cookie = cookies[i].trim();
+                                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                        break;
+                                    }
+                                }
+                            }
+                            return cookieValue;
+                        }
+
+                        // Status Color Mapper
+                        function updateStatusClass(status) {
+                            selectEl.className = 'status-select status-' + status;
+                        }
+
+                        // Modal Controls
+                        function closeModals() {
+                            trackingModal.style.display = 'none';
+                            returnModal.style.display = 'none';
+                        }
+
+                        // Close buttons
+                        document.querySelectorAll('.modal-close, .btn-secondary').forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                closeModals();
+                                selectEl.value = oldStatus; // Revert on cancel
+                            });
+                        });
+
+                        window.onclick = function (event) {
+                            if (event.target == trackingModal || event.target == returnModal) {
+                                closeModals();
+                                selectEl.value = oldStatus;
+                            }
+                        }
+
+                        selectEl.addEventListener('change', async function () {
+                            const newStatus = this.value;
+                            const msgSpan = document.getElementById('statusUpdateMsg');
+
+                            // Reset Message
+                            msgSpan.style.display = 'none';
+
+                            // 1. Check Fulfilled Rule
+                            if (newStatus === 'fulfilled' && oldStatus !== 'delivered') {
+                                alert('Order can only be marked as "Detailed" after it is "Delivered".');
+                                selectEl.value = oldStatus;
+                                return;
+                            }
+
+                            // 2. Check Shipped -> Warning/Modal
+                            if (newStatus === 'shipped') {
+                                // Open Tracking Modal
+                                trackingModal.style.display = 'block';
+                                return;
+                            }
+
+                            // 3. Check Returned -> Modal
+                            if (newStatus === 'returned') {
+                                returnModal.style.display = 'block';
+                                return;
+                            }
+
+                            // 4. Standard Update
+                            await updateOrderStatus(newStatus);
+                        });
+
+                        async function updateOrderStatus(status, extraData = {}) {
+                            const msgSpan = document.getElementById('statusUpdateMsg');
+                            selectEl.disabled = true;
+
+                            try {
+                                const response = await fetch('/admin/api/orders/update/', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRFToken': getCookie('csrftoken')
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: orderId,
+                                        status: status,
+                                        ...extraData
+                                    })
+                                });
+
+                                const result = await response.json();
+
+                                if (response.ok && result.success) {
+                                    // Success
+                                    oldStatus = status;
+                                    updateStatusClass(status);
+                                    msgSpan.textContent = 'Updated!';
+                                    msgSpan.style.color = 'green';
+                                    msgSpan.style.display = 'block';
+
+                                    // Optional: Reload after delay to refresh logs/dates if needed
+                                    // setTimeout(() => location.reload(), 1000); 
+                                } else {
+                                    alert(result.message || 'Update failed');
+                                    selectEl.value = oldStatus;
+                                }
+                            } catch (e) {
+                                console.error(e);
+                                alert('Network error');
+                                selectEl.value = oldStatus;
+                            } finally {
+                                selectEl.disabled = false;
+                                setTimeout(() => { msgSpan.style.display = 'none'; }, 3000);
+                            }
+                        }
+
+                        // Confirm Shipping
+                        confirmTrackingBtn.addEventListener('click', function () {
+                            const courier = document.getElementById('modalInputCourierName').value.trim();
+                            const code = document.getElementById('modalInputTrackingCode').value.trim();
+
+                            if (!courier || !code) {
+                                document.getElementById('trackingInputError').style.display = 'block';
+                                return;
+                            }
+
+                            closeModals();
+                            updateOrderStatus('shipped', {
+                                tracking_code: code,
+                                courier_name: courier
+                            });
+                        });
+
+                        // Confirm Return
+                        confirmReturnBtn.addEventListener('click', function () {
+                            const pkg = document.getElementById('modalReturnPackageNumber').value.trim();
+                            if (!pkg) {
+                                document.getElementById('returnInputError').style.display = 'block';
+                                return;
+                            }
+                            closeModals();
+                            updateOrderStatus('returned', {
+                                return_package_number: pkg
+                            });
+                        });
+                    });
+                </script>
+
+                <div class="detail-section-grid">
+                    <div class="detail-card">
+                        <h3>Customer Details</h3>
+                        <p><strong>Name:</strong> {{ customer_name }}</p>
+                        <p><strong>Email:</strong> {{ customer_email }}</p>
+                        <p><strong>Phone:</strong> {{ customer_phone }}</p>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3>Shipping Address</h3>
+                        <p>{{ order.shipping_address }}</p>
+                        <p>{{ order.shipping_city }}, {{ order.shipping_state }}</p>
+                        <p>{{ order.shipping_pincode }}</p>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3>Payment Info</h3>
+                        <p><strong>Method:</strong> {{ order.payment_method }}</p>
+                        <p><strong>Status:</strong> {{ order.payment_status|title }}</p>
+                        {% if order.transaction_id %}
+                        <p><strong>Trans ID:</strong> {{ order.transaction_id }}</p>
+                        {% endif %}
+                    </div>
+
+                    {% if order.tracking_code %}
+                    <div class="detail-card">
+                        <h3>Shipment Details</h3>
+                        <p><strong>Tracking Code:</strong> {{ order.tracking_code }}</p>
+                        {% if order.courier_name %}
+                        <p><strong>Shipped Via:</strong> {{ order.courier_name }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <h3>Ordered Items</h3>
+                <div style="overflow-x: auto;">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th style="text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>
+                                    <div class="product-info">
+                                        <img src="{{ item.product_image }}" alt="{{ item.product_name }}"
+                                            class="product-img">
+                                        <div>
+                                            <div style="font-weight: 500;">{{ item.product_name }}</div>
+                                            <div style="font-size: 13px; color: #777;">{{ item.category }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ item.effective_price|floatformat:2 }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td style="text-align: right; font-weight: 500;">{{ item.total_price|floatformat:2 }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="financial-box">
+                    <div class="financial-row">
+                        <span>Subtotal</span>
+                        <span>{{ order.subtotal_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="financial-row">
+                        <span>Shipping</span>
+                        <span>{{ order.shipping_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="financial-row">
+                        <span>Tax</span>
+                        <span>{{ order.tax_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="financial-row">
+                        <span>Discount</span>
+                        <span style="color: green;">-{{ order.discount_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="financial-row grand-total">
+                        <span>Grand Total</span>
+                        <span>{{ order.total_amount|floatformat:2 }}</span>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

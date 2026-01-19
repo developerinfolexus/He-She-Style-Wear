@@ -1,0 +1,159 @@
+/* --- BASIC STYLES --- */
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      :root {
+        --primary-color: #000000;
+        --secondary-color: #d11c5b;
+        --text-color: #333;
+        --background-color: #ffffff;
+        --border-color: #eee;
+      }
+
+      body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      .container {
+        width: 100%;
+        padding: 0 15px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* --- Removed Header Styles (Assume handled by index.css) --- */
+      /* .main-header { ... } */
+      /* .logo h1 { ... } */
+      /* .header-icons-right { ... } */
+      /* .header-icon { ... } */
+      /* .cart-count, .wishlist-count { ... } */
+
+      /* --- Removed Search Styles (Assume handled by index.css) --- */
+      /* .search-container { ... } */
+      /* #header-search-input { ... } */
+      /* #search-results-popup { ... } */
+      /* .popup-item { ... } */
+      /* .popup-no-results { ... } */
+
+      /* --- PRODUCT GRID STYLES (Keep for wishlist items) --- */
+      .listing-header {
+        text-align: center;
+        margin: 40px 0 30px;
+      }
+      .listing-header h2 {
+        font-size: 2rem;
+        font-family: "Playfair Display", serif;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Responsive grid columns */
+        gap: 20px;
+        padding-bottom: 40px;
+      }
+      .product-card {
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+      .product-card:hover {
+        transform: scale(1.03); /* Slightly larger scale */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+       /* Added wrapper for product card link */
+      .product-card > a { display: block; text-decoration: none; color: inherit; }
+
+      .product-image-container {
+        position: relative;
+      }
+      .product-image-container img {
+        width: 100%;
+        aspect-ratio: 3 / 4; /* Maintain aspect ratio */
+        object-fit: cover;
+      }
+      
+      /* --- MODIFICATION START --- */
+      /* Made selector more specific and added !important to override index.css */
+      #wishlist-grid .product-card .wishlist-btn { /* Style for the remove button */
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--secondary-color); /* Make heart red by default on wishlist */
+
+        /* These rules force the button to be visible, overriding hover-only styles */
+        opacity: 1 !important; 
+        visibility: visible !important;
+      }
+      
+      /* Ensure the heart icon inside is solid */
+      /* Made selector more specific */
+       #wishlist-grid .product-card .wishlist-btn i.fa-heart {
+           font-weight: 900; /* Use font-weight to make FontAwesome heart solid */
+       }
+       /* --- MODIFICATION END --- */
+
+      .product-info {
+        padding: 10px;
+      }
+      .product-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        /* Allow multiple lines if needed */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 2.7em; /* Approx height for 2 lines */
+      }
+      .product-price {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-top: 5px;
+      }
+      .empty-wishlist-message {
+        text-align: center;
+        padding: 50px 20px;
+        font-size: 1.2rem;
+        color: #777;
+      }
+      .empty-wishlist-message i {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: #ccc;
+      }
+      /* Added style for the link within the empty message */
+      .empty-wishlist-message a {
+          color: var(--secondary-color);
+          text-decoration: underline;
+          font-weight: 500;
+      }
+       .empty-wishlist-message a:hover {
+           color: var(--primary-color);
+       }
+
+
+      /* --- Removed Profile Dropdown Styles (Assume handled by index.css) --- */
+      /* .profile-icon-container { ... } */
+      /* .profile-dropdown { ... } */

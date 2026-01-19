@@ -1,0 +1,457 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Details - HE SHE STYLES</title>
+    <link rel="icon" href="{% static 'customer/images/logo.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'customer/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'customer/css/product.css' %}">
+</head>
+
+<body data-header-url="{% url 'api_header' %}">
+
+    <div id="header-placeholder"></div>
+
+    <main class="container" id="product-detail-wrapper">
+        <p>Loading product details...</p>
+
+        {# Server-side accordion fallback using DB fields from `customer_product` #}
+        {% if customer_product %}
+        <section class="product-accordion server-rendered-accordion" style="margin-top:20px;">
+            <details class="accordion-item" open>
+                <summary>Details</summary>
+                <div class="accordion-content">{{ customer_product.description|default:'N/A.' }}</div>
+            </details>
+
+            {% if customer_product.style_fit %}
+            <details class="accordion-item">
+                <summary>Style & Fit</summary>
+                <div class="accordion-content">{{ customer_product.style_fit }}</div>
+            </details>
+            {% endif %}
+
+            {% if customer_product.shipping_return %}
+            <details class="accordion-item">
+                <summary>Shipping & Returns</summary>
+                <div class="accordion-content">{{ customer_product.shipping_return }}</div>
+            </details>
+            {% endif %}
+        </section>
+        {% endif %}
+    </main>
+
+    <!-- Size Selection Section -->
+    <!-- <div class="product-sizes">
+    {% for size, data in size_data.items %}
+        {% if data.stock > 0 %}
+            <button class="size-btn"
+                data-size="{{ size }}"
+                data-price="{{ data.price }}"
+                data-stock="{{ data.stock }}">
+                {{ size }} ({{ data.stock }} left)
+            </button>
+        {% else %}
+            <button class="size-btn disabled" disabled>
+                {{ size }} (Out of Stock)
+            </button>
+        {% endif %}
+    {% endfor %}
+</div> -->
+
+
+
+
+    <!-- Reviews Section -->
+    <section class="reviews-section container" id="reviews-section"
+        style="margin-top: 50px; margin-bottom: 50px; padding-top: 30px; border-top: 1px solid #eee;">
+        <div class="section-header"
+            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="margin:0;">Customer Reviews <span id="review-count-badge"
+                    style="font-size:0.6em; background:#eee; padding:2px 8px; border-radius:12px; vertical-align:middle;">0</span>
+            </h2>
+            <div id="review-summary" style="text-align:right;">
+                <div class="avg-rating" style="color:#f39c12; font-size:1.2em; font-weight:bold;">
+                    <span id="avg-rating-val">0.0</span> <i class="fas fa-star"></i>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviews-list" class="reviews-list" style="max-height: 500px; overflow-y: auto; margin-bottom: 30px;">
+            <p style="text-align:center; color:#777; padding:20px;">Loading reviews...</p>
+        </div>
+
+        <!-- Write Review Form -->
+        <div id="write-review-container" class="write-review-container"
+            style="display:none; background:#f9f9f9; padding:25px; border-radius:12px; border:1px solid #e0e0e0;">
+            <h3 style="margin-top:0;">Write a Review</h3>
+            <p style="font-size:0.9em; color:#666;">⭐ Tell us how this product worked for you!</p>
+            <form id="review-form" style="margin-top:15px;">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px;">Your Rating</label>
+                    <div class="star-rating-input"
+                        style="font-size: 24px; color:#ddd; cursor:pointer; display:inline-block;">
+                        <i class="far fa-star" data-val="1"></i>
+                        <i class="far fa-star" data-val="2"></i>
+                        <i class="far fa-star" data-val="3"></i>
+                        <i class="far fa-star" data-val="4"></i>
+                        <i class="far fa-star" data-val="5"></i>
+                    </div>
+                    <input type="hidden" name="rating" id="review-rating-input" required>
+                    <span id="rating-error" style="color:red; font-size:0.8em; display:none; margin-left:10px;">Please
+                        select a rating</span>
+                </div>
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px;">Your Review</label>
+                    <textarea name="comment" id="review-comment" rows="4"
+                        style="width:100%; padding:12px; border:1px solid #ccc; border-radius:6px; font-family:inherit;"
+                        placeholder="How was the quality, fit, and experience?"></textarea>
+                </div>
+                <!-- Image Upload (Max 3) -->
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px;">Add Photos (Optional)</label>
+                    <input type="file" id="review-images" name="images" accept=".jpg,.jpeg,.png,.webp" multiple
+                        style="margin-bottom:5px; font-size:14px; width:100%;">
+                    <small style="display:block; color:#777;">Max 3 images. Allowed: .jpg, .jpeg, .png, .webp</small>
+                    <div id="image-error" style="color:red; font-size:0.9em; display:none; margin-top:5px;"></div>
+                </div>
+                <button type="submit" class="btn-primary"
+                    style="padding:10px 25px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Submit
+                    Review</button>
+            </form>
+        </div>
+
+        <div id="login-to-review"
+            style="display:none; text-align:center; padding:20px; background:#f8f9fa; border-radius:8px;">
+            <p>Please <a href="/login/" style="text-decoration:underline;">login</a> to write a review.</p>
+        </div>
+
+        <div id="not-eligible-msg"
+            style="display:none; text-align:center; padding:15px; color:#777; font-style:italic;">
+            <small>Only verified buyers who have received this product can write a review.</small>
+        </div>
+    </section>
+
+    <!-- Review Success Modal -->
+    <div id="review-success-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center;">
+        <div
+            style="background:#fff; padding:30px; border-radius:12px; max-width:400px; width:90%; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.3); animation: slideUp 0.3s ease;">
+            <style>
+                @keyframes slideUp {
+                    from {
+                        transform: translateY(20px);
+                        opacity: 0;
+                    }
+
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+            </style>
+            <div style="font-size:50px; color:#27ae60; margin-bottom:15px;"><i class="fas fa-check-circle"></i></div>
+            <h3 style="margin:0 0 10px 0; color:#333; font-size:22px;">Review Submitted!</h3>
+            <p style="color:#666; margin-bottom:25px; line-height:1.5;">Thank you for your feedback! Your review helps
+                others make better choices.</p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button id="modal-shop-btn"
+                    style="padding:12px; border:none; background:#000; color:#fff; border-radius:6px; cursor:pointer; font-weight:600; font-size:14px; transition: opacity 0.2s;">Continue
+                    Shopping</button>
+                <button id="modal-ok-btn"
+                    style="padding:12px; border:1px solid #ddd; background:#fff; color:#555; border-radius:6px; cursor:pointer; font-weight:600; font-size:14px; transition: background 0.2s;">OK,
+                    Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Similar Products Section -->
+    <section class="similar-products-section container">
+        <h2>You Might Also Like</h2>
+        <div class="product-grid" id="similar-products-grid"></div>
+    </section>
+
+    <!-- WhatsApp Contact -->
+    <div class="whatsapp-container">
+        <div class="whatsapp-tooltip">Need More Information</div>
+        <a href="https://wa.me/17808864821" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    {% include 'customer/footer.html' %}
+
+    <!-- Cart Sidebar -->
+    <div id="cart-overlay" class="cart-overlay">
+        <div id="cart-sidebar" class="cart-sidebar">
+            <div class="cart-header">
+                <h3>Your Cart</h3>
+                <button id="close-cart-btn" class="close-cart-btn">&times;</button>
+            </div>
+            <div class="cart-items-container" id="cart-items-container"></div>
+            <div class="cart-footer">
+                <div class="subtotal" id="subtotal-container">
+                    <span>Subtotal</span>
+                    <span id="subtotal-price">$0.00</span>
+                </div>
+                <a href="{% url 'checkout' %}" class="checkout-btn">Proceed to Checkout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="size-chart-modal-overlay" class="size-chart-modal-overlay">
+        <div class="size-chart-modal">
+            <div class="size-chart-header">
+                <h3>Size Chart (Inches)</h3>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+            <div class="size-chart-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Size</th>
+                            <th>Chest</th>
+                            <th>Waist</th>
+                            <th>Hips</th>
+                            <th>Shoulder</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>S</td>
+                            <td>36</td>
+                            <td>30</td>
+                            <td>38</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>M</td>
+                            <td>38</td>
+                            <td>32</td>
+                            <td>40</td>
+                            <td>15.5</td>
+                        </tr>
+                        <tr>
+                            <td>L</td>
+                            <td>40</td>
+                            <td>34</td>
+                            <td>42</td>
+                            <td>16</td>
+                        </tr>
+                        <tr>
+                            <td>XL</td>
+                            <td>42</td>
+                            <td>36</td>
+                            <td>44</td>
+                            <td>16.5</td>
+                        </tr>
+                        <tr>
+                            <td>XXL</td>
+                            <td>44</td>
+                            <td>38</td>
+                            <td>46</td>
+                            <td>17</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'customer/js/index.js' %}?v=3"></script>
+    <script src="{% static 'customer/js/product.js' %}?v=5"></script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            // --- Review handling logic ---
+            const pathParts = window.location.pathname.split('/').filter(p => p);
+            const productId = pathParts[pathParts.length - 1];
+
+            if (!productId || productId === 'product') return;
+
+            const reviewsContainer = document.getElementById('reviews-list');
+            const countBadge = document.getElementById('review-count-badge');
+            const avgDisplay = document.getElementById('avg-rating-val');
+            const formContainer = document.getElementById('write-review-container');
+            const loginMsg = document.getElementById('login-to-review');
+            const notEligibleMsg = document.getElementById('not-eligible-msg');
+
+            // Star Input Logic
+            const stars = document.querySelectorAll('.star-rating-input i');
+            const ratingInput = document.getElementById('review-rating-input');
+
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    const val = parseInt(star.dataset.val);
+                    ratingInput.value = val;
+                    updateStars(val);
+                    document.getElementById('rating-error').style.display = 'none';
+                });
+                star.addEventListener('mouseover', () => {
+                    updateStars(parseInt(star.dataset.val), true);
+                });
+                star.addEventListener('mouseout', () => {
+                    updateStars(parseInt(ratingInput.value) || 0);
+                });
+            });
+
+            function updateStars(val) {
+                stars.forEach(s => {
+                    const sVal = parseInt(s.dataset.val);
+                    if (sVal <= val) {
+                        s.classList.remove('far');
+                        s.classList.add('fas');
+                        s.style.color = '#f39c12';
+                    } else {
+                        s.classList.remove('fas');
+                        s.classList.add('far');
+                        s.style.color = '#ddd';
+                    }
+                });
+            }
+
+            // Fetch Reviews
+            try {
+                const res = await fetch(`/api/products/${productId}/reviews/`);
+                const data = await res.json();
+
+                if (data.success) {
+                    // Update stats using trust-first rating system
+                    const ratingData = data.rating_data || data.stats;
+
+                    if (countBadge) {
+                        if (ratingData.is_new) {
+                            countBadge.textContent = ratingData.display_text; // Shows "New Arrival"
+                        } else {
+                            countBadge.textContent = ratingData.review_count;
+                        }
+                    }
+
+                    if (avgDisplay) {
+                        avgDisplay.textContent = ratingData.rating;
+                    }
+
+                    // Render list
+                    if (data.reviews.length === 0) {
+                        const newProductMessage = ratingData.is_new
+                            ? '<p style="text-align:center; color:#999; font-style:italic;">This is a new arrival product. Be the first to review!</p>'
+                            : '<p style="text-align:center; color:#999; font-style:italic;">No reviews yet.</p>';
+                        reviewsContainer.innerHTML = newProductMessage;
+                    } else {
+                        reviewsContainer.innerHTML = data.reviews.map(r => `
+                        <div class="review-item" style="border-bottom:1px solid #eee; padding:15px 0;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <strong>${r.user} ${r.is_verified ? '<i class="fas fa-check-circle" title="Verified Purchase" style="color:#27ae60; font-size:0.8em; margin-left:5px;"></i>' : ''}</strong>
+                                <span style="color:#777; font-size:0.9em;">${r.created_at}</span>
+                            </div>
+                            <div style="color:#f39c12; margin-bottom:8px; font-size:0.9em;">
+                                ${'<i class="fas fa-star"></i>'.repeat(r.rating)}${'<i class="far fa-star"></i>'.repeat(5 - r.rating)}
+                            </div>
+                            <div style="color:#333; line-height:1.5;">${r.comment || ''}</div>
+                            ${r.images && r.images.length > 0 ? `
+                                <div style="margin-top:10px; display:flex; gap:10px;">
+                                    ${r.images.map(img => `
+                                        <a href="${img}" target="_blank">
+                                            <img src="${img}" style="width:60px; height:60px; object-fit:cover; border-radius:4px; border:1px solid #ddd;">
+                                        </a>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('');
+                    }
+
+                    // Show/Hide Form logic
+                    if (data.user_can_review) {
+                        formContainer.style.display = 'block';
+                        if (notEligibleMsg) notEligibleMsg.style.display = 'none';
+                        if (loginMsg) loginMsg.style.display = 'none';
+                    } else {
+                        formContainer.style.display = 'none';
+                        if (!data.is_authenticated) {
+                            if (loginMsg) loginMsg.style.display = 'block';
+                            if (notEligibleMsg) notEligibleMsg.style.display = 'none';
+                        } else {
+                            // Logged in but not eligible (or already reviewed)
+                            if (notEligibleMsg) notEligibleMsg.style.display = 'none';
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Error fetching reviews:', e);
+                reviewsContainer.innerHTML = '<p>Failed to load reviews.</p>';
+            }
+
+            // Submit Form
+            const form = document.getElementById('review-form');
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const rating = ratingInput.value;
+                    const comment = document.getElementById('review-comment').value;
+                    const imagesInput = document.getElementById('review-images');
+                    const imgError = document.getElementById('image-error');
+
+                    if (!rating) {
+                        document.getElementById('rating-error').style.display = 'inline';
+                        return;
+                    }
+
+                    // Validate Images Count
+                    if (imagesInput.files.length > 3) {
+                        imgError.textContent = 'You can select a maximum of 3 images.';
+                        imgError.style.display = 'block';
+                        return;
+                    } else {
+                        imgError.style.display = 'none';
+                    }
+
+                    // Prepare FormData
+                    const formData = new FormData();
+                    formData.append('product_id', productId);
+                    formData.append('rating', rating);
+                    formData.append('comment', comment);
+
+                    for (let i = 0; i < imagesInput.files.length; i++) {
+                        formData.append('images', imagesInput.files[i]);
+                    }
+
+                    try {
+                        const res = await fetch('/api/reviews/submit/', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await res.json();
+                        if (result.success) {
+                            const modal = document.getElementById('review-success-modal');
+                            const okBtn = document.getElementById('modal-ok-btn');
+                            const shopBtn = document.getElementById('modal-shop-btn');
+
+                            modal.style.display = 'flex';
+
+                            okBtn.onclick = () => {
+                                modal.style.display = 'none';
+                                window.location.reload();
+                            };
+
+                            shopBtn.onclick = () => {
+                                window.location.href = '/';
+                            };
+                        } else {
+                            alert(result.message || 'Error submitting review');
+                        }
+                    } catch (e) {
+                        alert('Error submitting review');
+                    }
+                });
+            }
+        });
+    </script>
+</body>

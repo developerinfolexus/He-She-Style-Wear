@@ -1,0 +1,309 @@
+/* HeShe/css/customers.css */
+
+/* --- Customer Summary Cards Layout --- */
+.customers-summary {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Allow more cards */
+}
+
+/* --- Filter Section --- */
+.customer-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 32px; /* Add margin like orders page */
+}
+.customer-filters .form-group {
+    margin: 0;
+    flex-grow: 1;
+    min-width: 150px;
+}
+.customer-filters .form-group.search-bar {
+    flex-grow: 2;
+    min-width: 250px;
+}
+
+/* Base Input & Select Styles for Filters (using Choices.js) */
+.customer-filters input[type="text"],
+.customer-filters .choices__inner /* Target Choices.js wrapper */
+{
+    width: 100%;
+    padding: 12px;
+    font-size: 0.9375rem;
+    font-family: 'Roboto', sans-serif;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-secondary-solid);
+    color: var(--text-primary);
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+}
+.customer-filters select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* display: none; */ /* Choices.js usually handles this */
+ } /* Hide original select */
+
+.customer-filters input[type="text"]:focus,
+.customer-filters .choices__inner.is-focused
+{
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+/* --- Main Table Styles --- */
+.recent-orders { /* Reusing class name */
+    background-color: var(--bg-secondary-solid);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+.recent-orders h2 {
+    margin: 0 0 16px 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+table { width: 100%; border-collapse: collapse; }
+th, td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+/* --- START: FIX FOR PHONE WRAP --- */
+td:nth-child(4) { /* Target the 4th column (Phone) */
+    white-space: nowrap;
+}
+/* --- END: FIX FOR PHONE WRAP --- */
+
+th {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap; /* Prevent headers from wrapping */
+}
+tbody tr:last-child td { border-bottom: none; }
+
+/* Status Styles */
+.status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.status.active { background-color: var(--status-delivered-bg); color: var(--status-delivered-text); }
+.status.inactive { background-color: var(--status-processing-bg); color: var(--status-processing-text); }
+.status.banned { background-color: var(--status-cancelled-bg); color: var(--status-cancelled-text); }
+
+/* Action Button Styles (Consistent with products/orders) */
+.action-buttons { display: flex; gap: 8px; }
+.btn-action {
+    padding: 6px; line-height: 0; font-size: 0.8125rem; font-weight: 500;
+    border-radius: 5px; cursor: pointer; border: 1px solid var(--border-color);
+    background-color: var(--bg-primary); color: var(--text-secondary);
+    transition: background-color 0.2s, color 0.2s; text-decoration: none;
+}
+.btn-action:hover { background-color: var(--border-color); }
+.btn-action.btn-view { color: var(--accent-primary); }
+.btn-action.btn-view:hover { background-color: var(--accent-light); }
+.btn-action.btn-edit { color: #1e88e5; /* Blue */ }
+.btn-action.btn-edit:hover { background-color: #e3f2fd; }
+.btn-action.btn-delete { color: var(--status-cancelled-text); }
+.btn-action.btn-delete:hover { background-color: var(--status-cancelled-bg); }
+/* REMOVED .btn-view-orders styles */
+
+
+/* --- Customer Detail Modal Styles --- */
+.modal-content-lg { max-width: 900px; width: 90%; }
+.customer-details-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.info-section {
+    background-color: var(--bg-primary); padding: 16px;
+    border-radius: 8px; border: 1px solid var(--border-color);
+}
+.info-section.full-width { grid-column: 1 / -1; }
+.info-section h3 {
+    margin-top: 0; margin-bottom: 16px; font-size: 1.1rem;
+    border-bottom: 1px solid var(--border-color); padding-bottom: 8px;
+}
+.info-section h4 {
+    margin-top: 0; margin-bottom: 8px; font-size: 1rem; color: var(--text-secondary);
+}
+.info-section p { margin: 4px 0; color: var(--text-secondary); }
+.info-section p strong, .info-section p span { color: var(--text-primary); }
+.info-section hr { border: none; border-top: 1px solid var(--border-color); margin: 16px 0; }
+.payment-summary { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9375rem; }
+.payment-summary.total { font-weight: 700; font-size: 1.1rem; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); }
+
+/* Address Grid */
+.address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.address-grid p { white-space: pre-line; /* Respect line breaks in address */ }
+
+/* Order History Table */
+.order-history-table-wrapper {
+    max-height: 300px; /* Limit height and make scrollable */
+    overflow-y: auto;
+}
+.items-table { font-size: 0.875rem; } /* Reusing class from orders.css */
+.items-table th, .items-table td { padding: 12px; }
+.items-table thead { background-color: var(--bg-primary); position: sticky; top: 0; z-index: 1;} /* Sticky header */
+.items-table .btn { padding: 4px 8px; font-size: 0.75rem; } /* Smaller button */
+
+/* Modal Footer */
+.modal-footer {
+    display: flex; justify-content: flex-end; gap: 12px;
+    padding: 16px 0 0 0; margin-top: 24px; border-top: 1px solid var(--border-color);
+}
+
+/* General button styles (ensure they exist in global or here) */
+.btn {
+    padding: 10px 18px; border: none; border-radius: 6px;
+    font-size: 0.875rem; font-weight: 600; cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+ }
+.btn-primary { background-color: var(--accent-primary); color: #ffffff; }
+.btn-primary:hover { background-color: #7b1fa2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.btn-secondary { background-color: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--border-color); font-weight: 500; }
+.btn-secondary:hover { background-color: var(--border-color); }
+.btn-danger { background-color: var(--status-cancelled-text); color: #ffffff; }
+.btn-danger:hover { background-color: #dc2626; }
+
+
+/* --- Choices.js Custom Styles (Copied from orders.css) --- */
+.choices { margin-bottom: 0; font-size: 0.9375rem; font-family: 'Roboto', sans-serif; }
+.is-open .choices__inner { border-radius: 6px 6px 0 0; }
+.choices[data-type*='select-one']::after { display: none !important; }
+.choices__inner::after {
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999999' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    height: 16px; width: 16px; border: none; position: absolute; right: 12px; top: 50%;
+    margin-top: -8px; pointer-events: none; transition: transform .2s ease-in-out;
+}
+.is-open .choices__inner::after { transform: rotate(-180deg); }
+.choices__list--dropdown, .choices__list[aria-expanded] {
+    background: var(--bg-secondary-solid); border: 1px solid var(--accent-primary); border-top: none;
+    border-radius: 0 0 6px 6px; box-shadow: 0 4px 12px var(--shadow-color); margin-top: -1px; z-index: 10;
+}
+.choices__list--dropdown .choices__item--selectable { padding: 10px 12px; color: var(--text-primary); }
+.choices__list--dropdown .choices__item--selectable.is-highlighted { background-color: var(--accent-light); color: var(--accent-primary); }
+.choices__list--dropdown .choices__placeholder { color: var(--text-secondary); }
+.choices__input { background-color: var(--bg-secondary-solid) !important; color: var(--text-primary) !important; }
+.choices__item--choice { padding: 10px 12px; }
+
+
+.customer-link {
+  color: #4f46e5;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.customer-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.btn-view, .btn-edit {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.btn-view:hover {
+  color: #2563eb;
+}
+
+.btn-edit:hover {
+  color: #16a34a;
+}
+
+/* --- START: Added Styles for Spending Filter Dropdown --- */
+#spendingFilter + .choices .choices__list--dropdown .choices__item--selectable {
+    padding: 12px 15px;
+    font-size: 1rem;
+    color: #333;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+#spendingFilter + .choices .choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background-color: var(--accent-primary);
+    color: #fff;
+}
+
+#spendingFilter + .choices .choices__inner .choices__item.choices__item--selectable {
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--accent-primary);
+}
+/* --- END: Added Styles for Spending Filter Dropdown --- */
+
+/* --- END Choices.js --- */
+
+/* ---------------------------------------------------------------------- */
+/* --- START: RESPONSIVENESS FOR CUSTOMERS PAGE --- */
+/* ---------------------------------------------------------------------- */
+
+/* Make the main customer list table scrollable on small screens */
+.page-content > .recent-orders {
+    overflow-x: auto;
+}
+
+/* Make the order history table in the modal scrollable */
+.order-history-table-wrapper {
+    overflow-x: auto;
+}
+
+@media (max-width: 992px) {
+    /* On tablets, allow more room for filters */
+    .customer-filters .form-group.search-bar {
+        min-width: 100%; /* Make search bar full width */
+    }
+}
+
+@media (max-width: 768px) {
+    /* Stack the 2-column layout in the modal */
+    .customer-details-layout {
+        grid-template-columns: 1fr;
+    }
+
+    /* Stack the 2-column address grid in the modal */
+    .address-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 500px) {
+    /* Stack the filter inputs vertically */
+    .customer-filters {
+        flex-direction: column;
+        align-items: stretch; /* Make all inputs full-width */
+    }
+
+    .customer-filters .form-group {
+        min-width: 100%;
+        width: 100%;
+    }
+
+    /* Reduce padding in the modal for small screens */
+    .modal-content .modal-body {
+        padding: 16px;
+    }
+
+    .customer-details-layout,
+    .address-grid {
+        gap: 16px; /* Reduce gap */
+    }
+}
+/* ---------------------------------------------------------------------- */
+/* --- END: RESPONSIVENESS FOR CUSTOMERS PAGE --- */
+/* ---------------------------------------------------------------------- */

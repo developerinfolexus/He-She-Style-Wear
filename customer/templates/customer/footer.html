@@ -1,0 +1,146 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'customer/css/index_modal_append.css' %}">
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-about">
+            <h4>He She Style Wear</h4>
+            <p>
+                Discover the latest trends and timeless styles. Quality apparel for
+                every occasion, designed to make you look and feel your best.
+            </p>
+        </div>
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/about-us/" class="policy-link">About Us</a></li>
+                <li><a href="/contact/" class="policy-link">Contact</a></li>
+                <li><a href="/reviews/" class="policy-link">Reviews</a></li>
+                <li><a href="/faqs/" class="policy-link">FAQs</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-links">
+            <h4>Customer Service</h4>
+            <ul>
+                <li><a href="/terms-conditions/" class="policy-link">Terms & Conditions</a></li>
+                <li><a href="/cancellation-return/" class="policy-link">Cancellation & Return</a></li>
+                <li><a href="/shipping-delivery/" class="policy-link">Shipping & Delivery</a></li>
+                <li><a href="/disclaimer-policy/" class="policy-link">Disclaimer Policy</a></li>
+                <li><a href="/track-order/" class="policy-link">Track Order</a></li>
+                <li><a href="/refund-policy/" class="policy-link">Refund Policy</a></li>
+                <li><a href="/privacy-policy/" class="policy-link">Privacy Policy</a></li>
+                <li><a href="/contact-us/" class="policy-link">Contact Us</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-newsletter">
+            <h4>Join Our Community</h4>
+            <p>Connect with us on social media</p>
+            <div class="social-connect-icons"
+                style="display: flex !important; flex-direction: row !important; justify-content: center !important; align-items: center !important; gap: 50px !important; margin-top: 30px !important;">
+                <a href="#" aria-label="Instagram" class="social-connect-link">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" aria-label="Facebook" class="social-connect-link">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://wa.me/17808864821" aria-label="WhatsApp" target="_blank" class="social-connect-link">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 He She Style Wear. All Rights Reserved.</p>
+        <p class="footer-credit">Designed And Developed By <a href="https://infolexus.com" target="_blank"
+                rel="noopener noreferrer">Infolexus Solutions</a></p>
+    </div>
+</footer>
+
+<!-- Customer Services Modal -->
+<div id="info-modal-overlay" class="info-modal-overlay">
+    <div class="info-modal">
+        <div class="info-modal-header">
+            <h2 id="info-modal-title">Info</h2>
+            <button id="close-info-modal" class="close-info-modal">&times;</button>
+        </div>
+        <div class="info-modal-body" id="info-modal-body">
+            <p>Loading...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const modalOverlay = document.getElementById('info-modal-overlay');
+        const modalBody = document.getElementById('info-modal-body');
+        const modalTitle = document.getElementById('info-modal-title');
+        const closeBtn = document.getElementById('close-info-modal');
+
+        // Close Modal Logic
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // Close on button click
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+        // Close on overlay click (click outside)
+        if (modalOverlay) modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        // Close on ESC key press
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Handle all policy links
+        document.querySelectorAll('.policy-link').forEach(link => {
+            link.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                const href = link.getAttribute('href');
+
+                // Show Modal with loading state
+                modalTitle.textContent = link.textContent;
+                modalBody.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+
+                try {
+                    const response = await fetch(href);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const html = await response.text();
+
+                    // Parse HTML to extract just the content
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Try multiple selectors to find the content
+                    const content = doc.querySelector('.info-page-content') ||
+                        doc.querySelector('main') ||
+                        doc.querySelector('.content') ||
+                        doc.querySelector('article');
+
+                    if (content) {
+                        modalBody.innerHTML = content.innerHTML;
+                    } else {
+                        // Fallback: show a message with link to open in new tab
+                        modalBody.innerHTML = '<div style="text-align:center; padding:20px;"><p>Unable to load content in modal.</p><p><a href="' + href + '" target="_blank" style="color: var(--secondary-color); text-decoration: underline;">Open in new tab</a></p></div>';
+                    }
+                } catch (error) {
+                    console.error('Error fetching page:', error);
+                    modalBody.innerHTML = '<p style="color:red; text-align:center; padding:20px;">Failed to load content. Please try again.</p>';
+                }
+
+                return false;
+            }, true); // Use capture phase to ensure this runs first
+        });
+    });
+</script>

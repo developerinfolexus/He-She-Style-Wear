@@ -1,0 +1,420 @@
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: #f5f5f7;
+}
+
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 26px;
+    color: #333;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.card h2 {
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.edit-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.edit-box p {
+    font-size: 16px;
+    margin: 0;
+    color: #444;
+    width: 80%;
+}
+
+button {
+    padding: 10px 16px;
+    background: #6a5acd;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #5848c2;
+}
+
+input.edit-input {
+    width: 80%;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    outline: none;
+}
+
+/* Disable visual effect */
+.disabled-text {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* Enable/Disable button styling */
+.toggle-btn {
+    margin-left: 10px;
+    background: #444;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.toggle-btn:hover {
+    background: #333;
+}
+.banner-list {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.banner-item {
+    background: #f8f8f8;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    font-size: 15px;
+    border-left: 4px solid #ff9800;
+}
+.coupon-list {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.coupon-item {
+    background: #eef9ff;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    font-size: 15px;
+    border-left: 4px solid #007bff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-btn {
+    background: #d9534f;
+    color: #fff;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 12px;
+}
+
+.remove-btn:hover {
+    background: #c9302c;
+}
+
+.disabled-text {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+
+.coupon-edit-wrapper { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.coupon-code-input { padding:6px 8px; border-radius:6px; border:1px solid #ccc; min-width:140px; }
+.coupon-amount-input { padding:6px 8px; border-radius:6px; border:1px solid #ccc; width:100px; }
+.coupon-unit-select { padding:6px 8px; border-radius:6px; border:1px solid #ccc; }
+
+/* Dropdown toggle styles */
+.toggle-dropdown { position: relative; display: inline-block; }
+.toggle-dropdown__btn {
+  background:#444; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;
+}
+.toggle-dropdown__btn:focus { outline:2px solid #88b7ff; }
+
+.toggle-dropdown__menu {
+  position: absolute;
+  right: 0;
+  margin-top: 6px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  min-width: 120px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  padding: 6px 0;
+  z-index: 200;
+}
+
+.toggle-dropdown__menu li { list-style: none; margin: 0; padding: 0; }
+.toggle-dropdown__menu button.toggle-option {
+  width: 100%; text-align: left; padding: 8px 12px; border: none; background: transparent; cursor: pointer;
+}
+.toggle-dropdown__menu button.toggle-option:hover { background: #f5f7fa; }
+
+/* Small responsive wrap */
+@media (max-width:520px) {
+  .edit-box { flex-direction: column; align-items: stretch; }
+  .toggle-dropdown__menu { right: 8px; left: 8px; }
+}
+
+/* Disabled visual state */
+.disabled-text { opacity: 0.45; pointer-events: none; }
+
+/* coupon-list / coupon-item (if not already present) */
+.coupon-list { margin-top: 12px; padding-top: 10px; border-top: 1px solid #ddd; }
+.coupon-item { background: #eef9ff; padding: 10px 14px; margin-bottom: 8px; border-radius: 6px; font-size: 15px; border-left: 4px solid #007bff; }
+.disabled-text {
+    opacity: 0.4;
+    pointer-events: none;
+}
+.toggle-btn {
+    margin-left: 10px;
+    background: #444;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.toggle-btn:hover {
+    background: #333;
+}
+
+/* New Arrivals date/edit styles */
+.newarrival-edit-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.newarrival-edit-wrapper .coupon-code-input,
+.newarrival-edit-wrapper .coupon-amount-input,
+.newarrival-edit-wrapper .coupon-unit-select,
+.newarrival-edit-wrapper .date-input {
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+.newarrival-edit-wrapper label {
+  font-size: 13px;
+  margin-left: 6px;
+}
+.coupon-list .coupon-item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px;
+  border:1px dashed #eee;
+  margin-top:8px;
+  border-radius:6px;
+}
+.coupon-list .remove-btn {
+  background: #d9534f;
+  color: #fff;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.disabled-text { opacity: 0.45; filter: grayscale(0.4); }
+.save-btn {
+    background: #28a745;
+    padding: 8px 14px;
+    border-radius: 6px;
+    color: white;
+    margin-left: 8px;
+}
+
+.cancel-btn {
+    background: #dc3545;
+    padding: 8px 14px;
+    border-radius: 6px;
+    color: white;
+    margin-left: 8px;
+}
+
+/* Mobile view responsive fix */
+@media (max-width: 520px) {
+    .edit-box {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .save-btn,
+    .cancel-btn {
+        width: 100%;
+        margin-top: 8px;
+    }
+}
+
+
+
+.banner-item-box {
+    width: 95%;
+    background: #fff;
+    padding: 14px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.banner-item-text {
+    font-size: 16px;
+    color: #333;
+    word-wrap: break-word;
+}
+
+/* Top Tab Buttons */
+.discount-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 10px 18px;
+    background: #6a5acd;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.tab-btn.active {
+    background: #837dff;
+}
+
+/* Tab show/hide */
+.tab-section {
+    display: none;
+}
+
+.tab-section.active {
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .tab-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+/* Women + Kids buttons container */
+.coupon-extra-btns {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+/* Individual gender buttons */
+.gender-btn {
+    padding: 10px 16px;
+    background: #ff9800;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.gender-btn:hover {
+    background: #e67f00;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .gender-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+.women-box {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.hidden {
+    display: none;
+}
+
+.women-coupon-entry {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+#womenCouponList .coupon-item {
+    background: #ffe9cc;
+    border-left: 4px solid #ff9800;
+}
+
+
+/* Kids Section Box */
+.kids-box {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.kids-hidden {
+    display: none;
+}
+
+.kids-coupon-entry {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+/* Kids Inputs */
+.kids-code-input,
+.kids-amount-input,
+.kids-unit-select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* Kids Coupon List Styling */
+.kids-coupon-list .kids-coupon-item {
+    background: #e1f4ff;
+    border-left: 4px solid #00aaff;
+}
+
+@media (max-width: 600px) {
+    .kids-code-input,
+    .kids-amount-input,
+    .kids-unit-select {
+        width: 100%;
+    }
+}
+

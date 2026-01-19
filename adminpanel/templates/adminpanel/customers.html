@@ -1,0 +1,359 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Admin Panel - Customers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <link rel="stylesheet" href="{% static 'adminpanel/css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/customers.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <style>
+        /* This style is kept from your example */
+        .btn-delete {
+            background-color: #f44336;
+            /* Red */
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+
+        .btn-delete:hover {
+            background-color: #d32f2f;
+        }
+
+        .pending .card-icon {
+            background-color: var(--status-shipped-bg);
+        }
+
+        .pending .card-icon svg {
+            stroke: var(--status-shipped-text);
+        }
+
+        /* Styles for custom date range */
+        .customer-filters.form-card {
+            flex-wrap: wrap;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            width: 100%;
+        }
+
+        #customDateRange {
+            align-items: flex-end;
+        }
+
+        #customDateRange .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #customDateRange label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        /* --- START: MODIFIED FOR ICON CLICK & BUTTON SIZE --- */
+        .input-with-icon {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-with-icon .fa-calendar-days {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            color: #888;
+            cursor: pointer;
+            /* Make the icon look clickable */
+            z-index: 2;
+            /* Ensure icon is above the input */
+        }
+
+        input[type="text"].flatpickr-input {
+            background-color: var(--body-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+            font-size: 14px;
+            line-height: 1.5;
+            width: 100%;
+            box-sizing: border-box;
+            padding-right: 35px;
+            position: relative;
+            /* Needed for z-index */
+            z-index: 1;
+            /* Place input behind the icon */
+        }
+
+        /* This rule reduces the size of the Apply button */
+        #applyDateRange.btn {
+            padding: 0.5rem 0.75rem;
+            /* Match the input padding */
+            font-size: 14px;
+            /* Match the input font-size */
+            line-height: 1.5;
+            /* Match the input line-height */
+        }
+
+        /* --- END: MODIFIED FOR ICON CLICK & BUTTON SIZE --- */
+    </style>
+</head>
+
+<body>
+    <div class="admin-panel">
+        {% include 'adminpanel/includes/sidebar.html' %}
+
+        <main class="main-content">
+            <header class="main-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <h1>Customers</h1>
+                <!-- <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://i.pravatar.cc/40" alt="User Avatar">
+                </div> -->
+            </header>
+
+            <div class="page-content active" id="customers-page">
+
+                <section class="summary-cards customers-summary">
+
+                    <div class="card customers">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total Customers</h3>
+                            <p id="totalCustomers">0</p>
+                        </div>
+                    </div>
+
+                    <div class="card revenue">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total Spend</h3>
+                            <p id="totalSpend">$0.00</p>
+                        </div>
+                    </div>
+
+                    <div class="card pending">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <line x1="19" y1="8" x2="19" y2="14"></line>
+                                <line x1="22" y1="11" x2="16" y2="11"></line>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <h3>New (CUSTOMERS)</h3>
+                            <p id="newCustomers">0</p>
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+
+            <section class="customer-filters form-card">
+
+                <div class="filter-row">
+                    <div class="form-group search-bar">
+                        <input type="text" id="customerSearch" placeholder="Search by Name, Email, Phone...">
+                    </div>
+                    <div class="form-group">
+                        <select id="spendingFilter">
+                            <option value="">Spending Range</option>
+                            <option value="0-1000">$0 – $1,000</option>
+                            <option value="1001-5000">$1,001 – $5,000</option>
+                            <option value="5001-10000">$5,001 – $10,000</option>
+                            <option value="10001+">$10,000+</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select id="statusFilter">
+                            <option value="All Time" selected>All Time</option>
+                            <option value="Today">Today</option>
+                            <option value="Last 7 days">Last 7 Days</option>
+                            <option value="Last 30 days">Last 30 Days</option>
+                            <option value="Last 6 months">Last 6 month</option>
+                            <option value="Custom range">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select id="sortBy">
+                            <option value="newest">Sort By: Newest</option>
+                            <option value="mostOrders">Sort By: Most Orders</option>
+                            <option value="highestSpend">Sort By: Highest Spend</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-row" id="customDateRange"
+                    style="display: none; margin-top: 15px;padding-left: 10px; width: 700px;">
+                    <div class="form-group">
+                        <label for="startDate">Start Date:</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="startDate" placeholder="Select start date...">
+                            <i class="fa-solid fa-calendar-days" id="startDateIcon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date:</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="endDate" placeholder="Select end date...">
+                            <i class="fa-solid fa-calendar-days" id="endDateIcon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button id="applyDateRange" class="btn btn-primary">Apply Range</button>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <section class="recent-orders">
+                <h2>All Customers</h2>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Customer ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Total Orders</th>
+                                <th>Total Spent ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customers-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+    </div>
+
+    <div id="customerDetailsModal" class="modal">
+        <div class="modal-content modal-content-lg">
+            <div class="modal-header">
+                <h2 id="modalCustomerNameTitle">Customer Details</h2>
+                <span class="modal-close" id="customerModalCloseBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="customer-details-layout">
+                    <div class="info-section">
+                        <h3>Personal Information</h3>
+                        <p><strong>ID:</strong> <span id="modalCustId"></span></p>
+                        <p><strong>Name:</strong> <span id="modalCustName"></span></p>
+                        <p><strong>Email:</strong> <span id="modalCustEmail"></span></p>
+                        <p><strong>Phone:</strong> <span id="modalCustPhone"></span></p>
+                        <p><strong>Joined:</strong> <span id="modalCustJoined"></span></p>
+                        <p><strong>Type:</strong> <span id="modalCustType"></span></p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Purchase Summary</h3>
+                        <div class="payment-summary"><span>Total Orders:</span><span id="modalCustTotalOrders"></span>
+                        </div>
+                        <div class="payment-summary total"><span>Total Spent:</span><span
+                                id="modalCustTotalSpent"></span></div>
+                        <div class="payment-summary"><span>Average Order Value:</span><span id="modalCustAov"></span>
+                        </div>
+                        <hr>
+                        <p><strong>Preferred Method:</strong> <span id="modalCustPrefPayment"></span></p>
+                        <p><strong>Last Payment:</strong> <span id="modalCustLastPayment"></span></p>
+                    </div>
+                    <div class="info-section full-width">
+                        <h3>Address Details</h3>
+                        <div class="address-grid">
+                            <div>
+                                <h4>Shipping Address</h4>
+                                <p id="modalCustShippingAddress">N/A</p>
+                            </div>
+                            <div>
+                                <h4>Billing Address</h4>
+                                <p id="modalCustBillingAddress">N/A</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-section full-width">
+                        <h3>Order History (<span id="modalCustOrderCount">0</span>)</h3>
+                        <div class="order-history-table-wrapper">
+                            <table class="items-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Items</th>
+                                        <th>Total ($)</th>
+                                        <th>Status</th>
+                                        <th>Payment</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalCustOrderHistory"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+    </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script src="{% static 'adminpanel/js/customers.js' %}"></script>
+    <script src="{% static 'adminpanel/js/global.js' %}"></script>
+</body>
+
+</html>

@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Wishlist - HE SHE STYLES</title>
+  <link rel="icon" href="{% static 'customer/images/logo.png' %}" type="image/png">
+  <link rel="stylesheet" href="{% static 'customer/css/wishlist.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'customer/css/index.css' %}">
+  <style>
+    /* --- Override conflicting wishlist.css header styles if necessary --- */
+
+
+    /* Add more specific overrides if needed */
+
+    /* --- Added Footer Styles (Ensure these are in index.css) --- */
+    /* .site-footer { ... } */
+    /* .footer-container { ... */
+    /* ... etc ... */
+
+    /* --- Added Review Modal & WhatsApp Styles (Ensure these are in index.css) --- */
+    /* .reviews-modal-overlay { ... */
+    /* .reviews-modal { ... */
+    /* .whatsapp-float { ... */
+  </style>
+</head>
+
+<body data-header-url="{% url 'api_header' %}">
+  <div id="header-placeholder"></div>
+  <main class="container">
+    <div class="listing-header">
+      <h2>My Wishlist</h2>
+    </div>
+
+    <div class="product-grid" id="wishlist-grid">
+    </div>
+
+    <div id="empty-message-container">
+    </div>
+  </main>
+
+  {% include 'customer/footer.html' %}
+
+  <div id="reviews-modal-overlay" class="reviews-modal-overlay">
+    <div class="reviews-modal">
+      <div class="reviews-modal-header">
+        <h2>Customer Reviews</h2>
+        <button id="close-reviews-modal" class="close-reviews-modal">&times;</button>
+      </div>
+      <div class="reviews-modal-body">
+        <div class="reviews-grid">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="whatsapp-container">
+    <div class="whatsapp-tooltip">Need More Information</div>
+    <a href="https://wa.me/17808864821" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </div>
+  <script src="{% static 'customer/js/wishlist.js' %}"></script>
+  <script src="{% static 'customer/js/index.js' %}"></script>
+
+
+  <script>
+    const headerUrl = document.body.dataset.headerUrl || '/api/header/';
+    fetch(headerUrl)
+      .then(response => response.text())
+      .then(data => {
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        if (headerPlaceholder) {
+          headerPlaceholder.innerHTML = data;
+
+          // Re-initialize dynamic header parts handled by index.js:
+          if (typeof setupSearchFunctionality === 'function') setupSearchFunctionality();
+          if (typeof setupProfileDropdown === 'function') setupProfileDropdown();
+          if (typeof setupNavDropdowns === 'function') setupNavDropdowns();
+          if (typeof setupRegionFlagDropdown === 'function') setupRegionFlagDropdown();
+          if (typeof updateCartCount === 'function') updateCartCount();
+          if (typeof updateWishlistCount === 'function') updateWishlistCount();
+
+          // --- THIS IS THE FIX ---
+          // This function call must be *after* header.html is loaded.
+          if (typeof setupMobileMenuToggle === 'function') setupMobileMenuToggle();
+          // --- END FIX ---
+
+          // Remove active class from all nav links on wishlist page
+          const navLinks = document.querySelectorAll(".main-nav li");
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+          });
+        } else {
+          console.error('Header placeholder element not found.');
+        }
+      })
+      .catch(error => console.error('Error loading header:', error));
+  </script>
+
+</body>
+
+</html>

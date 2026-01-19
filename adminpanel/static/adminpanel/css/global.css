@@ -1,0 +1,815 @@
+/* --- Google Font --- */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 0.9375rem;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- THEME VARIABLES (MODIFIED) --- */
+:root {
+    --bg-primary: #f9f9f9;
+    --bg-secondary-solid: #ffffff;
+    --text-primary: #3C4858;
+    --text-secondary: #999999;
+    --border-color: #eeeeee;
+    --shadow-color: rgba(0, 0, 0, 0.14);
+
+    --accent-primary: #9c27b0;
+    --accent-light: #f3e5f5;
+
+    --positive-change: #4caf50;
+    --negative-change: #f44336;
+
+    /* --- START: Status Colors --- */
+    --status-delivered-text: #4caf50;
+    --status-delivered-bg: #e8f5e9;
+    --status-shipped-text: #00bcd4;
+    --status-shipped-bg: #e0f7fa;
+    --status-processing-text: #ff9800;
+    --status-processing-bg: #fff3e0;
+    --status-cancelled-text: #f44336;
+    --status-cancelled-bg: #ffebee;
+    --status-returned-text: #607d8b;
+    /* Blue Grey */
+    --status-returned-bg: #eceff1;
+    --status-fulfilled-text: #009688;
+    /* Teal */
+    --status-fulfilled-bg: #e0f2f1;
+    /* --- END: New Status Colors --- */
+
+    /* --- Glassmorphism Variables (MODIFIED) --- */
+    --bg-glass: #ffffff;
+    --backdrop-blur: 0px;
+}
+
+/* MODIFIED: Removed all body.dark-theme rules */
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* --- Layout --- */
+.admin-panel {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 80px;
+    /* MODIFIED: Shrink width */
+    background-color: var(--bg-glass);
+    border-right: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    /* MODIFIED: Add width to transition */
+    transition: width 0.3s ease, background-color 0.3s, box-shadow 0.3s;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* ADDED: Hide overflowing content */
+    z-index: 10;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 0;
+    /* MODIFIED: Removed padding */
+    overflow-y: auto;
+    transition: margin-left 0.3s ease;
+    /* Added for mobile sidebar */
+}
+
+/* --- Sidebar --- */
+.sidebar-header h2 {
+    margin: 0 0 24px 8px;
+    font-size: 1.375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* START: ADDED STYLE FOR SIDEBAR PROFILE PIC */
+/* START: Sidebar Logo Styles */
+.sidebar-header {
+    height: 60px;
+    /* Exact height to prevent jumping */
+    display: flex;
+    /* Use flexbox for centering */
+    align-items: center;
+    justify-content: center;
+    /* Center content horizontally */
+    margin: 0 0 24px 0;
+    /* Standard margin */
+    overflow: hidden;
+    /* Hide overflow content */
+}
+
+.sidebar-header .logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.sidebar-header .logo-container img {
+    height: 40px;
+    /* Smaller icon for collapsed state */
+    width: auto;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    margin-bottom: 0px;
+    /* No margin when collapsed */
+}
+
+.sidebar-header .logo-container h2 {
+    font-size: 0px;
+    /* Hidden text by default */
+    color: var(--text-primary);
+    margin: 0;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    font-weight: 600;
+    height: 0;
+    /* Collapse height */
+}
+
+/* Expanded State (Hover) */
+.sidebar:hover .sidebar-header {
+    height: auto;
+    /* Let it grow */
+    padding-top: 10px;
+}
+
+.sidebar:hover .logo-container img {
+    height: 70px;
+    /* Larger logo on hover */
+    margin-bottom: 10px;
+    /* Add spacing */
+}
+
+.sidebar:hover .logo-container h2 {
+    font-size: 18px;
+    /* Visible text size */
+    opacity: 1;
+    /* Fade in */
+    height: auto;
+    /* Restore height */
+    margin-bottom: 10px;
+}
+
+/* END: Sidebar Logo Styles */
+
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    /* MODIFIED: Remove gap */
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    /* MODIFIED: Added font-size to transition */
+    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, font-size 0.1s;
+    font-size: 0;
+    /* MODIFIED: Hide text */
+    justify-content: center;
+    /* MODIFIED: Center icon */
+    white-space: nowrap;
+    /* ADDED: Prevent wrapping */
+    overflow: hidden;
+    /* ADDED: Hide text */
+}
+
+.sidebar-nav svg {
+    stroke: var(--text-secondary);
+    transition: stroke 0.2s;
+    flex-shrink: 0;
+    /* ADDED: Prevent icon from shrinking */
+}
+
+.sidebar-nav a:hover {
+    background-color: var(--accent-light);
+    color: var(--accent-primary);
+    transform: none;
+    box-shadow: none;
+}
+
+.sidebar-nav a:hover svg {
+    stroke: var(--accent-primary);
+}
+
+.sidebar-nav a.active {
+    background-color: var(--accent-primary);
+    color: #ffffff;
+    font-weight: 500;
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(156, 39, 176, .4);
+}
+
+.sidebar-nav a.active svg {
+    stroke: #ffffff;
+}
+
+/* --- START: Sidebar Hover Expansion --- */
+.sidebar:hover {
+    width: 260px;
+    /* Expand to original width */
+}
+
+.sidebar:hover .sidebar-nav a {
+    justify-content: flex-start;
+    /* Revert to left-align */
+    gap: 16px;
+    /* Restore gap */
+    font-size: 0.9375rem;
+    /* Restore font size for text */
+}
+
+/* --- END: Sidebar Hover Expansion --- */
+
+
+/* --- Main Content Header --- */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    background-color: #ffffff;
+    padding: 16px 48px;
+    /* MODIFIED: Adjusted horizontal padding */
+    border-radius: 0;
+    /* MODIFIED: Removed border-radius */
+    box-shadow: 0 1px 4px 0 var(--shadow-color);
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 400;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* START: NEW HEADER STYLES */
+.main-header.header-with-back-btn {
+    justify-content: flex-start;
+    /* Change alignment */
+    gap: 24px;
+}
+
+.main-header.header-with-back-btn h1 {
+    flex-grow: 1;
+    /* Make H1 take up space */
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    /* Make it a bit smaller */
+}
+
+/* END: NEW HEADER STYLES */
+
+/* START: MOBILE MENU BUTTON */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-right: 16px;
+}
+
+/* END: MOBILE MENU BUTTON */
+
+
+/* --- Content Header (for tables) --- */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.content-header h2 {
+    margin: 0;
+}
+
+/* --- Theme Switcher (REMOVED) --- */
+
+/* --- Page Content Switching --- */
+
+/* START: FIX - Added .main-container to padding rule */
+.page-content,
+.main-container {
+    padding: 0 48px 24px 48px;
+    /* Added padding for content */
+}
+
+/* END: FIX */
+
+.page-content {
+    display: none;
+    /* Hide all pages by default */
+}
+
+.page-content.active {
+    display: block;
+    /* Show only the active page */
+}
+
+/* --- Responsive --- */
+@media (max-width: 1200px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+        /* Stack charts on smaller screens */
+    }
+}
+
+/* --- START: NEW RESPONSIVE STYLES --- */
+@media (max-width: 992px) {
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        /* Hide sidebar off-screen */
+        top: 0;
+        height: 100%;
+        width: 260px;
+        /* Full width on mobile */
+        transition: left 0.3s ease;
+    }
+
+    .admin-panel.sidebar-open .sidebar {
+        left: 0;
+        /* Show sidebar */
+    }
+
+    .sidebar:hover {
+        width: 260px;
+        /* Keep width consistent on mobile */
+    }
+
+    .sidebar:hover .sidebar-nav a,
+    .admin-panel.sidebar-open .sidebar-nav a {
+        justify-content: flex-start;
+        gap: 16px;
+        font-size: 0.9375rem;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+        /* Show hamburger menu */
+    }
+
+    /* START: FIX - Added .main-container to responsive padding rule */
+    .main-header,
+    .page-content,
+    .main-container {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .page-content,
+    .main-container {
+        padding-top: 0;
+        padding-bottom: 24px;
+    }
+
+    /* END: FIX */
+
+    .main-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-cards {
+        grid-template-columns: 1fr 1fr;
+        /* 2 cards per row */
+    }
+
+    /* This rule from settings.css is fine, but moved to global for consistency */
+    .content-grid {
+        flex-direction: column;
+    }
+
+    .form-column {
+        width: 100%;
+        margin-top: 24px;
+    }
+
+    .sticky-form {
+        position: static;
+    }
+}
+
+@media (max-width: 576px) {
+    .summary-cards {
+        grid-template-columns: 1fr;
+        /* 1 card per row */
+    }
+
+    /* START: FIX - Added .main-container to responsive padding rule */
+    .main-header,
+    .page-content,
+    .main-container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .page-content,
+    .main-container {
+        padding-top: 0;
+        padding-bottom: 16px;
+    }
+
+    /* END: FIX */
+
+    .main-header h1 {
+        font-size: 1.25rem;
+    }
+}
+
+/* --- END: NEW RESPONSIVE STYLES --- */
+
+
+/* --- Modal Styles (Unchanged) --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--bg-secondary-solid);
+    margin: auto;
+    padding: 24px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 8px 30px var(--shadow-color);
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.modal-close {
+    color: var(--text-secondary);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+}
+
+/* --- Global Status Style (for tables) --- */
+.status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status.shipped {
+    background-color: var(--status-shipped-bg);
+    color: var(--status-shipped-text);
+}
+
+.status.processing {
+    background-color: var(--status-processing-bg);
+    color: var(--status-processing-text);
+}
+
+.status.delivered {
+    background-color: var(--status-delivered-bg);
+    color: var(--status-delivered-text);
+}
+
+.status.cancelled {
+    background-color: var(--status-cancelled-bg);
+    color: var(--status-cancelled-text);
+}
+
+.status.returned {
+    background-color: var(--status-returned-bg);
+    color: var(--status-returned-text);
+}
+
+
+/* --- START: NEW TOGGLE SWITCH STYLES --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    /* Width of the switch */
+    height: 28px;
+    /* Height of the switch */
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 28px;
+    /* Makes it pill-shaped */
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    /* Height of the inner circle */
+    width: 20px;
+    /* Width of the inner circle */
+    left: 4px;
+    /* Position from left */
+    bottom: 4px;
+    /* Position from bottom */
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    /* Makes it a circle */
+}
+
+input:checked+.slider {
+    background-color: var(--accent-primary);
+    /* Use theme color */
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--accent-primary);
+}
+
+input:checked+.slider:before {
+    transform: translateX(22px);
+    /* Moves the circle to the right */
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* --- END: NEW TOGGLE SWITCH STYLES --- */
+
+/* --- START: NEW LIGHTBOX STYLES --- */
+.lightbox {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    /* Higher than other modals */
+    padding: 20px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.85);
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.lightbox.show {
+    display: flex;
+}
+
+.lightbox-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.lightbox-close:hover,
+.lightbox-close:focus {
+    color: #bbb;
+    text-decoration: none;
+}
+
+/* --- END: NEW LIGHTBYOX STYLES --- */
+
+/* --- START: Toast Notification Styles --- */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background-color: #333;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 250px;
+    animation: slideInToast 0.3s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.hide {
+    animation: fadeOutToast 0.3s ease-in forwards;
+}
+
+.toast.success {
+    background-color: #4caf50;
+}
+
+.toast.error {
+    background-color: #f44336;
+}
+
+.toast.info {
+    background-color: #2196f3;
+}
+
+.toast.warning {
+    background-color: #ff9800;
+}
+
+@keyframes slideInToast {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutToast {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+/* --- END: Toast Notification Styles --- */
+
+/* --- Modal Footer & Buttons --- */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+}
+
+.btn-confirm {
+    background-color: var(--accent-primary);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-confirm:hover {
+    background-color: #7b1fa2;
+}
+
+.btn-cancel {
+    background-color: #f5f5f5;
+    color: #333;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-cancel:hover {
+    background-color: #e0e0e0;
+}
+
+.btn-danger {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f;
+}

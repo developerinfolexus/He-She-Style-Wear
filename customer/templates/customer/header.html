@@ -1,0 +1,856 @@
+{% load static %}
+<style>
+  /* --- Mobile Menu Toggle Button --- */
+  #mobile-menu-toggle {
+    display: none;
+    font-size: 1.6rem;
+    color: var(--primary-color, #333);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    z-index: 1101;
+  }
+
+  /* --- Mobile Menu Overlay --- */
+  #mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1098;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  #mobile-menu-overlay.active {
+    display: block;
+    opacity: 1;
+  }
+
+  /* --- Mobile Menu Container --- */
+  #mobile-menu-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80%;
+    max-width: 300px;
+    height: 100%;
+    background-color: var(--background-color, #fff);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1099;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    overflow-y: auto;
+    padding-top: 60px;
+  }
+
+  #mobile-menu-container.active {
+    transform: translateX(0);
+  }
+
+  /* --- Links inside mobile menu --- */
+  #mobile-menu-container .main-nav {
+    display: block;
+    width: 100%;
+    margin-top: 0;
+    padding: 20px 0;
+  }
+
+  #mobile-menu-container .main-nav ul {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  #mobile-menu-container .main-nav li {
+    width: 100%;
+    border-bottom: 1px solid var(--border-color, #eee);
+  }
+
+  #mobile-menu-container .main-nav li a {
+    display: block;
+    width: 100%;
+    padding: 15px 25px;
+    font-size: 1rem;
+  }
+
+  #mobile-menu-container .main-nav li.active a {
+    background-color: #fef5f8;
+    color: var(--secondary-color, #d63384);
+    font-weight: 600;
+  }
+
+  #mobile-menu-container .main-nav li.active a::after {
+    display: none;
+  }
+
+  #mobile-menu-container .hover-menu {
+    display: none;
+  }
+
+  /* --- Header layout --- */
+  .header-left-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 991px) {
+    #mobile-menu-toggle {
+      display: block;
+    }
+
+    .main-header>.main-nav {
+      display: none;
+    }
+
+    .main-header {
+      justify-content: space-between;
+    }
+
+    .logo {
+      flex-grow: 0;
+      justify-content: flex-start;
+      margin-left: 0;
+    }
+
+    .logo .header-logo-img {
+      height: 45px !important;
+      width: 45px !important;
+    }
+
+    .header-icons-right {
+      flex-grow: 1;
+      justify-content: flex-end;
+    }
+  }
+
+  @media (min-width: 992px) {
+
+    #mobile-menu-toggle,
+    #mobile-menu-container,
+    #mobile-menu-overlay {
+      display: none;
+    }
+
+    .header-left-group {
+      display: contents;
+    }
+  }
+
+  /* --- Mobile Menu Accordion Styles --- */
+  .main-nav .accordion-toggle {
+    display: none;
+  }
+
+  /* Styles for inside the mobile menu */
+  #mobile-menu-container .main-nav li.mobile-nav-trigger {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* The main link */
+  #mobile-menu-container .main-nav li.mobile-nav-trigger>a {
+    flex-grow: 1;
+  }
+
+  /* The plus/minus button */
+  #mobile-menu-container .accordion-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1rem;
+    padding: 15px 25px;
+    cursor: pointer;
+  }
+
+  /* The dropdown panel */
+  #mobile-menu-container .mobile-nav-panel {
+    display: block;
+    position: static;
+    width: 100%;
+    background-color: #f8f8f8;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+
+  #mobile-menu-container .mobile-nav-panel.active {}
+
+  /* Sub-links */
+  #mobile-menu-container .mobile-nav-panel ul {
+    column-width: auto;
+    padding: 10px 0;
+  }
+
+  #mobile-menu-container .mobile-nav-panel li {
+    border-bottom: none;
+  }
+
+  #mobile-menu-container .mobile-nav-panel li a {
+    padding: 10px 40px;
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  @media (max-width: 991px) {
+    #mobile-menu-container .main-nav li.mobile-nav-trigger {
+      position: relative;
+    }
+
+    #mobile-menu-container .accordion-toggle {
+      position: absolute;
+      right: 20px;
+      top: 0;
+      height: 100%;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+    }
+  }
+
+  /* PROMO BAR */
+  .promo-bar {
+    width: 100%;
+    background: #000;
+    color: #fff;
+    padding: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+  }
+
+  .promo-track {
+    display: inline-flex;
+    gap: 40px;
+    animation: marquee 25s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(100%);
+    }
+
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .promo-item {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .promo-bar:hover .promo-track {
+    animation-play-state: paused;
+  }
+
+  #promo-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: slide-left 25s linear infinite;
+  }
+
+  @keyframes slide-left {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+</style>
+
+<!-- Promo Bar -->
+<div class="promo-bar" id="promo-bar" style="display: none;">
+  <div id="promo-text">
+    <!-- Dynamic Content Loaded via JS -->
+  </div>
+</div>
+
+
+
+<header class="main-header container" style="max-width: 1500px">
+  <div class="header-left-group">
+    <button id="mobile-menu-toggle" aria-label="Open menu">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="logo">
+      <a href="{% url 'index' %}">
+        <img src="{% static 'customer/images/logo 3.png' %}" alt="He She Style Wear Logo" class="header-logo-img"
+          style="border-radius: 50%; height: 100px" />
+      </a>
+    </div>
+  </div>
+
+  <nav class="main-nav">
+    <ul>
+      <li class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+        <a href="{% url 'index' %}">HOME</a>
+      </li>
+
+      <li id="nav-women-link" class="nav-item-with-hover mobile-nav-trigger 
+              {% if request.resolver_match.url_name == 'women' %}active{% endif %}">
+
+        <a href="{% url 'women' %}">WOMEN</a>
+        <button class="accordion-toggle" aria-expanded="false" aria-controls="women-hover-menu">
+          <i class="fas fa-plus"></i>
+        </button>
+        <div class="hover-menu mobile-nav-panel" id="women-hover-menu">
+          <div class="subcat-slider-wrapper">
+            <button class="slider-nav slider-prev text-dark" aria-label="Previous"><i
+                class="fas fa-chevron-left"></i></button>
+            <div class="subcat-slider-viewport">
+              <div class="subcat-menu-grid slider-track" id="women-slider-track">
+                {% for sub in header_women_subcats %}
+                <a href="{% url 'women' %}?subcategory_id={{ sub.id }}" class="subcat-menu-item">
+                  <div class="subcat-menu-img">
+                    {% if sub.image %}
+                    <img src="{{ sub.image.url }}" alt="{{ sub.name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/80" alt="{{ sub.name }}">
+                    {% endif %}
+                  </div>
+                  <span class="subcat-menu-name">{{ sub.name|title }}</span>
+                </a>
+                {% empty %}
+                <div style="padding: 10px;">No categories found</div>
+                {% endfor %}
+              </div>
+            </div>
+            <button class="slider-nav slider-next text-dark" aria-label="Next"><i
+                class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </li>
+
+
+
+      <li id="nav-kids-link" class="nav-item-with-hover mobile-nav-trigger 
+              {% if request.resolver_match.url_name == 'kids' %}active{% endif %}">
+
+        <a href="{% url 'kids' %}">KIDS</a>
+        <button class="accordion-toggle" aria-expanded="false" aria-controls="kids-hover-menu">
+          <i class="fas fa-plus"></i>
+        </button>
+        <div class="hover-menu mobile-nav-panel" id="kids-hover-menu">
+          <div class="subcat-slider-wrapper">
+            <button class="slider-nav slider-prev text-dark" aria-label="Previous"><i
+                class="fas fa-chevron-left"></i></button>
+            <div class="subcat-slider-viewport">
+              <div class="subcat-menu-grid slider-track" id="kids-slider-track">
+                {% for sub in header_kids_subcats %}
+                <a href="{% url 'kids' %}?subcategory_id={{ sub.id }}" class="subcat-menu-item">
+                  <div class="subcat-menu-img">
+                    {% if sub.image %}
+                    <img src="{{ sub.image.url }}" alt="{{ sub.name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/80" alt="{{ sub.name }}">
+                    {% endif %}
+                  </div>
+                  <span class="subcat-menu-name">{{ sub.name|title }}</span>
+                </a>
+                {% empty %}
+                <div style="padding: 10px;">No categories found</div>
+                {% endfor %}
+              </div>
+            </div>
+            <button class="slider-nav slider-next text-dark" aria-label="Next"><i
+                class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <style>
+    /* New Header Subcategory Grid Styles */
+    .subcat-menu-grid {
+      display: flex;
+      flex-wrap: wrap;
+      /* Allow wrapping if many items */
+      gap: 20px;
+      padding: 20px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      justify-content: center;
+      /* Center align items */
+      min-width: 300px;
+      /* Ensure dropdown has width */
+    }
+
+    /* For desktop hover menu positioning */
+    @media (min-width: 992px) {
+      .hover-menu {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        z-index: 1000;
+        min-width: max-content;
+        border: 1px solid #f0f0f0;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+      }
+
+      .nav-item-with-hover:hover .hover-menu {
+        opacity: 1;
+        visibility: visible;
+        margin-top: 0;
+      }
+    }
+
+    .subcat-menu-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      margin: 0 40px;
+      color: #333;
+      width: 80px;
+      /* Fixed width for alignment */
+      transition: transform 0.2s;
+    }
+
+    .subcat-menu-item:hover {
+      transform: translateY(-3px);
+      color: var(--primary-color, #d63384);
+    }
+
+    .subcat-menu-img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .subcat-menu-item:hover .subcat-menu-img {
+      border-color: var(--primary-color, #d63384);
+    }
+
+    .subcat-menu-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .subcat-menu-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 991px) {
+      .subcat-menu-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 items per row on mobile */
+        gap: 15px;
+        padding: 15px;
+        background: #f8f8f8;
+      }
+
+      .subcat-menu-item {
+        width: auto;
+      }
+
+      .subcat-menu-img {
+        width: 60px;
+        height: 60px;
+      }
+
+      /* Reset Slider Structure for Mobile */
+      .slider-nav {
+        display: none;
+      }
+
+      .subcat-slider-wrapper {
+        display: block;
+        padding: 0;
+        border: none;
+      }
+
+      .subcat-slider-viewport {
+        overflow: visible;
+        margin: 0;
+      }
+
+      .subcat-menu-grid.slider-track {
+        display: grid;
+        flex-wrap: wrap;
+        width: auto;
+        transform: none !important;
+      }
+    }
+
+    /* Desktop Slider Styles */
+    @media (min-width: 992px) {
+      .subcat-slider-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px 10px;
+        background: #fff;
+        border-top: 1px solid #eee;
+        width: 100%;
+      }
+
+      .subcat-slider-viewport {
+        overflow: hidden;
+        max-width: 1250px;
+        margin: 0 10px;
+      }
+
+      .subcat-menu-grid.slider-track {
+        display: flex;
+        flex-wrap: nowrap;
+        width: max-content;
+        padding: 10px 0;
+        margin: 0;
+        background: transparent;
+        border: none;
+        transition: transform 0.5s ease-in-out;
+        justify-content: flex-start;
+        gap: 20px;
+      }
+
+      .subcat-menu-grid.slider-track .subcat-menu-item {
+        flex-shrink: 0;
+      }
+
+      .slider-nav {
+        background: #fff;
+        border: 1px solid #ddd;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+        color: #333;
+        flex-shrink: 0;
+        margin: 0 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+      }
+
+      .slider-nav:hover {
+        background: var(--primary-color, #d63384);
+        color: white;
+        border-color: var(--primary-color, #d63384);
+      }
+
+      .slider-nav.disabled {
+        opacity: 0.3;
+        cursor: default;
+        pointer-events: none;
+      }
+
+      .slider-nav.hidden {
+        display: none;
+      }
+    }
+  </style>
+
+
+  <div class="header-icons-right">
+    <form action="{% url 'search' %}" method="GET">
+      <div class="header-icon search-container" id="header-search-form">
+        <i class="fas fa-search search-icon-trigger"></i>
+        <input type="text" id="header-search-input" name="q" placeholder="Search..." />
+        <button type="submit" class="search-submit-icon" aria-label="Search">
+          <i class="fas fa-search"></i>
+        </button>
+        <div id="search-results-popup"></div>
+      </div>
+    </form>
+
+    {% comment %} <form action="{% url 'search' %}" method="GET">
+      <input type="text" name="query" placeholder="Search">
+    </form> {% endcomment %}
+
+
+
+
+    <div class="region-flag-selector" id="region-selector-container">
+      <div class="selected-region" id="selected-region-trigger">
+        <img id="selected-region-flag" src="" alt="Selected region flag" class="region-flag" />
+        <i class="fas fa-chevron-down region-arrow"></i>
+      </div>
+      <div class="region-dropdown" id="region-dropdown-menu">
+        <div class="region-option" data-value="ca">
+          <img src="https://flagcdn.com/w20/ca.png" alt="Canada flag" class="region-flag" />
+          <span>CA</span>
+        </div>
+        <div class="region-option" data-value="us">
+          <img src="https://flagcdn.com/w20/us.png" alt="USA flag" class="region-flag" />
+          <span>US</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-icon profile-icon-container" id="profileIconContainer">
+      <i class="far fa-user profile-icon-trigger"></i>
+      <div class="profile-dropdown" id="profileDropdown">
+        {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> My Profile</a>
+        <a href="{% url 'orders' %}"><i class="fas fa-box"></i> Orders</a>
+        {% if user.is_staff or user.is_superuser %}
+        <a href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Admin Panel</a>
+        {% endif %}
+        <a href="{% url 'logout' %}" id="logoutButton"><i class="fas fa-power-off"></i> Logout</a>
+        {% else %}
+        <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="header-icon cart-icon">
+      <a href="{% url 'cart' %}">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="cart-count" id="cartCount">0</span>
+      </a>
+    </div>
+
+    <div class="header-icon wishlist-icon-wrapper" id="wishlistIcon">
+      <a href="{% url 'wishlist' %}"><i class="far fa-heart"></i></a>
+      <span class="wishlist-count" id="wishlistCount">0</span>
+    </div>
+  </div>
+</header>
+
+<div id="mobile-menu-overlay"></div>
+<div id="mobile-menu-container"></div>
+
+<script>
+
+
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Select the input bar
+    const searchInput = document.querySelector(".header-icons-right form input[type='text']");
+    // Select the clickable icon *container*
+    const searchToggleDiv = document.querySelector(".search-toggle");
+
+    // Check if both elements exist
+    if (searchInput && searchToggleDiv) {
+
+      // 1. When the ICON is clicked
+      searchToggleDiv.addEventListener("click", (e) => {
+        e.stopPropagation(); // Stop this click from triggering the 'blur' or 'document' click
+
+        // Show the search bar
+        searchInput.classList.add("showSearch");
+        // Hide the icon
+        searchToggleDiv.style.display = 'none';
+
+        // Ensure mobile menu overlay is off
+        const overlay = document.getElementById("mobile-menu-overlay");
+        if (overlay) overlay.classList.remove("active");
+
+        // FIX: Wait a tiny moment for the browser to make the
+        // input visible, *then* focus it.
+        setTimeout(() => {
+          searchInput.focus();
+        }, 50); // 50ms delay
+      });
+
+      // 2. When the SEARCH BAR loses focus (e.g., user clicks away)
+      searchInput.addEventListener("blur", () => {
+        // Check if the search bar is currently visible
+        if (searchInput.classList.contains("showSearch")) {
+          // Hide the search bar
+          searchInput.classList.remove("showSearch");
+          // Show the icon again
+          searchToggleDiv.style.display = 'block';
+        }
+      });
+    }
+  });
+</script>
+
+
+
+
+<script>
+  fetch("{% url 'api_running_banners' %}")
+    .then(response => response.json())
+    .then(data => {
+      const promo = document.getElementById("promo-text");
+      const promoBar = document.getElementById("promo-bar");
+
+      // console.log("DATA RECEIVED:", data);
+
+      if (data.banners && data.banners.length > 0) {
+        promo.textContent = data.banners.join(" | ");
+        if (promoBar) promoBar.style.display = "flex";
+      } else {
+        promo.textContent = "";
+        if (promoBar) promoBar.style.display = "none";
+      }
+    })
+    .catch(error => console.error("ERROR:", error));
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Reusable function to setup a slider
+    const initSlider = (wrapper) => {
+      const track = wrapper.querySelector('.slider-track');
+      if (!track) return;
+
+      const items = track.querySelectorAll('.subcat-menu-item');
+      const prevBtn = wrapper.querySelector('.slider-prev');
+      const nextBtn = wrapper.querySelector('.slider-next');
+      const viewport = wrapper.querySelector('.subcat-slider-viewport');
+
+      if (items.length === 0) return;
+
+      const itemsToShow = 7;
+      const totalItems = items.length;
+      let currentIndex = 0;
+
+      // Item Dimensions
+      const itemStride = 180;
+
+      // Force desktop layout
+      if (window.innerWidth >= 992) {
+        track.style.display = 'flex';
+        track.style.flexWrap = 'nowrap';
+        track.style.width = 'max-content'; // Crucial for sliding
+        track.style.justifyContent = 'flex-start';
+        track.style.transition = 'transform 0.4s ease-in-out';
+
+        if (viewport) {
+          viewport.style.width = '1240px';
+          viewport.style.maxWidth = '100%';
+          viewport.style.overflow = 'hidden';
+        }
+      }
+
+      // Logic to show/hide arrows
+      const updateArrows = () => {
+        if (totalItems <= itemsToShow) {
+          if (prevBtn) prevBtn.style.display = 'none';
+          if (nextBtn) nextBtn.style.display = 'none';
+          track.style.justifyContent = 'center';
+          track.style.transform = 'none';
+          return;
+        }
+
+        if (prevBtn) {
+          prevBtn.style.display = 'flex';
+          if (currentIndex <= 0) {
+            prevBtn.style.opacity = '0.3';
+            prevBtn.style.pointerEvents = 'none';
+          } else {
+            prevBtn.style.opacity = '1';
+            prevBtn.style.pointerEvents = 'auto';
+          }
+        }
+
+        if (nextBtn) {
+          nextBtn.style.display = 'flex';
+          const maxIndex = totalItems - itemsToShow;
+
+          if (currentIndex >= maxIndex) {
+            nextBtn.style.opacity = '0.3';
+            nextBtn.style.pointerEvents = 'none';
+          } else {
+            nextBtn.style.opacity = '1';
+            nextBtn.style.pointerEvents = 'auto';
+          }
+        }
+      };
+
+      const slide = (direction) => {
+        const maxIndex = totalItems - itemsToShow;
+
+        if (direction === 'next') {
+          let nextIndex = currentIndex + itemsToShow;
+          if (nextIndex > maxIndex) nextIndex = maxIndex;
+          currentIndex = nextIndex;
+        } else {
+          let nextIndex = currentIndex - itemsToShow;
+          if (nextIndex < 0) nextIndex = 0;
+          currentIndex = nextIndex;
+        }
+
+        const translateX = -(currentIndex * itemStride);
+        track.style.transform = `translateX(${translateX}px)`;
+        updateArrows();
+      };
+
+      // Re-bind listeners
+      if (nextBtn) {
+        nextBtn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          slide('next');
+        };
+        // Ensure type is button dynamically if possible, but HTML change is better
+        nextBtn.setAttribute('type', 'button');
+      }
+
+      if (prevBtn) {
+        prevBtn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          slide('prev');
+        };
+        prevBtn.setAttribute('type', 'button');
+      }
+
+      updateArrows();
+    };
+
+    const sliders = document.querySelectorAll('.subcat-slider-wrapper');
+    sliders.forEach(initSlider);
+
+    // Safety: Re-initialize on hover to ensure correct layout calculations
+    const navItems = document.querySelectorAll('.nav-item-with-hover');
+    navItems.forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        const wrapper = item.querySelector('.subcat-slider-wrapper');
+        if (wrapper) {
+          const track = wrapper.querySelector('.slider-track');
+          if (track && window.innerWidth >= 992) {
+            track.style.width = 'max-content';
+          }
+        }
+      });
+    });
+  });
+</script>

@@ -1,0 +1,355 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile - HE SHE STYLES</title>
+    <link rel="icon" href="{% static 'customer/images/logo.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <link rel="stylesheet" href="{% static 'customer/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'customer/css/profile.css' %}">
+
+    <style>
+        /* Ensure header uses consistent max-width if not fully covered by index.css */
+        #header-placeholder .main-header {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        /* Basic styling for the new address section (can be moved to profile.css) */
+        .address-type-options label {
+            margin-right: 20px;
+        }
+
+        /* Style for the single Edit button */
+        .profile-main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-main-header h2 {
+            font-size: 1.4rem;
+            margin: 0;
+            font-family: "Playfair Display", serif;
+        }
+
+        #edit-profile-btn {
+            /* Style similar to section edit buttons */
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid transparent;
+            /* Add border for layout consistency */
+            border-radius: 4px;
+        }
+
+        #edit-profile-btn:hover {
+            border-color: var(--secondary-color);
+            background-color: #fef5f8;
+        }
+
+        /* Hide save/cancel initially */
+        #profile-form-actions.hidden {
+            display: none;
+        }
+
+        #profile-form-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        /* Added style for the image inside the h3 for alignment */
+        .profile-section[data-section="address"] h3 {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body data-header-url="{% url 'api_header' %}">
+
+
+    <div id="header-placeholder"></div>
+
+    <main class="container profile-page-container">
+        <nav aria-label="breadcrumb" class="profile-breadcrumb">
+            <ol>
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'profile' %}">Account</a></li>
+                <li aria-current="page"><a href="#">Profile</a></li>
+            </ol>
+        </nav>
+
+        <div class="profile-layout">
+
+            <aside class="profile-sidebar">
+                <div class="user-greeting">
+                    <!-- <img src="https://via.placeholder.com/80/cccccc/808080?text=U" alt="User Avatar" class="user-avatar" id="user-avatar"> -->
+                    <div class="user-name-greeting">
+                        <span>Hello,</span>
+                        <strong>
+                            {{ user.first_name }} {{ user.last_name }}
+                        </strong>
+                    </div>
+                </div>
+                <nav class="profile-nav">
+                    <ul>
+                        <li><a href="{% url 'profile' %}" class="active"><i class="fas fa-user-edit"></i> Profile
+                                Information</a></li>
+                        <li><a href="{% url 'orders' %}"><i class="fas fa-box"></i> My Orders</a></li>
+                        <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                        <li><a href="{% url 'logout' %}"><i class="fas fa-power-off"></i> Logout</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+
+            <section class="profile-main-content">
+
+                <div class="profile-main-header">
+                    <h2>Profile Information</h2>
+                    <button type="button" id="edit-profile-btn">Edit Profile</button>
+                </div>
+
+                <form id="profile-form" novalidate>
+
+                    <div class="profile-section" data-section="personal">
+                        <div class="section-header">
+                            <h3>Personal & Contact Details</h3>
+                        </div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="first-name">First Name</label>
+                                    <input type="text" id="first-name" name="firstName" value="{{ user.first_name }}"
+                                        readonly required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last-name">Last Name</label>
+                                    <input type="text" id="last-name" name="lastName" value="{{ user.last_name }}"
+                                        readonly required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" name="email" value="{{ user.email }}" readonly
+                                        required>
+                                </div>
+                                <!-- <div class="form-group">
+                                    <label for="mobile">Phone Number</label>
+                                    <input type="tel" id="mobile" name="mobile"
+                                           value="{{ user.phone }}" readonly required>
+                                </div> -->
+                            </div>
+                            <!-- <div class="form-group">
+                                <label class="gender-label">Your Gender</label>
+                                <div class="gender-options">
+                                    <label><input type="radio" name="gender" value="male" disabled> Male</label>
+                                    <label><input type="radio" name="gender" value="female" disabled> Female</label>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+
+                    <div id="address-section-anchor" style="scroll-margin-top: 80px;"></div>
+                    <div class="profile-section" data-section="address">
+                        <div class="section-header">
+                            <h3>
+                                Address
+                                <!-- <img src="IMG-20251011-WA0001 (1) (1).png" alt="Address Icon" style="height: 24px; width: 24px; vertical-align: middle; margin-left: 10px;"> -->
+                            </h3>
+                        </div>
+                        <div class="section-content">
+                            <div class="form-group">
+                                <label for="address-line">Street Address</label>
+                                <textarea id="address-line" name="addressLine" placeholder="e.g., 123 Main St" rows="2"
+                                    readonly required>{{ user.customer_profile.address|default:'' }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="address-locality">Apartment/Suite Number</label>
+                                <input type="text" id="address-locality" name="addressLocality"
+                                    placeholder="Apartment, suite, etc. (optional)" value="" readonly>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="address-city">City</label>
+                                    <input type="text" id="address-city" name="addressCity" placeholder="e.g., Toronto"
+                                        value="{{ user.customer_profile.city|default:'' }}" readonly required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="address-pincode">Postal Code</label>
+                                    <input type="text" id="address-pincode" name="addressPincode"
+                                        placeholder="e.g., A1A 1A1"
+                                        value="{{ user.customer_profile.pincode|default:'' }}" readonly required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="address-country">Country</label>
+                                    <select id="address-country" name="country" readonly disabled>
+                                        <option value="Canada">Canada</option>
+                                        <option value="United States">United States</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="address-state">Province/State</label>
+                                    <select id="address-state" name="addressState"
+                                        data-selected="{{ user.customer_profile.state|default:'' }}" readonly required
+                                        disabled>
+                                        <option value="">--Select Province/State--</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="form-actions hidden" id="profile-form-actions">
+                        <button type="button" class="save-btn" id="save-profile-btn">SAVE CHANGES</button>
+                        <button type="button" class="cancel-btn" id="cancel-profile-btn">CANCEL</button>
+                    </div>
+
+                </form>
+            </section>
+        </div>
+    </main>
+
+    {% include 'customer/footer.html' %}
+
+    <!-- CSS for Toast (You can move this to profile.css or index.css) -->
+    <style>
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #fff;
+            border-left: 5px solid #333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 15px 20px;
+            border-radius: 4px;
+            z-index: 10000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            min-width: 250px;
+            max-width: 400px;
+        }
+
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification-success {
+            border-left-color: #28a745;
+        }
+
+        .notification-success .toast-icon {
+            color: #28a745;
+        }
+
+        .notification-error {
+            border-left-color: #dc3545;
+        }
+
+        .notification-error .toast-icon {
+            color: #dc3545;
+        }
+
+        #notification-message {
+            font-size: 0.95rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .hidden-toast {
+            display: none;
+        }
+    </style>
+
+    <!-- Notification Toast Element -->
+    <div id="notification-toast" class="notification-toast hidden-toast">
+        <div class="notification-content">
+            <i id="notification-icon" class="fas toast-icon"></i>
+            <span id="notification-message"></span>
+        </div>
+    </div>
+
+
+    <div id="reviews-modal-overlay" class="reviews-modal-overlay">
+        <div class="reviews-modal">
+            <div class="reviews-modal-header">
+                <h2>Customer Reviews</h2><button id="close-reviews-modal" class="close-reviews-modal">&times;</button>
+            </div>
+            <div class="reviews-modal-body">
+                <div class="reviews-grid"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="{% static 'customer/js/index.js' %}"></script>
+    <script src="{% static 'customer/js/profile.js' %}"></script>
+
+    <script>
+        const headerUrl = document.body.dataset.headerUrl || '/api/header/';
+        fetch(headerUrl)
+            .then(response => {
+                if (!response.ok) { throw new Error('Network response was not ok loading header'); }
+                return response.text();
+            })
+            .then(data => {
+                const headerPlaceholder = document.getElementById('header-placeholder');
+                if (headerPlaceholder) {
+                    headerPlaceholder.innerHTML = data;
+
+                    // Re-initialize dynamic header parts AFTER loading header.html:
+                    if (typeof setupSearchFunctionality === 'function') setupSearchFunctionality();
+                    if (typeof setupProfileDropdown === 'function') setupProfileDropdown();
+                    if (typeof setupNavDropdowns === 'function') setupNavDropdowns();
+                    if (typeof setupRegionFlagDropdown === 'function') setupRegionFlagDropdown();
+                    if (typeof updateCartCount === 'function') updateCartCount();
+                    if (typeof updateWishlistCount === 'function') updateWishlistCount();
+
+                    // --- THIS IS THE FIX ---
+                    // This call activates the sandwich menu's click listener
+                    if (typeof setupMobileMenuToggle === 'function') setupMobileMenuToggle();
+                    // --- END FIX ---
+
+                    // Remove active class from nav links
+                    const navLinks = headerPlaceholder.querySelectorAll(".main-nav li");
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                    });
+
+                } else {
+                    console.error('Header placeholder element (#header-placeholder) not found.');
+                }
+            })
+            .catch(error => console.error('Error loading header:', error));
+    </script>
+
+</body>
+
+</html>

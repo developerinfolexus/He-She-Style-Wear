@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}He She Style Wear{% endblock %}</title>
+    <link rel="icon" href="{% static 'customer/images/logo 3.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'customer/css/index.css' %}">
+    <style>
+        .info-page-content {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #fff;
+            line-height: 1.8;
+        }
+
+        .info-page-content h1 {
+            font-family: "Playfair Display", serif;
+            font-size: 2.5rem;
+            color: var(--primary-color, #000);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .info-page-content h2 {
+            font-family: "Playfair Display", serif;
+            font-size: 1.8rem;
+            color: var(--primary-color, #000);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .info-page-content h3 {
+            font-size: 1.3rem;
+            color: var(--text-color, #333);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .info-page-content p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .info-page-content ul,
+        .info-page-content ol {
+            margin-bottom: 20px;
+            padding-left: 30px;
+        }
+
+        .info-page-content li {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .info-page-content strong {
+            color: var(--primary-color, #000);
+        }
+
+        .info-page-content a {
+            color: var(--secondary-color, #d11c5b);
+            text-decoration: underline;
+        }
+
+        .info-page-content a:hover {
+            color: #a01548;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="info-page-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'customer/footer.html' %}
+
+    <script src="{% static 'customer/js/index.js' %}"></script>
+</body>
+
+</html>

@@ -1,0 +1,522 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Access Options</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{% static 'adminpanel/css/settings.css' %}">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/global.css' %}">
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .close-modal {
+            color: #aaa;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        .modal-body {
+            padding: 24px;
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #eee;
+            text-align: right;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            background-color: #f9f9f9;
+        }
+
+        /* Admin Table Styles */
+        .admin-table-container {
+            overflow-x: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .admin-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #444;
+            white-space: nowrap;
+        }
+
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .role-badge.super {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .role-badge.manager {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background-color: #e6f4ea;
+            color: #1e7e34;
+        }
+
+        .status-badge.inactive {
+            background-color: #fce8e6;
+            color: #d93025;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon.danger {
+            color: #d93025;
+        }
+
+        .btn-icon.danger:hover {
+            background-color: #fce8e6;
+        }
+
+        .manager-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="admin-panel">
+        {% include 'adminpanel/includes/sidebar.html' %}
+
+        <main class="main-content">
+            <header class="main-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+                <h1>Admin Access Options</h1>
+                <!-- <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://i.pravatar.cc/40" alt="User Avatar">
+                </div> -->
+            </header>
+
+            <div class="main-container">
+                <header class="page-header">
+                    <p>Configure permissions for Super Admins and Managers.</p>
+                </header>
+
+                <div class="content-grid">
+                    <div class="content-column">
+                        <section class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Super Admin Access</h3>
+                                    <p>Full system access. Permissions are not configurable.</p>
+                                </div>
+                                <div class="admin-count">
+                                    <span class="material-symbols-outlined green filled">verified_user</span>
+                                    <span>2 Admins</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p>Super Admins have unrestricted access to all settings, users, and data within the
+                                    application. This role is intended for top-level administrators and cannot be
+                                    modified.</p>
+                                <div class="tag-container">
+                                    <span class="tag">User Management</span>
+                                    <span class="tag">Billing & Subscriptions</span>
+                                    <span class="tag">System Settings</span>
+                                    <span class="tag">Developer Options</span>
+                                    <span class="tag">+ All Permissions</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        {% if request.user.is_superuser %}
+                        <section class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Manager Access</h3>
+                                    <p>Limited access based on assigned permissions.</p>
+                                </div>
+                                <div class="admin-count">
+                                    <span class="material-symbols-outlined orange filled">manage_accounts</span>
+                                    <span>{{ total_manager_admins }} Manager{{ total_manager_admins|pluralize }}</span>
+                                </div>
+                            </div>
+                            <div class="card-body toggle-list">
+                                <p>Managers have a restricted set of permissions configured below. Use the toggles to
+                                    grant or revoke access to specific application areas.</p>
+
+                                <div class="toggle-item">
+                                    <div>
+                                        <h4>Manage Users</h4>
+                                        <p>Can view, add, and edit non-admin users.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" class="permission-toggle" data-permission="manage_users">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-item">
+                                    <div>
+                                        <h4>Access Analytics</h4>
+                                        <p>Can view all analytics dashboards and reports.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" class="permission-toggle"
+                                            data-permission="access_analytics">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-item">
+                                    <div>
+                                        <h4>Manage Billing</h4>
+                                        <p>Can access invoices and subscription details.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" class="permission-toggle"
+                                            data-permission="manage_billing">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-item">
+                                    <div>
+                                        <h4>Content Moderation</h4>
+                                        <p>Can review and manage user-generated content.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" class="permission-toggle"
+                                            data-permission="content_moderation">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+                        {% endif %}
+                    </div>
+
+                    <aside class="form-column">
+                        {% if request.user.is_superuser %}
+                        <!-- Current Admins Table -->
+                        <div class="sticky-form" style="margin-top: 20px;">
+                            <section class="card">
+                                <div class="card-body">
+                                    <h3>Current Admin Users</h3>
+                                    <p>Active administrators with system access.</p>
+
+                                    <div class="admin-table-container">
+                                        <table class="admin-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>User</th>
+                                                    <th>Role</th>
+                                                    <th>Status</th>
+                                                    <th style="text-align: right;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for admin in super_admins %}
+                                                <tr>
+                                                    <td>
+                                                        <div style="font-weight: 500;">{{ admin.username }}</div>
+                                                        <div style="font-size: 0.8rem; color: #777;">{{ admin.email }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="role-badge super">
+                                                            <span class="material-symbols-outlined"
+                                                                style="font-size: 14px;">verified_user</span>
+                                                            Super Admin
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        {% if admin.is_active %}
+                                                        <span class="status-badge active">Active</span>
+                                                        {% else %}
+                                                        <span class="status-badge inactive">Inactive</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td style="text-align: right;">
+                                                        {% if admin.email|lower != request.user.email|lower %}
+                                                        <button class="btn-icon danger"
+                                                            onclick="confirmRevoke('{{ admin.email }}', 'Super Admin')"
+                                                            title="Revoke Access">
+                                                            <span class="material-symbols-outlined">person_remove</span>
+                                                        </button>
+                                                        {% else %}
+                                                        <span style="color: #ccc; font-size: 0.8rem;">(You)</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+
+                                                {% for admin in manager_admins %}
+                                                <tr>
+                                                    <td>
+                                                        <div style="font-weight: 500;">{{ admin.username }}</div>
+                                                        <div style="font-size: 0.8rem; color: #777;">{{ admin.email }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="role-badge manager">
+                                                            <span class="material-symbols-outlined"
+                                                                style="font-size: 14px;">manage_accounts</span>
+                                                            Manager
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        {% if admin.is_active %}
+                                                        <span class="status-badge active">Active</span>
+                                                        {% else %}
+                                                        <span class="status-badge inactive">Inactive</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td style="text-align: right;">
+                                                        <button class="btn-icon danger"
+                                                            onclick="confirmRevoke('{{ admin.email }}', 'Manager')"
+                                                            title="Revoke Access">
+                                                            <span class="material-symbols-outlined">person_remove</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <!-- Assign Admin Form -->
+                        <div class="sticky-form">
+                            <section class="card">
+                                <div class="card-body">
+                                    <h3>Assign Admin Access</h3>
+                                    <p>Grant administrative privileges to a user.</p>
+
+                                    <form id="assign-admin-form" class="assign-form">
+                                        <div class="form-group">
+                                            <label for="userEmail">User Email</label>
+                                            <input type="email" id="userEmail" placeholder="e.g., alex@example.com"
+                                                required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="accessLevel">Access Level</label>
+                                            <select id="accessLevel">
+                                                <option>Manager</option>
+                                                <option>Super Admin</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- <div class="form-group-check">
+                                            <input type="checkbox" id="notifyUser" checked>
+                                            <label for="notifyUser">
+                                                <strong>Notify user by email</strong>
+                                                <p>An invitation will be sent to the user's email address.</p>
+                                            </label>
+                                        </div> -->
+
+                                        <button type="submit" class="btn-primary">
+                                            <span class="material-symbols-outlined">add</span>
+                                            Grant Access
+                                        </button>
+                                    </form>
+                                </div>
+                            </section>
+                        </div>
+                        {% endif %}
+                    </aside>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Dialog -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Success</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">Operation completed successfully.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="modalOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Action</h3>
+                <span class="close-modal close-confirm">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure?</p>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn-primary" style="background-color: #eee; color: #333;"
+                    onclick="closeConfirmModal()">Cancel</button>
+                <button class="btn-primary" style="background-color: #d93025;" id="confirmActionBtn">Revoke
+                    Access</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manager Selection Modal -->
+    <div id="managerSelectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="managerModalTitle">Select Managers</h3>
+                <span class="close-modal close-manager-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="managerModalMessage">Select which manager admins to apply this permission change:</p>
+                <div id="managerList" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Manager checkboxes will be dynamically loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn-primary" style="background-color: #eee; color: #333;"
+                    onclick="closeManagerModal()">Cancel</button>
+                <button class="btn-primary" id="confirmManagerBtn">Apply Permission</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'adminpanel/js/settings.js' %}?v=4"></script>
+    <script src="{% static 'adminpanel/js/global.js' %}?v=2"></script>
+</body>
+
+</html>

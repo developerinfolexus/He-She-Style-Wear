@@ -1,0 +1,935 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Admin Panel - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'adminpanel/css/dashboard.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="admin-panel">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <img src="{% static 'adminpanel/images/he_she.png' %}" alt="He She Style Wear">
+                    <h2>He She Style Wear</h2>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <!-- Dashboard -->
+                <a href="{% url 'admin_dashboard' %}"
+                    class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Dashboard
+                </a>
+                <!-- Products -->
+                <a href="{% url 'admin_products' %}"
+                    class="{% if request.resolver_match.url_name == 'admin_products' or request.resolver_match.url_name == 'admin_add_product' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                        </path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                    Products
+                </a>
+
+                <!-- Discounts -->
+                <a href="{% url 'admin_discount' %}"
+                    class="{% if request.resolver_match.url_name == 'admin_discount' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Tag Shape -->
+                        <path d="M3 7l9-4 9 4v6c0 3.5-2.5 6.5-6 7.4-3.5-.9-6-3.9-6-7.4V7z" />
+                        <!-- Percentage Symbol -->
+                        <line x1="9" y1="11" x2="15" y2="17" />
+                        <circle cx="9.5" cy="9.5" r="1.2" />
+                        <circle cx="14.5" cy="18.5" r="1.2" />
+                    </svg>
+                    <!-- Discounts --> Promotions & Offers
+                </a>
+
+
+                <!-- Orders -->
+                <a href="{% url 'admin_orders' %}"
+                    class="{% if request.resolver_match.url_name == 'admin_orders' or request.resolver_match.url_name == 'admin_order_detail' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                    </svg>
+                    Orders
+                </a>
+                <!-- Customers -->
+                <a href="{% url 'admin_customers' %}"
+                    class="{% if request.resolver_match.url_name == 'admin_customers' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Customers
+                </a>
+
+                <!-- Settings (Updated SVG for reliability) -->
+                <a href="{% url 'admin_settings' %}"
+                    class="{% if request.resolver_match.url_name == 'admin_settings' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.08a2 2 0 0 1 1 1.74v.44a2 2 0 0 1-1 1.73l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73v.18a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.44a2 2 0 0 1 1-1.73l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    Settings
+                </a>
+            </nav>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <a href="{% url 'index' %}" style="color: #4CAF50; display: flex; align-items: center; gap: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    View Customer Site
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <h1>Dashboard</h1>
+                <!-- <div class="user-profile">
+                    <img src="Gemini_Generated_Image_g0po22g0po22g0po.png" alt="User Avatar">
+                </div> -->
+            </header>
+
+            <!-- Country filter form (styled via dashboard.css and placed top-right) -->
+            <section class="dashboard-filter">
+                <form method="get" action="" id="dashboardFilterForm" class="filter-form">
+                    <input type="hidden" name="page" id="dashboardPage" value="1">
+                    <input type="hidden" name="status" id="statusFilterInput" value="{{ selected_status|default:'' }}">
+                    <div class="filter-group">
+                        <label class="filter-label" for="country">Country</label>
+                        <select id="country" name="country" onchange="this.form.submit()" class="filter-select">
+                            <option value="" {% if not selected_country %}selected{% endif %}>-- All countries --
+                            </option>
+                            <option value="US" {% if selected_country == 'US' %}selected{% endif %}>United States</option>
+                            <option value="CA" {% if selected_country == 'CA' %}selected{% endif %}>Canada</option>
+                        </select>
+                        {% if selected_country %}
+                        <span class="filter-badge" id="countryBadge">
+                            {% if selected_country == 'US' %}United States {% elif selected_country == 'CA' %} Canada
+                            {%else%}{{ selected_country }}{% endif %}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label" for="date_filter">Date</label>
+                        <select id="date_filter" name="date_filter" class="filter-select"
+                            onchange="onDateFilterChange()">
+                            <option value="">All</option>
+                            <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
+                            <option value="yesterday" {% if date_filter == 'yesterday' %}selected{% endif %}>Yesterday
+                            </option>
+                            <option value="custom" {% if date_filter == 'custom' %}selected{% endif %}>Custom</option>
+                        </select>
+                    </div>
+
+                    <div id="customDateInputs"
+                        class="custom-date-wrapper {% if date_filter == 'custom' %}custom-date-wrapper--visible{% endif %}">
+                        <label class="filter-label" for="from_date">From</label>
+                        <input type="date" id="from_date" name="from_date" value="{{ from_date }}" class="filter-input"
+                            onchange="document.getElementById('dashboardFilterForm').submit()">
+                        <label class="filter-label" for="to_date">To</label>
+                        <input type="date" id="to_date" name="to_date" value="{{ to_date }}" class="filter-input"
+                            onchange="document.getElementById('dashboardFilterForm').submit()">
+                    </div>
+
+                    {% if selected_country or date_filter %}
+                    <a class="filter-clear" href="{% url 'admin_dashboard' %}">Clear</a>
+                    {% endif %}
+                </form>
+            </section>
+            <br>
+
+            <!-- Recent checkouts (filtered by country) -->
+            <!-- Summary cards: Total Sales & Total Orders (respecting filters) -->
+            <section class="summary-cards">
+                {% if selected_country == 'US' or selected_country == 'CA' %}
+                <div class="card">
+                    <div class="card-meta">
+                        <div>
+                            <div class="card-title">Total Sales</div>
+                            <div class="card-value">{{ currency_code }} {{ display_total_sales }}</div>
+                        </div>
+                        <div style="font-size:20px; color:#4CAF50; font-weight:700;">{{ currency_code }}</div>
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Order Status Summary (Always Visible 4x2 Grid) -->
+            <!-- Order Status Summary (Always Visible 4x2 Grid) -->
+            <section class="status-grid">
+                <div class="status-card {% if not selected_status %}active{% endif %}" onclick="filterStatus('')">
+                    <div class="status-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="status-count">{{ status_counts.total }}</div>
+                        <div class="status-label">Total Orders</div>
+                    </div>
+                </div>
+                <div class="status-card {% if selected_status == 'pending' %}active{% endif %}"
+                    onclick="filterStatus('pending')">
+                    <div class="status-icon pending">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="status-count">{{ status_counts.pending }}</div>
+                        <div class="status-label">Pending</div>
+                    </div>
+                </div>
+                <div class="status-card {% if selected_status == 'shipping' %}active{% endif %}"
+                    onclick="filterStatus('shipping')">
+                    <div class="status-icon shipping">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="3" width="15" height="13"></rect>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="status-count">{{ status_counts.shipping }}</div>
+                        <div class="status-label">Shipping</div>
+                    </div>
+                </div>
+                <div class="status-card {% if selected_status == 'shipped' %}active{% endif %}"
+                    onclick="filterStatus('shipped')">
+                    <div class="status-icon shipped">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="status-count">{{ status_counts.shipped }}</div>
+                        <div class="status-label">Shipped</div>
+                    </div>
+                </div>
+                <div class="status-card {% if selected_status == 'delivered' %}active{% endif %}"
+                    onclick="filterStatus('delivered')">
+                    <div class="status-icon delivered">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                            </path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="status-count">{{ status_counts.delivered }}</div>
+                        <div class="status-label">Delivered</div>
+                    </div>
+                </div>
+                <div class="status-card {% if selected_status == 'cancelled' %}active{% endif %}"
+                    onclick="filterStatus('cancelled')">
+                    <div class="status-icon cancelled">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="status-count">{{ status_counts.cancelled }}</div>
+                        <div class="status-label">Cancelled</div>
+                    </div>
+                </div>
+                <div class="status-card {% if selected_status == 'returned' %}active{% endif %}"
+                    onclick="filterStatus('returned')">
+                    <div class="status-icon returned">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 14 20 9 15 4"></polyline>
+                            <path d="M4 20v-7a4 4 0 0 1 4-4h12"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="status-count">{{ status_counts.returned }}</div>
+                        <div class="status-label">Returned</div>
+                    </div>
+                </div>
+                <div class="status-card {% if selected_status == 'fulfilled' %}active{% endif %}"
+                    onclick="filterStatus('fulfilled')">
+                    <div class="status-icon fulfilled">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="status-count">{{ status_counts.fulfilled }}</div>
+                        <div class="status-label">Fulfilled</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="table-container">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h2 style="margin:0; font-size:18px;">Order Summary</h2>
+                    <button onclick="downloadExcel()" class="btn-download-excel"
+                        style="background:#217346; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px; transition: background 0.2s;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        Download Excel
+                    </button>
+                </div>
+                <div style="overflow:auto;">
+                    <table class="recent-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Order Items</th>
+                                <th>City</th>
+                                <th>Country</th>
+                                <th>Order Status</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% include 'adminpanel/dashboard_rows.html' %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if page_obj.has_other_pages %}
+                <div class="pagination-container"
+                    style="display:flex; justify-content:center; align-items:center; margin-top:16px; gap:8px;">
+                    {% if page_obj.has_previous %}
+                    <button onclick="goToPage({{ page_obj.previous_page_number }})" class="pagination-btn">&laquo;
+                        Previous</button>
+                    {% else %}
+                    <button class="pagination-btn disabled" disabled>&laquo; Previous</button>
+                    {% endif %}
+
+                    {% for i in page_obj.paginator.page_range %}
+                    {% if page_obj.number == i %}
+                    <button class="pagination-btn active">{{ i }}</button>
+                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %} <button
+                        onclick="goToPage({{ i }})" class="pagination-btn">{{ i }}</button>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <button onclick="goToPage({{ page_obj.next_page_number }})" class="pagination-btn">Next
+                            &raquo;</button>
+                        {% else %}
+                        <button class="pagination-btn disabled" disabled>Next &raquo;</button>
+                        {% endif %}
+                </div>
+                {% endif %}
+
+                <style>
+                    .status-card {
+                        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+                        border: 2px solid transparent;
+                        /* Prepare for border */
+                    }
+
+                    .status-card:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .status-card.active {
+                        border-color: #2563eb;
+                        background-color: #f0f9ff;
+                    }
+
+                    .pagination-btn {
+                        padding: 6px 12px;
+                        border: 1px solid #e5e7eb;
+                        background: #fff;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 13px;
+                        color: #374151;
+                        transition: all 0.2s;
+                    }
+
+                    .pagination-btn:hover:not(.disabled):not(.active) {
+                        background: #f3f4f6;
+                        border-color: #d1d5db;
+                    }
+
+                    .pagination-btn.active {
+                        background: #2563eb;
+                        color: white;
+                        border-color: #2563eb;
+                    }
+
+                    .pagination-btn.disabled {
+                        color: #9ca3af;
+                        cursor: not-allowed;
+                        background: #f9fafb;
+                    }
+                </style>
+            </section>
+
+            <!-- Sub-Category Sales Chart -->
+            <section class="dashboard-section chart-section">
+                <div class="section-header">
+                    <h2>Sub-Category Wise Sales – {{ product_gender|title }} Products</h2>
+                    <form id="genderForm" method="get" class="gender-filter-form">
+                        <!-- preserve existing filter params when switching gender -->
+                        <input type="hidden" name="country" value="{{ selected_country }}">
+                        <input type="hidden" name="date_filter" value="{{ date_filter }}">
+                        <input type="hidden" name="from_date" value="{{ from_date }}">
+                        <input type="hidden" name="to_date" value="{{ to_date }}">
+                        <div class="filter-group">
+                            <label class="filter-label">Dataset</label>
+                            <select name="product_gender" class="filter-select"
+                                onchange="document.getElementById('genderForm').submit();">
+                                <option value="women" {% if product_gender == 'women' %}selected{% endif %}>Women</option>
+                                <option value="kid" {% if product_gender == 'kid' %}selected{% endif %}>Kid</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="chart-container">
+                    <canvas id="subCategoryChart" height="200"></canvas>
+                </div>
+            </section>
+
+            <!-- Country vs Orders Pie Chart -->
+            <section class="dashboard-section chart-section">
+                <div class="section-header">
+                    <h2>Country vs Orders</h2>
+                </div>
+                <div class="country-chart-wrapper">
+                    <canvas id="countryOrdersChart" class="country-chart-canvas"></canvas>
+                </div>
+            </section>
+
+            <!-- Monthly Sales Bar Chart (shown only when a country is selected) -->
+            {% if selected_country %}
+            <section class="dashboard-section chart-section">
+                <div class="section-header">
+                    <h2>Monthly Sales – {{ selected_country }}</h2>
+                </div>
+                <div class="chart-container full-width">
+                    <canvas id="monthlySalesChart" height="240"></canvas>
+                </div>
+            </section>
+            {% endif %}
+
+
+
+            <script src="{% static 'adminpanel/js/dashboard.js' %}"></script>
+            <script src="{% static 'adminpanel/js/global.js' %}"></script>
+            <script>
+                // Sub-category chart data injected from server
+                const subcategoryChartData = {{ subcategory_chart_json| safe }} || { labels: [], values: [], percents: [], total: 0 };
+                // Debug: log payload so we can inspect what the template received
+                console.log('DEBUG subcategoryChartData:', subcategoryChartData);
+                // Country orders data injected from server
+                const countryOrdersData = {{ country_orders_json| safe }} || { labels: [], values: [], percents: [], total: 0 };
+                console.log('DEBUG countryOrdersData:', countryOrdersData);
+                // Monthly sales data (only populated when a country is selected)
+                const monthlySalesData = {{ monthly_sales_json| safe }} || { labels: [], values: [], total: 0 };
+                console.log('DEBUG monthlySalesData:', monthlySalesData);
+
+
+
+                function renderCountryOrdersChart() {
+                    const canvas = document.getElementById('countryOrdersChart');
+                    if (!canvas) return;
+                    // destroy existing chart if present
+                    if (window._countryChart) { window._countryChart.destroy(); }
+                    const ctx = canvas.getContext('2d');
+
+                    const labels = countryOrdersData.labels || [];
+                    const data = countryOrdersData.values || [];
+                    const total = data.reduce((s, v) => s + (Number(v) || 0), 0);
+
+                    // build palette by interpolating between two provided hex colors
+                    // User colors: #93C5FD (light blue) -> #86EFAC (mint)
+                    function hexToRgb(hex) {
+                        const h = hex.replace('#', '');
+                        return [parseInt(h.substring(0, 2), 16), parseInt(h.substring(2, 4), 16), parseInt(h.substring(4, 6), 16)];
+                    }
+                    function rgbToHex(r, g, b) {
+                        return '#' + [r, g, b].map(x => { const s = x.toString(16); return s.length === 1 ? '0' + s : s; }).join('').toUpperCase();
+                    }
+                    function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
+
+                    const colorA = '#007AFF';
+                    const colorB = '#86EFAC';
+                    const rgbA = hexToRgb(colorA);
+                    const rgbB = hexToRgb(colorB);
+                    const n = Math.max(labels.length, 1);
+                    const backgroundColors = labels.map((_, i) => {
+                        const t = n === 1 ? 0 : (i / (n - 1));
+                        const r = lerp(rgbA[0], rgbB[0], t);
+                        const g = lerp(rgbA[1], rgbB[1], t);
+                        const b = lerp(rgbA[2], rgbB[2], t);
+                        return rgbToHex(r, g, b);
+                    });
+
+                    // plugin: draw percent labels near each slice (outside) and a center total
+                    const countryLabelsPlugin = {
+                        id: 'countryLabels',
+                        afterDraw(chart) {
+                            const { ctx, chartArea: area } = chart;
+                            const meta = chart.getDatasetMeta(0);
+                            ctx.save();
+                            ctx.font = '12px Roboto, sans-serif';
+                            ctx.fillStyle = '#0f172a';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+
+                            meta.data.forEach((arc, idx) => {
+                                const value = Number(data[idx]) || 0;
+                                if (value === 0) return;
+                                // compute mid-angle of arc
+                                const start = arc.startAngle;
+                                const end = arc.endAngle;
+                                const mid = (start + end) / 2;
+                                const r = (arc.outerRadius + 10); // outside label radius
+                                const x = arc.x + Math.cos(mid) * r;
+                                const y = arc.y + Math.sin(mid) * r;
+
+                                const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+
+                                // draw connector line
+                                ctx.strokeStyle = 'rgba(15,23,42,0.08)';
+                                ctx.lineWidth = 1;
+                                ctx.beginPath();
+                                const innerX = arc.x + Math.cos(mid) * arc.outerRadius * 0.9;
+                                const innerY = arc.y + Math.sin(mid) * arc.outerRadius * 0.9;
+                                ctx.moveTo(innerX, innerY);
+                                ctx.lineTo(x, y);
+                                ctx.stroke();
+
+                                // label text
+                                ctx.fillStyle = '#0f172a';
+                                const txt = `${labels[idx]} (${pct}%)`;
+                                ctx.fillText(txt, x, y);
+                            });
+
+                            // center total
+                            ctx.font = '600 14px Roboto, sans-serif';
+                            ctx.fillStyle = '#111827';
+                            ctx.fillText(`${total}`, area.left + (area.width / 2), area.top + (area.height / 2) - 8);
+                            ctx.font = '12px Roboto, sans-serif';
+                            ctx.fillStyle = '#6b7280';
+                            ctx.fillText('Total Orders', area.left + (area.width / 2), area.top + (area.height / 2) + 12);
+
+                            ctx.restore();
+                        }
+                    };
+
+                    // subtle shadow plugin for depth (applies before drawing slices)
+                    const shadowPlugin = {
+                        id: 'shadowSlices',
+                        beforeDatasetDraw(chart, args, options) {
+                            const { ctx } = chart;
+                            ctx.save();
+                            ctx.shadowColor = 'rgba(15,23,42,0.08)';
+                            ctx.shadowBlur = 12;
+                        },
+                        afterDatasetDraw(chart) {
+                            chart.ctx.restore();
+                        }
+                    };
+
+                    window._countryChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: backgroundColors,
+                                borderColor: '#ffffff',
+                                borderWidth: 2,
+                                hoverOffset: 12
+                            }]
+                        },
+                        options: {
+                            cutout: '62%',
+                            maintainAspectRatio: false,
+                            layout: { padding: { left: 24, right: 24, top: 12, bottom: 12 } },
+                            plugins: {
+                                tooltip: {
+                                    padding: 8,
+                                    bodySpacing: 6,
+                                    backgroundColor: 'rgba(11,17,28,0.95)',
+                                    titleFont: { weight: 600 },
+                                    callbacks: {
+                                        label: function (ctx) {
+                                            const idx = ctx.dataIndex;
+                                            const val = data[idx] || 0;
+                                            const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                                            return `${labels[idx]}: ${val} orders (${pct}%)`;
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    position: 'right',
+                                    align: 'center',
+                                    labels: {
+                                        usePointStyle: true,
+                                        pointStyle: 'circle',
+                                        color: '#374151',
+                                        padding: 12
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [shadowPlugin, countryLabelsPlugin]
+                    });
+                }
+                // Monthly sales bar chart
+                function renderMonthlySalesChart() {
+                    const canvas = document.getElementById('monthlySalesChart');
+                    if (!canvas) return; // canvas not rendered (country not selected)
+                    // destroy existing chart if present
+                    if (window._monthlyChart) { window._monthlyChart.destroy(); }
+                    const ctx = canvas.getContext('2d');
+
+                    const labels = monthlySalesData.labels || [];
+                    const values = monthlySalesData.values || [];
+                    if (!labels.length || !values.length) return; // nothing to render
+
+                    // create a pleasant blue gradient for bars
+                    const barGrad = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+                    barGrad.addColorStop(0, 'rgba(59,130,246,0.95)');
+                    barGrad.addColorStop(1, 'rgba(99,102,241,0.9)');
+
+                    window._monthlyChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Sales',
+                                data: values,
+                                backgroundColor: labels.map(() => barGrad),
+                                borderColor: 'rgba(30,64,175,0.12)',
+                                borderWidth: 1,
+                                borderRadius: 6,
+                                maxBarThickness: 48
+                            }]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { ticks: { color: '#374151' }, grid: { display: false } },
+                                y: { ticks: { color: '#374151' }, grid: { color: 'rgba(15,23,42,0.03)' } }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: 'rgba(11,17,28,0.95)',
+                                    callbacks: {
+                                        label: function (ctx) {
+                                            const v = ctx.parsed.y !== undefined ? ctx.parsed.y : ctx.parsed;
+                                            return `Sales: ${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [percentPlugin]
+                    });
+                }
+
+                // date filter handler: show custom inputs or submit the form
+                function onDateFilterChange() {
+                    var sel = document.getElementById('date_filter');
+                    var form = document.getElementById('dashboardFilterForm');
+                    var custom = document.getElementById('customDateInputs');
+                    if (!sel || !form) return;
+                    if (sel.value === 'custom') {
+                        if (custom) custom.classList.add('custom-date-wrapper--visible');
+                        // focus the from_date to prompt user
+                        var f = document.getElementById('from_date'); if (f) f.focus();
+                    } else {
+                        if (custom) custom.classList.remove('custom-date-wrapper--visible');
+                        // submit to apply selected preset
+                        form.submit();
+                    }
+                }
+                function renderSubCategoryChart() {
+                    const canvas = document.getElementById('subCategoryChart');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    // destroy existing chart instance if exists
+                    if (window._subCatChart) { window._subCatChart.destroy(); }
+
+                    const labels = subcategoryChartData.labels || [];
+                    const values = subcategoryChartData.values || [];
+                    const percents = subcategoryChartData.percents || [];
+
+                    // create a smooth gradient per bar by interpolating between two hex colors
+                    // using the user's palette: #93C5FD (light blue) -> #86EFAC (mint)
+                    function hexToRgb(hex) {
+                        const h = hex.replace('#', '');
+                        return [parseInt(h.substring(0, 2), 16), parseInt(h.substring(2, 4), 16), parseInt(h.substring(4, 6), 16)];
+                    }
+                    function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
+
+                    const startHex = '#93C5FD';
+                    const endHex = '#86EFAC';
+                    const rgbStart = hexToRgb(startHex);
+                    const rgbEnd = hexToRgb(endHex);
+                    const itemCount = Math.max(labels.length, 1);
+
+                    const backgrounds = labels.map((_, i) => {
+                        const t = itemCount === 1 ? 0.5 : (i / (itemCount - 1));
+                        // primary color for this bar (interpolated)
+                        const r = lerp(rgbStart[0], rgbEnd[0], t);
+                        const g = lerp(rgbStart[1], rgbEnd[1], t);
+                        const b = lerp(rgbStart[2], rgbEnd[2], t);
+                        // secondary color a bit shifted toward the end color for depth
+                        const t2 = Math.min(1, t + 0.12);
+                        const r2 = lerp(rgbStart[0], rgbEnd[0], t2);
+                        const g2 = lerp(rgbStart[1], rgbEnd[1], t2);
+                        const b2 = lerp(rgbStart[2], rgbEnd[2], t2);
+
+                        const grad = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
+                        grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.98)`);
+                        grad.addColorStop(1, `rgba(${r2}, ${g2}, ${b2}, 0.88)`);
+                        return grad;
+                    });
+
+                    // small plugin: draw percent labels to the right of each horizontal bar
+                    const percentPlugin = {
+                        id: 'percentLabels',
+                        afterDatasetsDraw(chart) {
+                            const { ctx, chartArea: area } = chart;
+                            const meta = chart.getDatasetMeta(0);
+                            ctx.save();
+                            ctx.font = '12px Roboto, sans-serif';
+                            ctx.fillStyle = '#0f172a';
+                            ctx.textBaseline = 'middle';
+                            meta.data.forEach((bar, idx) => {
+                                const pct = percents[idx] !== undefined ? percents[idx] : '';
+                                if (pct === '') return;
+                                // position slightly after the bar end
+                                const x = bar.x + 10;
+                                const y = bar.y;
+                                ctx.fillText(pct + '%', x, y);
+                            });
+                            ctx.restore();
+                        }
+                    };
+
+                    window._subCatChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Sales',
+                                data: values,
+                                backgroundColor: backgrounds,
+                                borderColor: 'rgba(15,23,42,0.06)',
+                                borderWidth: 1,
+                                borderRadius: 10,
+                                barThickness: 26,
+                                maxBarThickness: 48,
+                                borderSkipped: false
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            maintainAspectRatio: false,
+                            layout: { padding: { left: 6, right: 24, top: 6, bottom: 6 } },
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        callback: function (value) {
+                                            return Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        },
+                                        color: '#374151'
+                                    },
+                                    grid: { color: 'rgba(15,23,42,0.03)' }
+                                },
+                                y: {
+                                    ticks: { color: '#374151' },
+                                    grid: { display: false }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        title: function (items) { return items[0].label; },
+                                        label: function (ctx) {
+                                            const value = ctx.parsed.x;
+                                            const pct = percents[ctx.dataIndex] || 0;
+                                            return `Sales: ${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} — ${pct}%`;
+                                        }
+                                    }
+                                },
+                                legend: { display: false }
+                            }
+                        },
+                        plugins: [percentPlugin]
+                    });
+                }
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    try { renderSubCategoryChart(); } catch (e) { console.warn('subcat chart render failed', e); }
+                    try { renderCountryOrdersChart(); } catch (e) { console.warn('country chart render failed', e); }
+                    try { renderMonthlySalesChart(); } catch (e) { console.warn('monthly chart render failed', e); }
+                });
+
+                // ensure UI is in correct state on load
+                document.addEventListener('DOMContentLoaded', function () {
+                    var sel = document.getElementById('date_filter');
+                    var custom = document.getElementById('customDateInputs');
+                    if (sel && custom) {
+                        if (sel.value === 'custom') {
+                            custom.classList.add('custom-date-wrapper--visible');
+                        } else {
+                            custom.classList.remove('custom-date-wrapper--visible');
+                        }
+                    }
+                });
+            </script>
+
+            <script>
+
+
+                function downloadExcel() {
+                    const params = new URLSearchParams(window.location.search);
+                    const url = "{% url 'export_orders_excel' %}?" + params.toString();
+                    window.location.href = url;
+                }
+
+                function goToPage(pageNum) {
+                    const pageInput = document.getElementById('dashboardPage');
+                    const form = document.getElementById('dashboardFilterForm');
+                    if (pageInput && form) {
+                        pageInput.value = pageNum;
+                        form.submit();
+                    }
+                }
+
+                function filterStatus(status) {
+                    // Update hidden input
+                    const statusInput = document.getElementById('statusFilterInput');
+                    if (statusInput) statusInput.value = status;
+
+                    // Update UI active state
+                    document.querySelectorAll('.status-card').forEach(card => {
+                        card.classList.remove('active');
+                        // Check if this card matches the clicked status
+                        // Simple check: looking at onclick attribute or text content is risky.
+                        // Better: checking the argument passed in onclick vs the status var.
+                        // Actually, I can just rely on the click event if I passed 'this', but I passed string.
+                        // Let's rely on re-rendering or manual toggle.
+                    });
+
+                    // Find the card that was clicked (approximate) or loop to find match
+                    // Since we don't have unique IDs on cards, let's just use the event.currentTarget if we passed it, 
+                    // but we didn't. 
+                    // Let's assume the user can see the effect. 
+                    // Wait, I should add the 'active' class to the clicked card. 
+                    // I'll assume the click handler is on the element.
+                    // But I didn't pass 'this'. 
+                    // I will change the logic to find the card by status.
+                    const cards = document.querySelectorAll('.status-card');
+                    cards.forEach(card => {
+                        const onclickAttr = card.getAttribute('onclick');
+                        if (onclickAttr && onclickAttr.includes(`'${status}'`)) {
+                            card.classList.add('active');
+                        }
+                    });
+
+                    // AJAX Fetch
+                    fetchOrders();
+                }
+
+                function fetchOrders() {
+                    const form = document.getElementById('dashboardFilterForm');
+                    const formData = new FormData(form);
+                    const params = new URLSearchParams(formData);
+
+                    // Ensure page is 1 when changing filters via AJAX (unless pagination handling is complex)
+                    // For status filter, we should probably reset to page 1.
+                    params.set('page', '1');
+                    document.getElementById('dashboardPage').value = '1';
+
+                    // Add ajax flag
+                    params.append('ajax', 'true');
+
+                    fetch(`{% url 'admin_dashboard' %}?${params.toString()}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(response => response.text())
+                        .then(html => {
+                            const tbody = document.querySelector('.recent-table tbody');
+                            if (tbody) {
+                                tbody.innerHTML = html;
+                            }
+                        })
+                        .catch(error => console.error('Error loading orders:', error));
+                }
+            </script>
+        </main>
+    </div>
+</body>
+
+</html>
+
+
+</html>

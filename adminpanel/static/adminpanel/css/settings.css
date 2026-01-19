@@ -1,0 +1,459 @@
+/* --- Global Styles & Resets --- */
+:root {
+    --primary-color: #136dec;
+    --primary-darker: p;
+    --primary-hover-bg: rgba(19, 109, 236, 0.1);
+    
+    --bg-light: #f6f7f8;
+    --surface-light: #ffffff;
+    
+    --text-primary: #111418;
+    --text-secondary: #617289;
+    
+    --border-light: #dbe0e6;
+    
+    --green: #22c55e;
+    --orange: #f97316;
+    --blue-tag-bg: #e0eefd;
+    --blue-tag-text: pink;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+}
+
+/* --- Base Layout --- */
+.page-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    /* * The padding rule was removed from here in the previous step 
+     * and is now correctly handled by global.css
+     */
+    overflow-y: auto;
+}
+
+.main-container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+}
+
+.profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--border-light); /* Placeholder color */
+    object-fit: cover;
+}
+
+.profile-info h1 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.profile-info p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.navigation {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.nav-item:hover {
+    background-color: var(--primary-hover-bg);
+    color: var(--primary-color);
+}
+
+.nav-item.active {
+    background-color: var(--primary-hover-bg);
+    color: var(--primary-color);
+}
+
+/* --- Google Icons Style --- */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-size: 20px;
+}
+.nav-item.active .material-symbols-outlined.filled {
+    font-variation-settings: 'FILL' 1;
+}
+.admin-count .material-symbols-outlined.filled {
+     font-variation-settings: 'FILL' 1;
+}
+.admin-count .green { color: var(--green); }
+.admin-count .orange { color: var(--orange); }
+
+
+
+
+/* --- Main Content --- */
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.page-header p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+.content-column {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.form-column .sticky-form {
+    position: sticky;
+    top: 32px;
+}
+
+/* --- Card --- */
+.card {
+    background-color: var(--surface-light);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.card-header h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.card-header p,
+.card-body p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    line-height: 1.5;
+}
+
+.admin-count {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-left: 16px;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+.card-body.toggle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.card-body.toggle-list > p {
+    margin-bottom: 4px; /* Space between text and first toggle */
+}
+
+
+/* --- Tags --- */
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: var(--blue-tag-bg);
+    color: var(--blue-tag-text);
+}
+
+/* --- Toggle Switch --- */
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-light);
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.toggle-item h4 {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+/* * This .switch style from settings.css is different from global.css.
+ * We'll leave it, as it's specific to this page's design.
+ * It does not conflict with the menu function itself.
+*/
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px; /* w-11 */
+    height: 24px; /* h-6 */
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-light);
+    border-radius: 34px;
+    transition: .3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px; /* h-5 */
+    width: 20px; /* w-5 */
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .3s;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px); 
+}
+
+/* --- Assign Form --- */
+.form-column h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+.form-column > .card > .card-body > p {
+    margin-top: 4px;
+    margin-bottom: 24px;
+}
+
+.assign-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-group label,
+.form-group-check label strong {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background-color: var(--bg-light);
+    font-size: 0.875rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-group input::placeholder {
+    color: var(--text-secondary);
+}
+
+.form-group-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.form-group-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+    flex-shrink: 0;
+    accent-color: var(--primary-color);
+}
+
+.form-group-check label p {
+    margin-top: 2px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+:root {
+    --primary-color: #4f46e5;
+    --primary-darker: #4338ca;
+}
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    margin-top: 8px;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-darker);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-primary:disabled,
+.btn-primary:disabled:hover {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-primary .material-symbols-outlined {
+    font-size: 18px;
+}
+
+
+
+
+/* --- Mobile Responsive Styles --- */
+@media (max-width: 768px) {
+
+    /* * START: FIX
+     * The conflicting .page-container, .sidebar, .sidebar.is-open, 
+     * and .main-content rules have been DELETED from here.
+     * The styles in global.css will now correctly handle the mobile menu.
+     */
+
+    /* Stacks the two-column grid into a single column */
+    /* This rule is fine and does not conflict */
+    .content-grid {
+        grid-template-columns: 1fr; /* Single column */
+        gap: 24px; /* Slightly smaller gap */
+    }
+
+    /* Removes the sticky behavior from the form on mobile */
+    /* This rule is fine and does not conflict */
+    .form-column .sticky-form {
+        position: static; /* Disable sticky positioning */
+        top: auto;
+    }
+
+    /* Reduces the main title size */
+    .page-header h1 {
+        font-size: 1.5rem; /* Smaller heading */
+    }
+
+    /* Reduces padding inside cards */
+    .card-header,
+    .card-body {
+        padding: 16px;
+    }
+
+    /* Reduces padding for toggle items */
+    .toggle-item {
+        padding: 12px;
+    }
+}

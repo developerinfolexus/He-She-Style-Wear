@@ -1,0 +1,389 @@
+/* HeShe/css/products.css */
+
+/* --- Content Header & Actions --- */
+/* Ensures the H2 and the action buttons are aligned horizontally */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+    gap: 16px; /* Spacing between the title and the buttons */
+}
+
+/* Styles for the container holding the Add Product and Add Media buttons */
+.header-actions {
+    display: flex;
+    gap: 12px; /* Space between the two buttons */
+    flex-wrap: wrap; 
+}
+
+
+/* --- Table Styles --- */
+.recent-orders {
+    background-color: var(--bg-secondary-solid);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+.recent-orders h2 {
+    margin: 0 0 16px 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+table { width: 100%; border-collapse: collapse; }
+th, td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle; 
+}
+th {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+tbody tr:last-child td { border-bottom: none; }
+.status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.status.shipped { background-color: var(--status-shipped-bg); color: var(--status-shipped-text); }
+.status.processing { background-color: var(--status-processing-bg); color: var(--status-processing-text); }
+.status.delivered { background-color: var(--status-delivered-bg); color: var(--status-delivered-text); }
+.status.cancelled { background-color: var(--status-cancelled-bg); color: var(--status-cancelled-text); }
+
+/* --- Button Styles --- */
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    text-decoration: none; 
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-primary {
+    background-color: var(--accent-primary);
+    color: #ffffff;
+}
+.btn-primary:hover {
+    background-color: #7b1fa2; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.btn-secondary {
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    font-weight: 500;
+}
+.btn-secondary:hover {
+    background-color: var(--border-color);
+}
+.btn-danger {
+    background-color: var(--status-cancelled-text);
+    color: #ffffff;
+}
+.btn-danger:hover {
+    background-color: #dc2626; 
+}
+
+
+/* --- Form Grid Styles --- */
+.product-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+.form-group.full-width {
+    grid-column: 1 / -1; 
+}
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.9375rem;
+    font-family: 'Poppins', sans-serif; 
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    box-sizing: border-box; 
+}
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+.form-group-file {
+    position: relative;
+}
+.form-group-file input[type="file"] {
+    opacity: 0;
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    z-index: -1;
+}
+.form-group-file .btn-secondary {
+    display: inline-block;
+    padding: 12px 18px; 
+    cursor: pointer;
+    margin-right: 12px;
+}
+.form-group-file #fileName {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+.product-table-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover; 
+    border-radius: 6px; 
+    border: 1px solid var(--border-color); 
+}
+.form-group select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center; 
+    padding-right: 40px; 
+}
+
+/* --- Action Button Styles --- */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+.btn-action {
+    padding: 6px;
+    line-height: 0; 
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    transition: background-color 0.2s, color 0.2s;
+    text-decoration: none; 
+}
+.btn-action:hover {
+    background-color: var(--border-color);
+}
+.btn-action.btn-view {
+    color: var(--accent-primary);
+}
+.btn-action.btn-view:hover {
+    background-color: var(--accent-light);
+}
+.btn-action.btn-delete {
+    color: var(--status-cancelled-text);
+}
+.btn-action.btn-delete:hover {
+    background-color: var(--status-cancelled-bg);
+}
+
+/* --- Modal Footer Styles --- */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 0 0 0;
+    margin-top: 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* --- START: MODIFIED PRODUCT MODAL STYLES --- */
+.modal-content-lg {
+    max-width: 900px;
+    width: 90%;
+}
+/* MODIFIED: Layout is now 2-col */
+.product-details-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+.info-section {
+    background-color: var(--bg-primary);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+.info-section.full-width {
+    grid-column: 1 / -1;
+}
+.info-section h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+.info-section p {
+    margin: 4px 0;
+    color: var(--text-secondary);
+}
+.info-section p strong,
+.info-section p span {
+    color: var(--text-primary);
+}
+.info-section hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 16px 0;
+}
+.payment-summary {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9375rem;
+}
+.payment-summary.total {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+/* NEW: Container for multiple images */
+.modal-image-container {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto; /* Allows horizontal scrolling */
+    padding: 16px;
+}
+.modal-image-container p {
+    margin: 0;
+}
+.modal-image-container img {
+    height: 200px; /* Taller for better view */
+    width: auto;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+/* --- END: MODIFIED PRODUCT MODAL STYLES --- */
+
+/* ---------------------------------------------------------------------- */
+/* --- START: RESPONSIVENESS FOR PRODUCTS PAGE --- */
+/* ---------------------------------------------------------------------- */
+
+/* * This makes your main product table scrollable horizontally
+ * on small screens so it doesn't break the layout.
+ */
+.recent-orders {
+    overflow-x: auto;
+}
+
+@media (max-width: 992px) {
+    /* --- Tablet (Stack 2-column grids) --- */
+    
+    /* * This stacks the grids used in your "Edit Product" modal
+     * and "View Product" modal from 2 columns to 1 column.
+     */
+    .product-form-grid,
+    .product-details-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        /* Reset grid-column to work in a 1-column layout */
+        grid-column: auto;
+    }
+    
+    /* Ensure action buttons wrap on tablet screens */
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+        /* Make buttons stack vertically if the screen is too narrow */
+        flex-direction: row; 
+    }
+}
+
+@media (max-width: 768px) {
+    /* --- Large Phone (Stack buttons, reduce padding) --- */
+
+    /* Reduce padding in tables to save space */
+    th, td {
+        padding: 12px 10px;
+    }
+
+    /*
+     * MODIFICATION:
+     * Only .form-actions and .modal-footer stack vertically.
+     * .header-actions is removed from this rule, so its buttons
+     * will remain in a row (side-by-side) as defined in the
+     * (max-width: 992px) media query.
+    */
+    .form-actions,
+    .modal-footer {
+        flex-direction: column;
+        align-items: stretch; /* Make children full-width */
+        gap: 10px;
+    }
+
+    /*
+     * MODIFICATION:
+     * Only buttons inside .form-actions and .modal-footer
+     * will become full-width.
+    */
+    .form-actions .btn,
+    .modal-footer .btn {
+        width: 100%;
+    }
+
+    /* Allows the 'Edit'/'Delete' buttons in the table to wrap */
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    /* Make large modals take up more screen width */
+    .modal-content-lg {
+        width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+    /* --- Small Phone (Tighter layout) --- */
+
+    /* Further reduce table padding */
+    th, td {
+        padding: 10px 8px;
+    }
+
+    /* Reduce image height in modal to fit screen */
+    .modal-image-container img {
+        height: 150px;
+    }
+}
+/* ---------------------------------------------------------------------- */
+/* --- END: RESPONSIVENESS --- */
+/* ---------------------------------------------------------------------- */

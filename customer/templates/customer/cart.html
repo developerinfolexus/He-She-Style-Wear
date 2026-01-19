@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Cart - HE SHE STYLES</title>
+  <link rel="icon" href="{% static 'customer/images/logo.png' %}" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'customer/css/index.css' %}">
+  <link rel="stylesheet" href="{% static 'customer/css/cart.css' %}">
+  <style>
+
+  </style>
+</head>
+
+<body data-header-url="{% url 'api_header' %}">
+  <div id="header-placeholder"></div>
+  <main class="container">
+    <div class="page-header">
+      <h2>Shopping Cart</h2>
+    </div>
+
+    <div class="cart-layout" id="cart-layout">
+      <section class="cart-items-list" id="cart-items-container">
+      </section>
+      <aside class="order-summary" id="order-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Item</span>
+          <span id="subtotal-price">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span id="shipping-price">FREE</span>
+        </div>
+        <div class="summary-row">
+          <span>GST (5%)</span>
+          <span id="gst-price">$0.00</span>
+        </div>
+        <div class="summary-row total">
+          <span>Order</span>
+          <span id="total-price">$0.00</span>
+        </div>
+        <button class="checkout-btn">PROCEED TO CHECKOUT</button>
+      </aside>
+    </div>
+
+    <div class="empty-cart-message" id="empty-cart-message">
+      <i class="fas fa-shopping-bag"></i>
+      <p>Your cart is currently empty.</p>
+      <a href="{% url 'index' %}" class="shop-now-link">CONTINUE SHOPPING</a>
+    </div>
+  </main>
+
+  <div class="whatsapp-container">
+    <div class="whatsapp-tooltip">Need More Information</div>
+    <a href="https://wa.me/17808864821"
+
+ class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </div>
+  {% include 'customer/footer.html' %}
+
+  <div id="reviews-modal-overlay" class="reviews-modal-overlay">
+    <div class="reviews-modal">
+      <div class="reviews-modal-header">
+        <h2>Customer Reviews</h2>
+        <button id="close-reviews-modal" class="close-reviews-modal">&times;</button>
+      </div>
+      <div class="reviews-modal-body">
+        <div class="reviews-grid">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="{% static 'customer/js/cart.js' %}?v=3"></script>
+  <script src="{% static 'customer/js/index.js' %}?v=3"></script>
+
+  <script>
+  </script>
+</body>
+
+</html>

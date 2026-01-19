@@ -1,0 +1,190 @@
+/* --- Info Modal Styles (Footer Policies) --- */
+.info-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 1250;
+    /* Higher than reviews modal */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.info-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.info-modal {
+    background-color: var(--background-color, #fff);
+    padding: 0;
+    /* Header/Body handle padding */
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 700px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+}
+
+.info-modal-overlay.active .info-modal {
+    transform: scale(1) translateY(0);
+}
+
+.info-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color, #eee);
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    flex-shrink: 0;
+}
+
+.info-modal-header h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 1.5rem;
+    margin: 0;
+    color: var(--primary-color, #333);
+}
+
+.close-info-modal {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    font-weight: 300;
+    color: #888;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s, transform 0.2s;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.close-info-modal:hover {
+    color: #333;
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: rotate(90deg);
+}
+
+.info-modal-body {
+    padding: 25px;
+    overflow-y: auto;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #555;
+    flex: 1;
+}
+
+/* Ensure content inside doesn't overflow horizontally */
+.info-modal-body img {
+    max-width: 100%;
+    height: auto;
+}
+
+.info-modal-body h1,
+.info-modal-body h2,
+.info-modal-body h3 {
+    color: var(--primary-color, #333);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.info-modal-body h1 {
+    font-size: 1.8rem;
+}
+
+.info-modal-body h2 {
+    font-size: 1.4rem;
+}
+
+.info-modal-body h3 {
+    font-size: 1.2rem;
+}
+
+.info-modal-body p {
+    margin-bottom: 1em;
+}
+
+.info-modal-body ul,
+.info-modal-body ol {
+    margin-bottom: 1em;
+    padding-left: 1.5em;
+}
+
+.info-modal-body li {
+    margin-bottom: 0.5em;
+}
+
+/* Mobile Responsive - Full width on small screens */
+@media (max-width: 768px) {
+    .info-modal {
+        width: 95%;
+        max-height: 90vh;
+        border-radius: 12px 12px 0 0;
+        margin-top: auto;
+    }
+
+    .info-modal-header {
+        padding: 18px 20px;
+    }
+
+    .info-modal-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .info-modal-body {
+        padding: 20px;
+        font-size: 0.95rem;
+    }
+
+    .close-info-modal {
+        font-size: 1.8rem;
+    }
+}
+
+/* Extra small screens - Bottom sheet style */
+@media (max-width: 480px) {
+    .info-modal-overlay {
+        align-items: flex-end;
+    }
+
+    .info-modal {
+        width: 100%;
+        max-height: 85vh;
+        border-radius: 16px 16px 0 0;
+        transform: translateY(100%);
+    }
+
+    .info-modal-overlay.active .info-modal {
+        transform: translateY(0);
+    }
+
+    .info-modal-header {
+        padding: 16px 18px;
+    }
+
+    .info-modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .info-modal-body {
+        padding: 18px;
+    }
+}
