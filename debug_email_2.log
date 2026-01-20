@@ -1,0 +1,18 @@
+2026-01-20 11:28:26.536481+00:00: DEBUG: update_order_api called for ID=75, Status=cancelled_by_admin
+2026-01-20 11:28:26.538045+00:00: DEBUG: admin_cancel_reason=Cannot Ship to Address
+2026-01-20 11:28:26.561897+00:00: DEBUG: Status matches 'cancelled_by_admin', entering email block.
+2026-01-20 11:28:26.564516+00:00: DEBUG: Preparing email for harishjharish24@gmail.com
+2026-01-20 11:28:26.572165+00:00: DEBUG: Error sending cancellation email: Traceback (most recent call last):
+  File "C:\Users\HARISH\Downloads\boutique_backend admin work\boutique_backend\boutique_backend\adminpanel\views.py", line 1104, in update_order_api
+    html_content = render_to_string("customer/emails/admin_cancellation_email.html", {
+                   ^^^^^^^^^^^^^^^^
+NameError: name 'render_to_string' is not defined
+
+2026-01-20 11:28:26.572165+00:00: Error sending cancellation email: name 'render_to_string' is not defined
+2026-01-20 11:30:03.728962+00:00: DEBUG: update_order_api called for ID=75, Status=pending
+2026-01-20 11:30:03.729468+00:00: DEBUG: admin_cancel_reason=
+2026-01-20 11:30:12.777627+00:00: DEBUG: update_order_api called for ID=75, Status=cancelled_by_admin
+2026-01-20 11:30:12.777627+00:00: DEBUG: admin_cancel_reason=Payment Verification Failed
+2026-01-20 11:30:12.795127+00:00: DEBUG: Status matches 'cancelled_by_admin', entering email block.
+2026-01-20 11:30:12.796696+00:00: DEBUG: Preparing email for harishjharish24@gmail.com
+2026-01-20 11:30:18.692526+00:00: DEBUG: Admin Cancellation Email SENT successfully to harishjharish24@gmail.com

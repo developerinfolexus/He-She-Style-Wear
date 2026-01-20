@@ -279,6 +279,7 @@ class Order(models.Model):
         ('returned', 'Returned'),
         ('fulfilled', 'Order Fulfilled'),
         ('cancelled', 'Cancelled'),
+        ('cancelled_by_admin', 'Cancelled by Admin'),
     ]
 
     tracking_code = models.CharField(max_length=100, blank=True, null=True)
@@ -309,6 +310,8 @@ class Order(models.Model):
     notes = models.TextField(blank=True)
     
     # Return Fields
+    admin_cancel_reason = models.TextField(blank=True, null=True)
+    cancel_reason = models.TextField(blank=True, null=True)
     return_reason = models.TextField(blank=True, null=True)
     return_package_number = models.CharField(max_length=100, blank=True, null=True)
     courier_name = models.CharField(max_length=100, blank=True, null=True)
@@ -423,8 +426,20 @@ class Coupon(models.Model):
         return True
 
 
+class OrderStatusHistory(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='history')
+    status = models.CharField(max_length=20, choices=Order.STATUS_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.order.order_number} - {self.status} at {self.created_at}"
+
+
 # ==========================================
-# SIGNALS FOR EMAIL NOTIFICATIONS
+# SIGNALS FOR EMAIL NOTIFICATIONS & HISTORY
 # ==========================================
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
@@ -439,11 +454,17 @@ from customer.utils import generate_order_pdf
 @receiver(pre_save, sender=Order)
 def order_pre_save(sender, instance, **kwargs):
     """
-    Detect status changes
+    Detect status changes for Emails AND History
     """
     if instance.pk:
         try:
             old_obj = Order.objects.get(pk=instance.pk)
+            
+            # 1. Detect Status Change for History
+            if old_obj.status != instance.status:
+                instance._status_changed_to = instance.status
+
+            # 2. Detect specific changes for Emails
             # Shipping
             if old_obj.status != 'shipping' and instance.status == 'shipping':
                 instance._should_send_shipping_email = True
@@ -459,15 +480,25 @@ def order_pre_save(sender, instance, **kwargs):
         except Order.DoesNotExist:
             pass
 
+
 @receiver(post_save, sender=Order)
 def order_post_save(sender, instance, created, **kwargs):
     """
-    Send emails based on flags set in pre_save
+    Send emails based on flags set in pre_save AND create History records
     """
     if created:
+        # Initial History for new order
+        OrderStatusHistory.objects.create(order=instance, status=instance.status)
         # Order Placed - Handled in View usually, but can be here. 
         # But we handle it in view to attach PDF.
         pass
+    
+    # Check if status changed in pre_save
+    if getattr(instance, '_status_changed_to', None):
+        new_status = instance._status_changed_to
+        instance._status_changed_to = None # Reset
+        OrderStatusHistory.objects.create(order=instance, status=new_status)
+
 
     # 0. Shipping Email
     if getattr(instance, '_should_send_shipping_email', False):

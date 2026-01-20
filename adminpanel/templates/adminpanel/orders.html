@@ -60,6 +60,7 @@
                             <option value="returned">Returned</option>
                             <option value="fulfilled">Order Fulfilled</option>
                             <option value="cancelled">Cancelled</option>
+                            <option value="cancelled_by_admin">Cancelled by Admin</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -186,6 +187,7 @@
                                 <option value="returned">Returned</option>
                                 <option value="fulfilled">Order Fulfilled</option>
                                 <option value="cancelled">Cancelled</option>
+                                <option value="cancelled_by_admin">Cancelled by Admin</option>
                             </select>
                         </div>
                         <div class="form-group-inline" id="trackingCodeGroup" style="display:none; margin-left:10px;">
@@ -211,6 +213,53 @@
                     <div class="modal-footer">
                         <button id="cancelActionBtn" class="btn btn-secondary">Keep Order</button>
                         <button id="confirmCancelBtn" class="btn btn-danger">Confirm Cancellation</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN CANCEL REASON MODAL -->
+            <div id="adminCancelModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Cancel Order <span id="adminCancelOrderIdDisplay"></span></h2>
+                        <span class="modal-close" id="adminCancelModalCloseBtn">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please select a reason for cancelling this order. This will be sent to the customer.</p>
+                        <div class="cancel-reasons-list">
+                            <label class="radio-option">
+                                <input type="radio" name="adminCancelReason" value="Out of Stock">
+                                <span class="radio-label">Out of Stock</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="adminCancelReason" value="Payment Verification Failed">
+                                <span class="radio-label">Payment Verification Failed</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="adminCancelReason" value="Suspected Fraud">
+                                <span class="radio-label">Suspected Fraud</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="adminCancelReason" value="Duplicate Order">
+                                <span class="radio-label">Duplicate Order</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="adminCancelReason" value="Cannot Ship to Address">
+                                <span class="radio-label">Cannot Ship to Address</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="adminCancelReason" value="Customer Request">
+                                <span class="radio-label">Customer Request</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="adminCancelReason" value="Other">
+                                <span class="radio-label">Other</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="closeAdminCancelBtn" class="btn btn-secondary">Close</button>
+                        <button id="confirmAdminCancelBtn" class="btn btn-danger">Confirm Cancellation</button>
                     </div>
                 </div>
             </div>

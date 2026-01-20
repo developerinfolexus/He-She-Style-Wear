@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #eee;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header img {
+            max-height: 50px;
+        }
+
+        .content {
+            margin-bottom: 30px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .reason-box {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #dc3545;
+            margin: 20px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- Ensure cid:logo is handled by the backend logic -->
+            <img src="cid:logo" alt="HE SHE STYLE WEAR">
+        </div>
+
+        <div class="content">
+            <h2>Order Cancellation Update</h2>
+            <p>Dear {{ user_name }},</p>
+
+            <p>We regret to inform you that your order <strong>#{{ order_number }}</strong> has been cancelled.</p>
+
+            <p><strong>Reason for cancellation:</strong></p>
+            <div class="reason-box">
+                {{ cancellation_reason }}
+            </div>
+
+            <p>We sincerely apologize for this inconvenience and for not being able to fulfill your order at this time.
+                We value your business and are committed to improving our service.</p>
+
+            <p>If you have already paid for this order, a refund has been initiated and will be processed back to your
+                original payment method shortly, according to our refund policy.</p>
+
+            <a href="https://heshestylewear.com/contact" class="btn">Contact Support</a>
+        </div>
+
+        <div class="footer">
+            <p>&copy; {% now "Y" %} HE SHE STYLE WEAR. All rights reserved.</p>
+            <p>If you have any questions, please reply to this email.</p>
+        </div>
+    </div>
+</body>
+
+</html>

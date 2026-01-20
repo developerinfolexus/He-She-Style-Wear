@@ -160,6 +160,11 @@
             background-color: #8e44ad;
         }
 
+        .status-cancelled_by_admin {
+            background-color: #c0392b;
+            /* Same as cancelled for now, or distinct */
+        }
+
         .back-btn {
             display: inline-flex;
             align-items: center;
@@ -168,10 +173,6 @@
             text-decoration: none;
             font-weight: 500;
             margin-bottom: 20px;
-        }
-
-        .back-btn:hover {
-            color: #333;
         }
 
         /* Status Select Styling */
@@ -193,77 +194,6 @@
         .status-select option {
             color: black;
             background: white;
-        }
-
-        /* Modal Styles (Copied from orders.css/global.css approximation) */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 8px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
-        }
-
-        .modal-close {
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .btn-primary {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .btn-secondary {
-            background-color: #ddd;
-            color: #333;
         }
     </style>
 </head>
@@ -298,13 +228,14 @@
                             <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
                             <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered
                             </option>
-                            <option value="return_requested" {% if order.status == 'return_requested' %}selected{% endif %}>Return Requested</option>
+                            <option value="return_requested" {% if order.status == 'return_requested' %}selected{% endif%}>Return Requested</option>
                             <option value="returned" {% if order.status == 'returned' %}selected{% endif %}>Returned
                             </option>
                             <option value="fulfilled" {% if order.status == 'fulfilled' %}selected{% endif %}>Order
                                 Fulfilled</option>
                             <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled
                             </option>
+                            <option value="cancelled_by_admin" {% if order.status == 'cancelled_by_admin' %}selected{%endif %}>Cancelled by Admin</option>
                         </select>
                         <span id="statusUpdateMsg" style="font-size: 14px; font-weight: 500; display: none;"></span>
                     </div>
@@ -377,6 +308,7 @@
                         // Modals
                         const trackingModal = document.getElementById('trackingInputModal');
                         const returnModal = document.getElementById('returnPackageModal');
+                        const adminCancelModal = document.getElementById('adminCancelModal');
                         const confirmTrackingBtn = document.getElementById('confirmTrackingBtn');
                         const confirmReturnBtn = document.getElementById('confirmReturnBtn');
 
@@ -403,8 +335,9 @@
 
                         // Modal Controls
                         function closeModals() {
-                            trackingModal.style.display = 'none';
-                            returnModal.style.display = 'none';
+                            if (trackingModal) trackingModal.style.display = 'none';
+                            if (returnModal) returnModal.style.display = 'none';
+                            if (adminCancelModal) adminCancelModal.style.display = 'none';
                         }
 
                         // Close buttons
@@ -415,8 +348,46 @@
                             });
                         });
 
+                        // Close global modal button (specifically for admin cancel if using different class)
+                        // Note: The admin cancel modal uses onclick="closeGlobalModal()", which is global. 
+                        // We should override/handle it here or ensure that function exists. 
+                        // Better to bind it here.
+                        const adminCloseBtn = document.querySelector('#adminCancelModal button[onclick="closeGlobalModal()"]');
+                        if (adminCloseBtn) {
+                            adminCloseBtn.onclick = function (e) {
+                                e.preventDefault();
+                                closeModals();
+                                selectEl.value = oldStatus;
+                            };
+                        }
+
+                        const adminConfirmBtn = document.querySelector('#adminCancelModal button[onclick="confirmAdminCancel()"]');
+                        if (adminConfirmBtn) {
+                            adminConfirmBtn.onclick = function (e) {
+                                e.preventDefault();
+                                // Logic for admin confirm
+                                const radios = document.getElementsByName('adminCancelReason');
+                                let selectedReason = null;
+                                for (const radio of radios) {
+                                    if (radio.checked) {
+                                        selectedReason = radio.value;
+                                        break;
+                                    }
+                                }
+
+                                if (!selectedReason) {
+                                    alert("Please select a valid reason.");
+                                    return;
+                                }
+
+                                closeModals();
+                                updateOrderStatus('cancelled_by_admin', { admin_cancel_reason: selectedReason });
+                            };
+                        }
+
+
                         window.onclick = function (event) {
-                            if (event.target == trackingModal || event.target == returnModal) {
+                            if (event.target == trackingModal || event.target == returnModal || event.target == adminCancelModal) {
                                 closeModals();
                                 selectEl.value = oldStatus;
                             }
@@ -431,14 +402,13 @@
 
                             // 1. Check Fulfilled Rule
                             if (newStatus === 'fulfilled' && oldStatus !== 'delivered') {
-                                alert('Order can only be marked as "Detailed" after it is "Delivered".');
+                                alert('Order can only be marked as "Fulfilled" after it is "Delivered".');
                                 selectEl.value = oldStatus;
                                 return;
                             }
 
                             // 2. Check Shipped -> Warning/Modal
                             if (newStatus === 'shipped') {
-                                // Open Tracking Modal
                                 trackingModal.style.display = 'block';
                                 return;
                             }
@@ -449,7 +419,13 @@
                                 return;
                             }
 
-                            // 4. Standard Update
+                            // 4. Check Cancelled by Admin -> Modal
+                            if (newStatus === 'cancelled_by_admin') {
+                                adminCancelModal.style.display = 'block';
+                                return;
+                            }
+
+                            // 5. Standard Update
                             await updateOrderStatus(newStatus);
                         });
 
@@ -481,8 +457,8 @@
                                     msgSpan.style.color = 'green';
                                     msgSpan.style.display = 'block';
 
-                                    // Optional: Reload after delay to refresh logs/dates if needed
-                                    // setTimeout(() => location.reload(), 1000); 
+                                    // Refresh logic
+                                    setTimeout(() => location.reload(), 500);
                                 } else {
                                     alert(result.message || 'Update failed');
                                     selectEl.value = oldStatus;
@@ -498,34 +474,39 @@
                         }
 
                         // Confirm Shipping
-                        confirmTrackingBtn.addEventListener('click', function () {
-                            const courier = document.getElementById('modalInputCourierName').value.trim();
-                            const code = document.getElementById('modalInputTrackingCode').value.trim();
+                        if (confirmTrackingBtn) {
+                            confirmTrackingBtn.addEventListener('click', function () {
+                                const courier = document.getElementById('modalInputCourierName').value.trim();
+                                const code = document.getElementById('modalInputTrackingCode').value.trim();
 
-                            if (!courier || !code) {
-                                document.getElementById('trackingInputError').style.display = 'block';
-                                return;
-                            }
+                                if (!courier || !code) {
+                                    document.getElementById('trackingInputError').style.display = 'block';
+                                    return;
+                                }
 
-                            closeModals();
-                            updateOrderStatus('shipped', {
-                                tracking_code: code,
-                                courier_name: courier
+                                closeModals();
+                                updateOrderStatus('shipped', {
+                                    tracking_code: code,
+                                    courier_name: courier
+                                });
                             });
-                        });
+                        }
 
                         // Confirm Return
-                        confirmReturnBtn.addEventListener('click', function () {
-                            const pkg = document.getElementById('modalReturnPackageNumber').value.trim();
-                            if (!pkg) {
-                                document.getElementById('returnInputError').style.display = 'block';
-                                return;
-                            }
-                            closeModals();
-                            updateOrderStatus('returned', {
-                                return_package_number: pkg
+                        if (confirmReturnBtn) {
+                            confirmReturnBtn.addEventListener('click', function () {
+                                const pkg = document.getElementById('modalReturnPackageNumber').value.trim();
+                                if (!pkg) {
+                                    document.getElementById('returnInputError').style.display = 'block';
+                                    return;
+                                }
+                                closeModals();
+                                updateOrderStatus('returned', {
+                                    return_package_number: pkg
+                                });
                             });
-                        });
+                        }
+
                     });
                 </script>
 
@@ -562,6 +543,31 @@
                         {% endif %}
                     </div>
                     {% endif %}
+
+                    <!-- USER CANCEL/RETURN REASON -->
+                    {% if order.cancel_reason or order.status == 'cancelled' or order.status == 'return_requested' %}
+                    <div class="detail-card" style="border-left: 4px solid #dc3545; background-color: #fff8f8;">
+                        <h3 style="color: #dc3545;">User Cancellation / Return Reason</h3>
+                        {% if order.cancel_reason %}
+                        <p style="font-size: 15px;">{{ order.cancel_reason }}</p>
+                        {% else %}
+                        <p style="color: #999; font-style: italic;">No specific reason provided.</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- ADMIN CANCELLATION REASON -->
+                    {% if order.admin_cancel_reason or order.status == 'cancelled_by_admin' %}
+                    <div class="detail-card" style="border-left: 4px solid #000; background-color: #f4f4f4;">
+                        <h3 style="color: #000;">Admin Cancellation Reason</h3>
+                        {% if order.admin_cancel_reason %}
+                        <p style="font-size: 15px;">{{ order.admin_cancel_reason }}</p>
+                        {% else %}
+                        <p style="color: #999; font-style: italic;">No specific reason recorded.</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
                 </div>
 
                 <h3>Ordered Items</h3>
@@ -598,6 +604,7 @@
                     </table>
                 </div>
 
+
                 <div class="financial-box">
                     <div class="financial-row">
                         <span>Subtotal</span>
@@ -621,9 +628,172 @@
                     </div>
                 </div>
 
+                <!-- --- ORDER STATUS HISTORY --- -->
+                <div class="financial-summary" style="margin-top: 30px;">
+                    <h3>Order Status History</h3>
+                    <table class="items-table" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <thead>
+                            <tr style="background-color: #f8f9fa;">
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Status</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Changed At
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="statusHistoryBody">
+                            {% for history in order.history.all %}
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 12px; text-transform: capitalize;">{{ history.get_status_display }}
+                                </td>
+                                <td style="padding: 12px; color: #666;">{{ history.created_at|date:"M d, Y, h:i A" }}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" style="padding: 20px; text-align: center; color: #999;">No history
+                                    available yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </main>
     </div>
+
+    <!-- Start of Admin Cancel Modal -->
+    <div id="adminCancelModal"
+        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div
+            style="background-color: #fff; margin: 10% auto; padding: 25px; border-radius: 8px; width: 400px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0; color: #d9534f;">Cancel Order</h3>
+            <p style="margin-bottom: 20px;">Please select a reason for cancellation:</p>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <label><input type="radio" name="adminCancelReason" value="Out of Stock"> Out of Stock</label>
+                <label><input type="radio" name="adminCancelReason" value="Supplier Delay"> Supplier Delay</label>
+                <label><input type="radio" name="adminCancelReason" value="Product Discontinued"> Product
+                    Discontinued</label>
+                <label><input type="radio" name="adminCancelReason" value="Payment Verification Failed"> Payment
+                    Verification Failed</label>
+                <label><input type="radio" name="adminCancelReason" value="Other Unavoidable Reason"> Other Unavoidable
+                    Reason</label>
+            </div>
+
+            <div style="text-align: right; margin-top: 20px;">
+                <button onclick="closeGlobalModal()"
+                    style="padding: 8px 16px; background: #ccc; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Close</button>
+                <button onclick="confirmAdminCancel()"
+                    style="padding: 8px 16px; background: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer;">Confirm
+                    Cancellation</button>
+            </div>
+        </div>
+    </div>
+    <!-- End of Admin Cancel Modal -->
+
+    <script>
+        // --- Update Status AJAX ---
+
+        // Store previous value to revert if cancelled
+        let previousStatus = "{{ order.status }}";
+        const statusSelect = document.getElementById('orderStatusSelect');
+
+        // Initialize previousStatus on load
+        if (statusSelect) {
+            statusSelect.addEventListener('focus', function () {
+                previousStatus = this.value;
+            });
+
+            statusSelect.addEventListener('change', function () {
+                if (this.value === 'cancelled_by_admin') {
+                    const modal = document.getElementById('adminCancelModal');
+                    if (modal) modal.style.display = 'block';
+                } else {
+                    // For normal statuses, trigger update immediately
+                    updateOrderStatus(this.value);
+                }
+            });
+        }
+
+        function closeGlobalModal() {
+            document.getElementById('adminCancelModal').style.display = 'none';
+            // Revert select
+            if (statusSelect) statusSelect.value = previousStatus;
+        }
+
+        function confirmAdminCancel() {
+            const radios = document.getElementsByName('adminCancelReason');
+            let selectedReason = null;
+            for (const radio of radios) {
+                if (radio.checked) {
+                    selectedReason = radio.value;
+                    break;
+                }
+            }
+
+            if (!selectedReason) {
+                alert("Please select a valid reason.");
+                return;
+            }
+
+            // Proceed with update
+            document.getElementById('adminCancelModal').style.display = 'none';
+            updateOrderStatus('cancelled_by_admin', { admin_cancel_reason: selectedReason });
+        }
+
+        function updateOrderStatus(newStatus, additionalPayload = {}) {
+            let payload = {
+                order_id: "{{ order.id }}",
+                status: newStatus,
+                ...additionalPayload // Merge additional payload for admin_cancel_reason, return_package_number etc.
+            };
+
+            // Handle input for specific statuses
+            if (newStatus === 'shipped') {
+                const code = prompt("Enter Tracking Code:");
+                if (!code) {
+                    if (statusSelect) statusSelect.value = previousStatus; // Revert
+                    return alert("Tracking Code required.");
+                }
+                const courier = prompt("Enter Courier Name:");
+                if (!courier) {
+                    if (statusSelect) statusSelect.value = previousStatus; // Revert
+                    return alert("Courier Name required.");
+                }
+                payload.tracking_code = code;
+                payload.courier_name = courier;
+            }
+
+            // The 'returned' status is handled by a dedicated modal and its confirmReturnBtn listener
+            // which calls updateOrderStatus with the correct payload.
+            // So, no need for a prompt here.
+
+            fetch("{% url 'admin_update_order_api' %}", {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert("Error: " + data.message);
+                        if (statusSelect) statusSelect.value = previousStatus; // Revert on error
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Something went wrong.");
+                    if (statusSelect) statusSelect.value = previousStatus;
+                });
+        }
+    </script>
 </body>
 
 </html>
+```

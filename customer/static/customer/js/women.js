@@ -437,8 +437,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         const currentRegion = getSelectedRegion(); // Use global getter
 
         if (productsToRender.length === 0) {
-            const msg = currentActiveCategory ? `No products available for ${currentActiveCategory}.` : 'No products match your filters.';
+            // Check if price filters are active
+            const priceRangeSelected = document.querySelectorAll('input[name="price_range"]:checked').length > 0;
+            const customPriceFrom = document.getElementById('price-from')?.value;
+            const customPriceTo = document.getElementById('price-to')?.value;
+            const hasPriceFilter = priceRangeSelected || customPriceFrom || customPriceTo;
+
+            let msg;
+            if (hasPriceFilter) {
+                msg = 'No products available in this price range.';
+            } else if (currentActiveCategory) {
+                msg = `No products available for ${currentActiveCategory}.`;
+            } else {
+                msg = 'No products match your filters.';
+            }
             grid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #888; padding: 40px;">${msg}</p>`;
+            grid.classList.remove("products-hidden"); // Make grid visible
             return;
         }
 

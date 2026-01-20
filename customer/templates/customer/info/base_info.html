@@ -10,13 +10,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="stylesheet" href="{% static 'customer/css/index.css' %}">
     <style>
-        .info-page-content {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 30px;
-            background-color: #fff;
-            line-height: 1.8;
-        }
+        /* Remove top margin of first content heading */
+.info-page-content h2:first-child {
+    margin-top: 0;
+}
+#header-placeholder {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Remove extra space below header line if any */
+.info-header-row {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+}
+
+       .info-page-content {
+    max-width: 900px;
+    margin: 0 auto;      /* removes big top gap */
+    padding: 20px;
+    background-color: #fff;
+    line-height: 1.8;
+}
+.info-page-content {
+    padding-top: 10px;  /* or 0 if you want tight */
+}
+
+
 
         .info-page-content h1 {
             font-family: "Playfair Display", serif;
@@ -69,6 +89,10 @@
         .info-page-content a:hover {
             color: #a01548;
         }
+        .modal-content {
+    padding-top: 0 !important;
+}
+
     </style>
 </head>
 

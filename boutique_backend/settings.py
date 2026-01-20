@@ -70,9 +70,16 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Toronto'
 USE_I18N = True
 USE_TZ = True
+
+# Global Date/Time Formats (US/Canada Style)
+USE_L10N = False 
+DATE_FORMAT = 'M d, Y'        # Jan 20, 2026
+TIME_FORMAT = 'h:i A'         # 03:21 PM
+DATETIME_FORMAT = 'M d, Y, h:i A' 
+
 
 # Static and Media
 STATIC_URL = '/static/'

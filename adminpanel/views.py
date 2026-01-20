@@ -1,7 +1,12 @@
 ﻿from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from email.mime.image import MIMEImage
+import os
 from .models import RunningBanner, ManagerPermission, AdminOTP
 from customer.models import Product, Order, Customer, CheckoutDetails
 from django.views.decorators.csrf import csrf_exempt
@@ -939,15 +944,29 @@ def update_order_api(request):
         data = json.loads(request.body)
         order_id = data.get('order_id')
         status = data.get('status')
+        
+        # DEBUG LOGGING TO FILE
+        def log_debug(msg):
+             try:
+                 with open("debug_email_2.log", "a") as f:
+                     f.write(f"{timezone.now()}: {msg}\n")
+             except:
+                 pass
+                 
         # We assume tracking_code might be sent empty if not entered
         tracking_code = data.get('tracking_code', '').strip()
         courier_name = data.get('courier_name', '').strip()
+        admin_cancel_reason = data.get('admin_cancel_reason', '').strip()
+        
+        # DEBUG LOGGING
+        log_debug(f"DEBUG: update_order_api called for ID={order_id}, Status={status}")
+        log_debug(f"DEBUG: admin_cancel_reason={admin_cancel_reason}")
         
         if not order_id or not status:
             return JsonResponse({'success': False, 'message': 'Order ID and status are required'}, status=400)
         
         # Validate status - Updated to match new requirements
-        valid_statuses = ['pending', 'shipping', 'shipped', 'delivered', 'fulfilled', 'cancelled', 'return_requested', 'returned']
+        valid_statuses = ['pending', 'shipping', 'shipped', 'delivered', 'fulfilled', 'cancelled', 'cancelled_by_admin', 'return_requested', 'returned']
         if status not in valid_statuses:
             return JsonResponse({'success': False, 'message': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'}, status=400)
         
@@ -997,8 +1016,9 @@ def update_order_api(request):
             if order.status != 'delivered':
                 return JsonResponse({'success': False, 'message': 'Order can only be marked as "Fulfilled" after it is "Delivered".'}, status=400)
 
-        # Check if status is changing to 'returned' from a non-returned state to restore stock
-        if status == 'returned' and order.status != 'returned':
+        # Check if status is changing to 'returned' or 'cancelled_by_admin' to restore stock
+        if (status == 'returned' and order.status != 'returned') or \
+           (status == 'cancelled_by_admin' and order.status not in ['cancelled', 'cancelled_by_admin', 'returned']):
             try:
                 for item in order.items.all():
                     product = item.product
@@ -1057,6 +1077,62 @@ def update_order_api(request):
         # Update Status Change Date
         order.status_change_date = timezone.now()
         
+        if status == 'cancelled_by_admin':
+            log_debug("DEBUG: Status matches 'cancelled_by_admin', entering email block.")
+            order.status_change_date = timezone.now()
+            # Save the reason
+            if admin_cancel_reason:
+                order.admin_cancel_reason = admin_cancel_reason
+            
+            # Send Email
+            try:
+                subject = "Order Cancellation Notice - HE SHE STYLE WEAR"
+                from_email = settings.DEFAULT_FROM_EMAIL
+                
+                # Determine recipient (User email or Customer email)
+                to_email = None
+                if order.customer.user and order.customer.user.email:
+                    to_email = order.customer.user.email
+                elif order.customer.email:
+                    to_email = order.customer.email
+                
+                # Determine Name
+                user_name = "Customer"
+                if order.customer.first_name:
+                    user_name = f"{order.customer.first_name} {order.customer.last_name}"
+                elif order.customer.user:
+                    user_name = order.customer.user.first_name or order.customer.user.username
+                
+                if to_email:
+                    log_debug(f"DEBUG: Preparing email for {to_email}")
+                    html_content = render_to_string("customer/emails/admin_cancellation_email.html", {
+                        "user_name": user_name,
+                        "order_number": order.order_number,
+                        "cancellation_reason": admin_cancel_reason or "Unspecified",
+                    })
+
+                    msg = EmailMultiAlternatives(subject, "", from_email, [to_email])
+                    msg.attach_alternative(html_content, "text/html")
+                    
+                    # Attach Logo
+                    logo_path = os.path.join(settings.BASE_DIR, 'customer/static/customer/images/email_logo.png')
+                    if not os.path.exists(logo_path):
+                        logo_path = os.path.join(settings.BASE_DIR, 'static/images/logo.png')
+                    
+                    if os.path.exists(logo_path):
+                        with open(logo_path, "rb") as f:
+                            logo = MIMEImage(f.read())
+                            logo.add_header("Content-ID", "<logo>")
+                            logo.add_header("Content-Disposition", "inline", filename="logo.png")
+                            msg.attach(logo)
+                    
+                    msg.send()
+                    log_debug(f"DEBUG: Admin Cancellation Email SENT successfully to {to_email}")
+            except Exception as e:
+                import traceback
+                log_debug(f"DEBUG: Error sending cancellation email: {traceback.format_exc()}")
+                log_debug(f"Error sending cancellation email: {str(e)}")
+
         order.save()
         
         return JsonResponse({
@@ -1189,7 +1265,7 @@ def addmedia(request):
 
 
 @staff_member_required(login_url='admin_login')
-def settings(request):
+def settings_view(request):
     """
     Settings view to manage admin access and view current admins.
     """

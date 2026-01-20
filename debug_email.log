@@ -1,0 +1,10 @@
+2026-01-20 11:18:15.352329+00:00: DEBUG: update_order_api called for ID=75, Status=cancelled_by_admin
+2026-01-20 11:18:15.352329+00:00: DEBUG: admin_cancel_reason=Supplier Delay
+2026-01-20 11:18:15.389411+00:00: DEBUG: Status matches 'cancelled_by_admin', entering email block.
+2026-01-20 11:18:15.393951+00:00: DEBUG: Error sending cancellation email: Traceback (most recent call last):
+  File "C:\Users\HARISH\Downloads\boutique_backend admin work\boutique_backend\boutique_backend\adminpanel\views.py", line 1085, in update_order_api
+    from_email = settings.DEFAULT_FROM_EMAIL
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'function' object has no attribute 'DEFAULT_FROM_EMAIL'
+
+2026-01-20 11:18:15.393951+00:00: Error sending cancellation email: 'function' object has no attribute 'DEFAULT_FROM_EMAIL'

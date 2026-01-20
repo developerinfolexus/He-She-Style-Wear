@@ -2158,12 +2158,13 @@ def cancel_order_api(request):
             # Update order status to cancelled
             order.status = 'cancelled'
             
-            # Store cancellation reasons as JSON
-            if not hasattr(order, 'cancellation_reasons') or order.cancellation_reasons is None:
-                # If field doesn't exist, store in notes
-                order.notes = f"Cancelled. Reasons: {', '.join(reasons)}"
-            else:
-                order.cancellation_reasons = reasons
+            # Store cancellation reasons
+            order.cancel_reason = ", ".join(reasons)
+            
+            # Legacy/Fallback (Optional, keeping for safety)
+            if hasattr(order, 'cancellation_reasons'):
+                 order.cancellation_reasons = reasons
+
             
             order.save()
         
@@ -2240,11 +2241,10 @@ def return_order_api(request):
         order.status = 'return_requested' if 'return_requested' in [choice[0] for choice in Order.STATUS_CHOICES] else 'delivered'
         
         # Store return reasons
-        if not hasattr(order, 'return_reasons') or order.return_reasons is None:
-            # If field doesn't exist, store in notes
-            current_notes = order.notes or ''
-            order.notes = f"{current_notes}\nReturn requested. Reasons: {', '.join(reasons)}"
-        else:
+        order.cancel_reason = ", ".join(reasons)
+        
+        # Legacy/Fallback
+        if hasattr(order, 'return_reasons'):
             order.return_reasons = reasons
         
         order.save()

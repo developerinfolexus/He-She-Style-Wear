@@ -312,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <option value="returned" ${order.orderStatus === 'returned' ? 'selected' : ''}>Returned</option>
                         <option value="fulfilled" ${order.orderStatus === 'fulfilled' ? 'selected' : ''}>Order Fulfilled</option>
                         <option value="cancelled" ${order.orderStatus === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                        <option value="cancelled_by_admin" ${order.orderStatus === 'cancelled_by_admin' ? 'selected' : ''}>Cancelled by Admin</option>
                     </select>
                 </td>
                 <td>${formatStatusChangeDate(order.statusChangeDate)}</td>
@@ -586,6 +587,127 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+
+    // --- Admin Cancel Modal Logic ---
+    const adminCancelModal = document.getElementById('adminCancelModal');
+    const adminCancelModalCloseBtn = document.getElementById('adminCancelModalCloseBtn');
+    const closeAdminCancelBtn = document.getElementById('closeAdminCancelBtn');
+    const confirmAdminCancelBtn = document.getElementById('confirmAdminCancelBtn');
+    const adminCancelOrderIdDisplay = document.getElementById('adminCancelOrderIdDisplay');
+
+    let pendingAdminCancelParams = null; // { source, orderId, dbOrderId, selectElement, oldStatus, orderData }
+
+    const openAdminCancelModal = (orderId, orderIdentifier, params) => {
+        if (adminCancelOrderIdDisplay) adminCancelOrderIdDisplay.textContent = `#${orderIdentifier}`;
+        // Uncheck all radios
+        const radios = document.getElementsByName('adminCancelReason');
+        radios.forEach(r => r.checked = false);
+
+        pendingAdminCancelParams = params;
+        if (adminCancelModal) adminCancelModal.classList.add('show');
+    };
+
+    const closeAdminCancelModal = () => {
+        if (adminCancelModal) adminCancelModal.classList.remove('show');
+    };
+
+    const handleAdminCancelDismiss = () => {
+        if (pendingAdminCancelParams) {
+            if (pendingAdminCancelParams.source === 'table' && pendingAdminCancelParams.selectElement) {
+                pendingAdminCancelParams.selectElement.value = pendingAdminCancelParams.oldStatus;
+            } else if (pendingAdminCancelParams.source === 'modal' && modalStatusChoiceInstance) {
+                modalStatusChoiceInstance.setChoiceByValue(pendingAdminCancelParams.oldStatus);
+            } else if (pendingAdminCancelParams.source === 'modal' && modalUpdateStatusSelect) {
+                modalUpdateStatusSelect.value = pendingAdminCancelParams.oldStatus;
+            }
+        }
+        closeAdminCancelModal();
+        pendingAdminCancelParams = null;
+    };
+
+    if (adminCancelModalCloseBtn) adminCancelModalCloseBtn.addEventListener('click', handleAdminCancelDismiss);
+    if (closeAdminCancelBtn) closeAdminCancelBtn.addEventListener('click', handleAdminCancelDismiss);
+
+    // Click outside
+    window.addEventListener('click', (e) => {
+        if (e.target === adminCancelModal) handleAdminCancelDismiss();
+    });
+
+    if (confirmAdminCancelBtn) {
+        confirmAdminCancelBtn.addEventListener('click', async () => {
+            if (!pendingAdminCancelParams) return;
+
+            // Get Reason
+            const radios = document.getElementsByName('adminCancelReason');
+            let selectedReason = null;
+            for (const radio of radios) {
+                if (radio.checked) {
+                    selectedReason = radio.value;
+                    break;
+                }
+            }
+
+            if (!selectedReason) {
+                alert("Please select a valid reason.");
+                return;
+            }
+
+            const { dbOrderId, selectElement, orderData, source } = pendingAdminCancelParams;
+            const newStatus = 'cancelled_by_admin';
+
+            const originalBtnText = confirmAdminCancelBtn.textContent;
+            confirmAdminCancelBtn.disabled = true;
+            confirmAdminCancelBtn.textContent = "Cancelling...";
+
+            try {
+                const response = await fetch('/admin/api/orders/update/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        order_id: dbOrderId,
+                        status: newStatus,
+                        admin_cancel_reason: selectedReason
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    orderData.orderStatus = newStatus;
+                    orderData.status = newStatus;
+                    // orderData.admin_cancel_reason = selectedReason;
+
+                    if (source === 'table' && selectElement) {
+                        selectElement.className = `status-select ${newStatus}`;
+                        selectElement.value = newStatus;
+                    } else if (source === 'modal') {
+                        if (modalStatusChoiceInstance) {
+                            modalStatusChoiceInstance.setChoiceByValue(newStatus);
+                        } else if (modalUpdateStatusSelect) {
+                            modalUpdateStatusSelect.value = newStatus;
+                        }
+                    }
+
+                    closeAdminCancelModal();
+                    pendingAdminCancelParams = null;
+                    // showAlert("Order cancelled successfully", 'success');
+                } else {
+                    alert(result.message || "Failed to cancel order.");
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                alert("Network error.");
+            } finally {
+                confirmAdminCancelBtn.disabled = false;
+                confirmAdminCancelBtn.textContent = originalBtnText;
+            }
+        });
+    }
+
+
     // --- Table Change Listener (for Dropdowns) ---
     if (tableBody) {
         tableBody.addEventListener('change', async (e) => {
@@ -642,6 +764,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         orderData: orderData
                     };
                     openReturnModal(orderIdToUpdate, visualOrderId, pendingReturnParams);
+                    return;
+                }
+
+                // Intercept 'cancelled_by_admin' status
+                if (newStatus === 'cancelled_by_admin') {
+                    pendingAdminCancelParams = {
+                        source: 'table',
+                        orderId: visualOrderId,
+                        dbOrderId: orderIdToUpdate,
+                        selectElement: selectEl,
+                        oldStatus: oldStatus,
+                        orderData: orderData
+                    };
+                    openAdminCancelModal(orderIdToUpdate, visualOrderId, pendingAdminCancelParams);
                     return;
                 }
 
@@ -891,6 +1027,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     trackingGroup.style.display = 'flex';
                 } else {
                     trackingGroup.style.display = 'none';
+                }
+            }
+
+            if (status === 'cancelled_by_admin') {
+                const orderData = ordersData.find(o => o.id === currentOrderId);
+                if (orderData) {
+                    const orderIdToUpdate = orderData.dbOrderId || orderData.id;
+                    const oldStatus = orderData.orderStatus || 'pending';
+
+                    const params = {
+                        source: 'modal',
+                        orderId: currentOrderId,
+                        dbOrderId: orderIdToUpdate,
+                        oldStatus: oldStatus,
+                        orderData: orderData
+                    };
+                    openAdminCancelModal(orderIdToUpdate, currentOrderId, params);
                 }
             }
 

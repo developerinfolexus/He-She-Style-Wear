@@ -285,7 +285,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         grid.innerHTML = "";
         const currentRegion = getSelectedRegion();
 
-        if (productsToRender.length === 0) { grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #888; padding: 40px;">No products match your filters.</p>'; return; }
+        if (productsToRender.length === 0) {
+            // Check if price filters are active
+            const priceRangeSelected = document.querySelectorAll('input[name="price_range"]:checked').length > 0;
+            const customPriceFrom = document.getElementById('price-from')?.value;
+            const customPriceTo = document.getElementById('price-to')?.value;
+            const hasPriceFilter = priceRangeSelected || customPriceFrom || customPriceTo;
+
+            let msg;
+            if (hasPriceFilter) {
+                msg = 'No products available in this price range.';
+            } else {
+                msg = 'No products match your filters.';
+            }
+            grid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #888; padding: 40px;">${msg}</p>`;
+            grid.classList.remove("products-hidden"); // Make grid visible
+            return;
+        }
 
         productsToRender.forEach(product => {
             const regularPriceConverted = convertInrToTargetCurrency(product.price, currentRegion);
