@@ -23,7 +23,7 @@
   --star-color: #f9a825;
 
   /* Main Banner Carousel Variables */
-  --carousel-height: 400px;
+  --carousel-height: 550px;
   --overlay-bg: rgba(0, 0, 0, 0.4);
   --heading-color: #ffffff;
   --button-bg: #d11c5b;
@@ -664,19 +664,18 @@ img {
 
 /* === REMOVED .sub-categories SECTION === */
 
-/* --- Main Banner Carousel Container --- */
+/* --- Main Banner Carousel (Matches Women/Kids Page Style) --- */
 .main-banner-carousel {
   position: relative;
   width: 100%;
   max-width: 1500px;
-  /* Added max-width */
   margin: 20px auto;
-  --carousel-height: 500px;
-  /* Default height */
   height: var(--carousel-height);
+  /* Defaults to 400px from root */
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  background-color: var(--background-color);
 }
 
 .carousel-slide {
@@ -687,17 +686,25 @@ img {
 }
 
 .carousel-item {
-  min-width: 100%;
+  min-width: 100% !important;
+  width: 100% !important;
   height: 100%;
   position: relative;
-  flex-shrink: 0;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block;
+  /* Reset centering flex display */
 }
 
 .carousel-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* As requested: Matches Women/Kids style */
   filter: brightness(0.7);
+  display: block;
 }
 
 .carousel-overlay {
@@ -805,6 +812,39 @@ img {
   right: 15px;
 }
 
+
+/* Tablet & Mobile Banner Fixes (max-width: 1024px) */
+/* Tablet & Mobile Banner Fixes (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .main-banner-carousel {
+    height: auto !important;
+    /* Let image define height */
+    min-height: unset !important;
+    --carousel-height: auto;
+    /* Reset variable */
+  }
+
+  .carousel-slide {
+    height: auto !important;
+  }
+
+  /* Fix for overlap on tablet/mobile */
+  .carousel-item {
+    min-width: 100% !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+    height: auto !important;
+  }
+
+  /* Natural image scaling - No grey space, no cropping */
+  .carousel-item img {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: unset !important;
+    background-color: transparent !important;
+  }
+}
+
 /* Main Carousel Responsive Adjustments */
 @media (max-width: 768px) {
   .main-banner-carousel {
@@ -836,6 +876,13 @@ img {
 
   .next-arrow {
     right: 10px;
+  }
+
+  /* Fix for mobile banner overlap */
+  .carousel-item {
+    min-width: 100% !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
   }
 }
 
@@ -1347,8 +1394,8 @@ img {
   }
 
   .product-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
   }
 
   .listing-header h2 {
@@ -1439,7 +1486,7 @@ img {
 
 /* --- MODIFICATION START --- */
 .search-container.active #header-search-input {
-  width: 120px;
+  width: 140px;
   /* Reduced width from 150px to prevent wrapping */
   opacity: 1;
   padding: 6px 10px;
@@ -1936,102 +1983,94 @@ img {
   -webkit-backdrop-filter: blur(5px);
 }
 
-/ *   - - -   I n f o   M o d a l   S t y l e s   ( F o o t e r   P o l i c i e s )   - - -   * /     . i n f o - m o d a l - o v e r l a y    {
-               p o s i t i o n :    f i x e d ;
-               t o p :    0 ;
-               l e f t :    0 ;
-               w i d t h :    1 0 0 % ;
-               h e i g h t :    1 0 0 % ;
-               b a c k g r o u n d - c o l o r :    r g b a ( 0 ,    0 ,    0 ,    0 . 6 ) ;
-               z - i n d e x :    1 2 5 0 ;
-               / *   H i g h e r   t h a n   r e v i e w s   m o d a l   * /             d i s p l a y :    f l e x ;
-               j u s t i f y - c o n t e n t :    c e n t e r ;
-               a l i g n - i t e m s :    c e n t e r ;
-               o p a c i t y :    0 ;
-               v i s i b i l i t y :    h i d d e n ;
-               t r a n s i t i o n :    o p a c i t y   0 . 3 s   e a s e ,    v i s i b i l i t y   0 . 3 s   e a s e ;
-       
+/* --- Info Modal Styles (Footer Policies) --- */
+.info-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1250;
+  /* Higher than reviews modal */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-         . i n f o - m o d a l - o v e r l a y . a c t i v e    {
-               o p a c i t y :    1 ;
-               v i s i b i l i t y :    v i s i b l e ;
-       
+.info-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
-         . i n f o - m o d a l    {
-               b a c k g r o u n d - c o l o r :    v a r ( - - b a c k g r o u n d - c o l o r ,    # f f f ) ;
-               p a d d i n g :    0 ;
-               / *   H e a d e r / B o d y   h a n d l e   p a d d i n g   * /             b o r d e r - r a d i u s :    8 p x ;
-               b o x - s h a d o w :    0   5 p x   2 5 p x   r g b a ( 0 ,    0 ,    0 ,    0 . 2 ) ;
-               w i d t h :    9 0 % ;
-               m a x - w i d t h :    7 0 0 p x ;
-               m a x - h e i g h t :    8 5 v h ;
-               d i s p l a y :    f l e x ;
-               f l e x - d i r e c t i o n :    c o l u m n ;
-               t r a n s f o r m :    s c a l e ( 0 . 9 ) ;
-               t r a n s i t i o n :    t r a n s f o r m   0 . 3 s   e a s e ;
-               o v e r f l o w :    h i d d e n ;
-       
+.info-modal {
+  background-color: var(--background-color, #fff);
+  padding: 0;
+  /* Header/Body handle padding */
+  border-radius: 8px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 700px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+  overflow: hidden;
 }
 
-         . i n f o - m o d a l - o v e r l a y . a c t i v e   . i n f o - m o d a l    {
-               t r a n s f o r m :    s c a l e ( 1 ) ;
-       
+.info-modal-overlay.active .info-modal {
+  transform: scale(1);
 }
 
-         . i n f o - m o d a l - h e a d e r    {
-               d i s p l a y :    f l e x ;
-               j u s t i f y - c o n t e n t :    s p a c e - b e t w e e n ;
-               a l i g n - i t e m s :    c e n t e r ;
-               p a d d i n g :    2 0 p x   2 5 p x ;
-               b o r d e r - b o t t o m :    1 p x   s o l i d   v a r ( - - b o r d e r - c o l o r ,    # e e e ) ;
-               b a c k g r o u n d - c o l o r :    # f a f a f a ;
-       
+.info-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid var(--border-color, #eee);
+  background-color: #fafafa;
 }
 
-         . i n f o - m o d a l - h e a d e r   h 2    {
-               f o n t - f a m i l y :    " P l a y f a i r   D i s p l a y "  ,    s e r i f ;
-               f o n t - s i z e :    1 . 5 r e m ;
-               m a r g i n :    0 ;
-               c o l o r :    v a r ( - - p r i m a r y - c o l o r ,    # 3 3 3 ) ;
-       
+.info-modal-header h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--primary-color, #333);
 }
 
-         . c l o s e - i n f o - m o d a l    {
-               b a c k g r o u n d :    n o n e ;
-               b o r d e r :    n o n e ;
-               f o n t - s i z e :    2 r e m ;
-               f o n t - w e i g h t :    3 0 0 ;
-               c o l o r :    # 8 8 8 ;
-               c u r s o r :    p o i n t e r ;
-               l i n e - h e i g h t :    1 ;
-               t r a n s i t i o n :    c o l o r   0 . 2 s ;
-       
+.close-info-modal {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  font-weight: 300;
+  color: #888;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
 }
 
-         . c l o s e - i n f o - m o d a l : h o v e r    {
-               c o l o r :    # 3 3 3 ;
-       
+.close-info-modal:hover {
+  color: #333;
 }
 
-         . i n f o - m o d a l - b o d y    {
-               p a d d i n g :    2 5 p x ;
-               o v e r f l o w - y :    a u t o ;
-               f o n t - s i z e :    1 r e m ;
-               l i n e - h e i g h t :    1 . 6 ;
-               c o l o r :    # 5 5 5 ;
-       
+.info-modal-body {
+  padding: 25px;
+  overflow-y: auto;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
 }
 
-         / *   E n s u r e   c o n t e n t   i n s i d e   d o e s n ' t   o v e r f l o w   h o r i z o n t a l l y   * / 
-    . i n f o - m o d a l - b o d y   i m g    {
-               m a x - w i d t h :    1 0 0 % ;
-               h e i g h t :    a u t o ;
-       
+/* Ensure content inside doesn't overflow horizontally */
+.info-modal-body img {
+  max-width: 100%;
+  height: auto;
 }
 
-     
 
 /* Social Connect Icons Styles */
 .social-connect-icons {

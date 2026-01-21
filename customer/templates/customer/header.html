@@ -296,7 +296,7 @@
 
     <div class="logo">
       <a href="{% url 'index' %}">
-        <img src="{% static 'customer/images/logo 3.png' %}" alt="He She Style Wear Logo" class="header-logo-img"
+        <img src="{% static 'customer/images/logo_new.png' %}" alt="He She Style Wear Logo" class="header-logo-img"
           style="border-radius: 50%; height: 100px" />
       </a>
     </div>
@@ -474,13 +474,19 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         /* 3 items per row on mobile */
-        gap: 15px;
+        gap: 10px;
+        row-gap: 15px;
         padding: 15px;
         background: #f8f8f8;
+        min-width: 0 !important;
+        /* Reset desktop min-width */
       }
 
       .subcat-menu-item {
         width: auto;
+        margin: 0 !important;
+        /* Reset desktop margin */
+        justify-self: center;
       }
 
       .subcat-menu-img {
@@ -497,18 +503,30 @@
         display: block;
         padding: 0;
         border: none;
+        height: auto !important;
+        overflow: visible !important;
       }
 
       .subcat-slider-viewport {
-        overflow: visible;
+        overflow: visible !important;
         margin: 0;
+        height: auto !important;
       }
 
       .subcat-menu-grid.slider-track {
         display: grid;
+        grid-template-columns: repeat(2, 1fr) !important;
+        /* 2 columns for cleaner look */
         flex-wrap: wrap;
-        width: auto;
+        width: 100% !important;
+        height: auto !important;
         transform: none !important;
+        overflow-y: auto !important;
+        /* Enable vertical scrolling */
+        max-height: 50vh;
+        /* Limit height to trigger scrolling */
+        scrollbar-width: thin;
+        /* For Firefox */
       }
     }
 
@@ -516,6 +534,8 @@
     @media (min-width: 992px) {
       .subcat-slider-wrapper {
         display: flex;
+        flex-direction: row;
+        /* Ensure horizontal layout */
         align-items: center;
         justify-content: center;
         padding: 15px 10px;

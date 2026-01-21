@@ -387,7 +387,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!detailContainer) return;
 
         // Toggle Visibility
-        if (listContainer) listContainer.style.display = 'none';
+        const mainContainer = document.querySelector('.order-detail-main');
+        if (mainContainer) mainContainer.style.display = 'none'; // Hide the parent container
+
         if (breadcrumb) breadcrumb.style.display = 'none';
         if (sidebar) sidebar.style.display = 'none';
         detailContainer.style.display = 'block';
@@ -551,7 +553,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Hide the single-order sidebar
         sidebar.style.display = 'none';
-        listContainer.style.gridColumn = "1 / -1";
+
+        // Ensure main container is visible
+        const mainContainer = document.querySelector('.order-detail-main');
+        if (mainContainer) mainContainer.style.display = 'grid'; // Restore grid display
+
+        if (listContainer) {
+            listContainer.style.display = 'block'; // Ensure list is visible
+            listContainer.style.gridColumn = "1 / -1";
+        }
 
         // Show loading state
         listContainer.innerHTML = '<p style="text-align: center; padding: 40px;">Loading orders...</p>';

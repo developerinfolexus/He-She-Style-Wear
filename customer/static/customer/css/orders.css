@@ -1,55 +1,75 @@
+/* Preserving existing styles at the top, appending/overriding for the new look */
+
 body {
   margin: 0;
   font-family: "Poppins", sans-serif;
-  background-color: #f4f4f4;
+  background-color: #f8f9fa;
+  /* Lighter, more modern background */
   color: #333;
 }
 
-/* --- NEW: Grid Layout --- */
+/* --- Grid Layout --- */
 .order-detail-layout {
-  max-width: 1200px; /* Wider layout */
-  margin: 20px auto;
-  padding: 0 15px;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
   display: grid;
-  grid-template-columns: 1fr; /* Single column on mobile */
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 30px;
 }
 
 @media (min-width: 992px) {
   .order-detail-layout {
-    grid-template-columns: 2fr 1fr; /* 2/3 for main, 1/3 for sidebar */
-    gap: 30px;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
     align-items: start;
   }
 }
 
 .breadcrumb {
   font-size: 0.9rem;
-  color: #777;
-  margin-bottom: 10px;
-  /* Make it span full width if needed */
-  grid-column: 1 / -1; 
+  color: #888;
+  margin-bottom: 20px;
+  background: transparent;
+  padding: 0;
+  grid-column: 1 / -1;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: #555;
+  transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+  color: #000;
 }
 
 /* --- Main Content Column --- */
 .order-detail-main {
-  /* This container holds the order card(s) */
-  /* --- MODIFICATION START --- */
   display: grid;
-  gap: 20px; /* This adds 20px space between each order card */
-  /* --- MODIFICATION END --- */
+  gap: 25px;
 }
 
 .order-card {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  padding: 20px;
+  border-radius: 16px;
+  /* Softer corners */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  /* Premium shadow */
+  padding: 25px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
 }
 
 @media (min-width: 768px) {
   .order-card {
-    padding: 30px;
+    padding: 35px;
   }
 }
 
@@ -58,76 +78,86 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .order-info h2 {
-  margin: 0;
-  font-size: 1.4rem;
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  font-weight: 600;
 }
 
-.order-info span {
-  font-weight: 600;
+.order-info h2 span {
+  font-family: 'Roboto Mono', monospace;
+  /* Monospaced for ID */
+  color: #555;
 }
 
 .order-info p {
   margin: 5px 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .delivery-estimate {
-  color: #0b8f3f;
+  color: #27ae60;
   font-weight: 500;
+  margin-top: 5px;
+  background: #eafaf1;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  font-size: 0.8rem !important;
 }
 
 .order-buttons {
   display: flex;
-  gap: 10px;
-  margin-top: 10px; /* Add space on mobile when it wraps */
-}
-
-@media (min-width: 600px) {
-  .order-buttons {
-    margin-top: 0; /* Reset margin on larger screens */
-  }
+  gap: 12px;
 }
 
 .invoice-btn,
-.track-btn {
-  padding: 8px 14px;
+.track-btn,
+.cancel-btn,
+.return-btn {
+  padding: 10px 18px;
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border-radius: 50px;
+  /* Pill shape */
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.invoice-btn {
-  background-color: #f0f0f0;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .track-btn {
-  background-color: #007bff;
+  background-color: #1a1a1a;
+  /* Black simplified button */
   color: white;
 }
 
 .track-btn:hover {
-  background-color: #005ecc;
+  background-color: #333;
+  transform: translateY(-1px);
 }
 
-/* Order Items */
+/* Order Items List */
 .order-items {
-  margin-top: 20px;
-  /* Removed bottom border, card has padding */
+  margin-top: 0;
 }
 
 .order-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #f2f2f2;
+  padding: 20px 0;
+  border-bottom: 1px solid #f9f9f9;
 }
 
 .order-item:last-child {
@@ -135,26 +165,40 @@ body {
 }
 
 .order-item img {
-  width: 70px;
-  height: 70px;
-  border-radius: 8px;
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
   object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .item-info {
   flex: 1;
-  margin-left: 15px;
+  margin-left: 20px;
 }
 
 .item-info h3 {
-  margin: 0;
-  font-size: 1rem;
+  margin: 0 0 5px 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.item-info h3 a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s;
+}
+
+.item-info h3 a:hover {
+  color: #e67e22;
+  /* Accent color */
 }
 
 .item-info p {
-  margin: 4px 0;
-  color: #777;
-  font-size: 0.9rem;
+  margin: 3px 0;
+  color: #888;
+  font-size: 0.85rem;
 }
 
 .item-price {
@@ -165,383 +209,204 @@ body {
 .item-price p {
   margin: 0;
   font-weight: 600;
+  font-size: 1rem;
+  color: #333;
 }
 
 .item-price span {
-  font-size: 0.85rem;
-  color: #777;
+  font-size: 0.8rem;
+  color: #999;
+  display: block;
+  margin-top: 2px;
 }
 
-/* --- NEW: Sidebar Styles --- */
-.order-summary-sidebar {
-  /* This container holds summary, delivery, payment */
-  position: sticky;
-  top: 20px; /* Sticks to top on scroll */
+.item-price .item-total {
+  margin-top: 5px;
+  color: #111;
+  font-weight: 700;
 }
 
-.card {
+/* --- Single Order Detail View (The "New CSS" Part) --- */
+#single-order-detail-view {
+  grid-column: 1 / -1;
+  /* Full width */
+  max-width: 1000px;
+  /* Constrained width */
+  margin: 0 auto;
+  /* Center */
   background: #fff;
-  border-radius: 8px; /* Slightly smaller radius */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  padding: 20px;
-  margin-bottom: 20px;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+  /* Soft, deep shadow */
+  animation: fadeIn 0.4s ease;
 }
 
-.card h3 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
-  font-family: 'Playfair Display', serif;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.card h4 {
+
+#single-order-detail-view h2 {
+  font-size: 2rem;
+  font-family: 'Playfair Display', serif;
+  color: #111;
+  margin-bottom: 5px;
+}
+
+#detail-order-id {
+  color: #888;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-left: 10px;
+}
+
+/* Detail Sections Grid */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  margin: 40px 0;
+}
+
+.detail-section h3 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #999;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.detail-section p {
   font-size: 1rem;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.detail-section strong {
   font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 10px;
+  color: #000;
+  margin-right: 5px;
+}
+
+/* Table Styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 15px;
+  color: #888;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #eee;
+}
+
+td {
+  padding: 20px 15px;
+  border-bottom: 1px solid #f9f9f9;
+  vertical-align: middle;
+}
+
+#detail-items-body tr:last-child td {
+  border-bottom: none;
+}
+
+/* Financial Box */
+.financial-box {
+  background: #fdfdfd;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  width: 350px;
+  margin-left: auto;
+}
+
+.financial-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
   color: #555;
 }
 
-/* Order Summary Card */
-.summary-card .summary-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.95rem;
-  margin-bottom: 12px;
-}
-.summary-card .summary-row span:first-child {
-  color: #666;
-}
-.summary-card .summary-row span:last-child {
-  font-weight: 500;
-}
-.summary-card .summary-row.discount span {
-  color: #0b8f3f; /* Green for discount */
-}
-.summary-card .summary-row.discount #discount-percent {
-  font-size: 0.85rem;
-  margin-left: 5px;
-}
-.summary-card .summary-row span i {
-  color: #999;
-  font-size: 0.8em;
-  margin-left: 4px;
-}
-.summary-divider {
-  border: none;
+.financial-row.grand-total {
   border-top: 1px dashed #ddd;
-  margin: 15px 0;
-}
-.summary-card .summary-row.total {
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-.summary-card .summary-row.total span:first-child {
-  color: #333;
-}
-.summary-card .summary-row.total strong {
+  margin-top: 15px;
+  padding-top: 15px;
   font-size: 1.2rem;
   font-weight: 700;
   color: #000;
 }
 
-/* Delivery & Payment Cards */
-.delivery-details-card p,
-.payment-method-card p {
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: #555;
-  display: flex;
-  align-items: flex-start; /* Align icon with first line of text */
-  gap: 10px;
-}
-.delivery-details-card p i,
-.payment-method-card p i {
-  font-size: 1.1rem;
-  color: #888;
-  width: 20px;
-  text-align: center;
-  margin-top: 2px; /* Align icon slightly */
+/* Status Badge in Detail View */
+#detail-order-status span {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-
-/* Responsive (Original) */
-@media (max-width: 600px) {
-  .order-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  #single-order-detail-view {
+    padding: 20px;
   }
 
-  .item-price {
-    text-align: left;
-    margin-top: 8px;
+  .financial-box {
+    width: 100%;
+  }
+
+  .order-detail-layout {
+    padding: 0 15px;
   }
 }
 
-/* --- Return Order Modal Styles --- */
-.return-modal-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex; justify-content: center; align-items: center;
-  z-index: 2000;
-  opacity: 0; visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.return-modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.return-modal {
-  background: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  width: 90%;
-  max-width: 420px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-  animation: scaleIn 0.3s ease;
-}
-
-@keyframes scaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.return-modal h3 {
-  margin-top: 0;
-  font-size: 1.2rem;
-  text-align: center;
-  font-family: "Playfair Display", serif;
-}
-
-.return-modal .checkbox-group {
-  margin: 15px 0;
-}
-
-.return-modal label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: #444;
-}
-
-.return-modal input[type="checkbox"] {
-  accent-color: #007bff;
-  transform: scale(1.1);
-  cursor: pointer;
-}
-
-.return-modal .modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.return-modal button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s ease;
-}
-
-.return-cancel-btn {
-  background-color: #ccc;
-}
-.return-cancel-btn:hover {
-  background-color: #b3b3b3;
-}
-.return-submit-btn {
-  background-color: #007bff;
-  color: white;
-}
-.return-submit-btn:hover {
-  background-color: #005ecc;
-}
-
-/* --- STYLES FOR NEW REVIEW SUBMISSION MODAL --- */
-/* (These are dynamically injected by js/orders.js, but including here for completeness) */
-
-.review-modal-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0, 0, 0, 0.6); z-index: 1200; display: flex;
-  justify-content: center; align-items: center; opacity: 0; visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-.review-modal-overlay.active { opacity: 1; visibility: visible; }
-.review-modal {
-  background-color: #ffffff; padding: 25px;
-  border-radius: 8px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-  width: 90%; max-width: 500px; /* Smaller width for a form */
-  max-height: 90vh; overflow-y: auto;
-  transform: scale(0.9); transition: transform 0.3s ease;
-}
-.review-modal-overlay.active .review-modal { transform: scale(1); }
-.review-modal-header {
-  display: flex; justify-content: space-between; align-items: center;
-  border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;
-}
-.review-modal-header h2 { font-family: "Playfair Display", serif; font-size: 1.4rem; margin: 0; line-height: 1.3; }
-.close-reviews-modal { background: none; border: none; font-size: 2rem; font-weight: 300; color: #888; cursor: pointer; line-height: 1; }
-.review-modal-body { padding-top: 10px; }
-
-/* Form-specific styles */
-.review-form-product-preview {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    background-color: #f9f9f9;
-    padding: 10px;
-    border-radius: 4px;
-}
-.review-form-product-preview img {
-    width: 60px;
-    height: 75px;
-    object-fit: cover;
-    border-radius: 4px;
-}
-.review-form-product-preview p {
-    font-size: 0.9rem;
-    color: #555;
-    margin: 0;
-}
-
-.review-form-group {
-    margin-bottom: 20px;
-}
-.review-form-group label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-.review-form-group textarea {
-    width: 100%;
-    min-height: 100px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    font-family: "Poppins", sans-serif;
-    resize: vertical;
-}
-.review-form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-color, #000);
-    box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
-}
-
-.rating-stars-input {
-    font-size: 1.8rem;
-    color: #ccc;
-    cursor: pointer;
-}
-.rating-stars-input i {
-    transition: color 0.2s;
-}
-.rating-stars-input i:hover {
-    color: #ffe0b3; /* Hover pre-select */
-}
-/* Class to be added by JS */
-.rating-stars-input i.selected {
-    color: var(--star-color, #f9a825);
-}
-
-#submit-review-button {
-    width: 100%;
-    padding: 12px;
-    background-color: var(--primary-color, #000);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-#submit-review-button:hover {
-    background-color: #333;
-}
-#submit-review-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-/* --- START MODIFICATION: Added WhatsApp Styles --- */
+/* --- WhatsApp Button --- */
 .whatsapp-container {
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
-    z-index: 1001; 
-}
-.whatsapp-tooltip {
-    position: absolute;
-    bottom: 100%; 
-    right: 0;
-    margin-bottom: 15px; 
-    padding: 8px 12px;
-    background-color: white;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    font-size: 0.9rem;
-    color: #333;
-    white-space: nowrap;
-    opacity: 1; 
-    visibility: visible; 
-    transform: translateY(0); 
-    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
-    pointer-events: none; 
-}
-.whatsapp-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%; 
-    right: 20px; 
-    border-width: 5px;
-    border-style: solid;
-    border-color: white transparent transparent transparent;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 999;
 }
 
 .whatsapp-float {
-    position: relative !important; 
-    bottom: auto !important;
-    right: auto !important;
-    z-index: 1; 
-    width: 60px; height: 60px;
-    background-color: #25d366; color: #FFF; border-radius: 50px; text-align: center;
-    font-size: 30px; box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
-    display: flex; justify-content: center; align-items: center;
-    transition: transform 0.2s ease-in-out;
-}
-.whatsapp-float:hover { 
-    transform: scale(1.1); 
-    background-color: #128C7E; 
+  width: 55px;
+  height: 55px;
+  background-color: #25d366;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
- @media (max-width: 991px) {
-     .whatsapp-container {
-          bottom: 80px; /* Space for bottom nav */
-          right: 15px;
-     }
-     .whatsapp-float {
-          width: 50px; 
-          height: 50px; 
-          font-size: 24px; 
-     }
-     .whatsapp-tooltip::after {
-         right: 15px; /* Adjust arrow for smaller button */
-     }
- }
-/* --- END MODIFICATION: Added WhatsApp Styles --- */ 
+.whatsapp-float:hover {
+  transform: scale(1.1) rotate(10deg);
+}
+
+/* Modal Overlays (Review & Tracking) */
+.reviews-modal-overlay,
+.tracking-modal-overlay,
+.return-modal-overlay {
+  backdrop-filter: blur(5px);
+}

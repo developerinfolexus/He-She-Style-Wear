@@ -25,7 +25,7 @@ html {
   --border-color: #eee;
   --star-color: #f9a825;
   /* Added Carousel Variables */
-  --carousel-height: 400px;
+  --carousel-height: 550px;
   --overlay-bg: rgba(0, 0, 0, 0.4);
   --heading-color: #ffffff;
   --button-bg: #d11c5b;
@@ -534,8 +534,8 @@ img {
 .main-banner-carousel {
   position: relative;
   width: 100%;
-  max-width: 100%;
-  margin: auto;
+  max-width: 1500px;
+  margin: 20px auto;
   height: var(--carousel-height);
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);

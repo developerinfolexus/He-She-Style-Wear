@@ -398,13 +398,39 @@ function setupMobileMenuToggle() {
             if (isOpening) {
                 newButton.setAttribute('aria-expanded', 'true');
                 panel.classList.add('active'); // Use class for CSS
+
+                // set to specific pixel count first to animate
                 panel.style.maxHeight = panel.scrollHeight + 'px';
+
                 icon.classList.remove('fa-plus');
                 icon.classList.add('fa-minus');
+
+                // After animation completes, remove max-height restriction to allow full expansion (lazy loads, wrapping)
+                setTimeout(() => {
+                    if (newButton.getAttribute('aria-expanded') === 'true') {
+                        panel.style.maxHeight = 'none';
+                        panel.style.overflow = 'visible';
+                    }
+                }, 310); // Match transition duration
+
             } else {
+                // Restore pixel height for animation to work
+                // We need to set it to current scrollHeight explicitly before setting to 0
+                panel.style.maxHeight = panel.scrollHeight + 'px';
+                panel.style.overflow = 'hidden';
+
+                // Force reflow to ensure the browser registers the height change
+                panel.offsetHeight;
+
+                // Now collapse
                 newButton.setAttribute('aria-expanded', 'false');
                 panel.classList.remove('active');
-                panel.style.maxHeight = null;
+
+                // Use requestAnimationFrame to ensure the style set above takes effect before clearing
+                requestAnimationFrame(() => {
+                    panel.style.maxHeight = null;
+                });
+
                 icon.classList.remove('fa-minus');
                 icon.classList.add('fa-plus');
             }
@@ -1139,6 +1165,18 @@ function setupHoverSubcategoryNavigation() {
 
         const updateSlider = () => {
             // Force layout update for desktop
+            if (window.innerWidth < 992) {
+                // Mobile: Reset styles to let CSS Grid take over
+                track.style.width = '';
+                track.style.transform = '';
+                track.style.display = '';
+                nextBtn.style.opacity = '';
+                nextBtn.style.pointerEvents = '';
+                prevBtn.style.opacity = '';
+                prevBtn.style.pointerEvents = '';
+                return;
+            }
+
             if (window.innerWidth >= 992) {
                 track.style.width = 'max-content';
             }
