@@ -410,3 +410,120 @@ td {
 .return-modal-overlay {
   backdrop-filter: blur(5px);
 }
+
+/* Return/Cancel Modal Styles */
+.return-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.return-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.return-modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.return-modal-overlay.active .return-modal {
+  transform: scale(1);
+}
+
+.return-modal h3 {
+  margin: 0 0 20px 0;
+  font-size: 1.3rem;
+  color: #333;
+  font-family: "Playfair Display", serif;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.return-modal .checkbox-group {
+  margin-bottom: 20px;
+}
+
+.return-modal .checkbox-group p {
+  margin: 0 0 15px 0;
+  color: #555;
+}
+
+.return-modal .checkbox-group label {
+  display: block;
+  margin-bottom: 10px;
+  cursor: pointer;
+  padding: 10px 12px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.return-modal .checkbox-group label:hover {
+  background: #f0f0f0;
+}
+
+.return-modal .checkbox-group input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.1);
+}
+
+.return-modal .modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.return-modal .return-cancel-btn {
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.return-modal .return-cancel-btn:hover {
+  background: #f5f5f5;
+}
+
+.return-modal .return-submit-btn {
+  padding: 10px 20px;
+  border: none;
+  background: #e74c3c;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.return-modal .return-submit-btn:hover {
+  background: #c0392b;
+}
+
+.return-modal .return-submit-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}

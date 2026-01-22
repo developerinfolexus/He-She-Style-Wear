@@ -635,9 +635,8 @@ def add_product(request):
             )
             product.save()
 
-            # --- SIZES LIST (optional) ---
-            # sizes_list = request.POST.getlist('sizes')
-            # product.sizes = ",".join(s for s in sizes_list if s)
+            # --- SIZES LIST ---
+            product.sizes = request.POST.get('sizes', '')
 
             # --- IMAGE REMOVAL HANDLING ---
             removed_fields_json = request.POST.get('removed_fields')
@@ -1035,9 +1034,13 @@ def update_order_api(request):
                         # but assuming standard keys based on model definition
                         size_key = size.lower().strip()
                         
-                        # Handle common expansions if necessary, or just rely on direct map
-                        # Model has: stock_s, stock_m, stock_l, stock_xl, stock_xxl
-                        stock_field = f"stock_{size_key}"
+                        # Handle Free Size - it uses stock_s
+                        if size_key in ('free size', 'freesize', 'free'):
+                            stock_field = 'stock_s'
+                        else:
+                            # Handle common expansions if necessary, or just rely on direct map
+                            # Model has: stock_s, stock_m, stock_l, stock_xl, stock_xxl
+                            stock_field = f"stock_{size_key}"
                         
                         if hasattr(product, stock_field):
                             current_val = getattr(product, stock_field)

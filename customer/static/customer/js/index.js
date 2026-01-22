@@ -1,19 +1,47 @@
 // --- Constants (Global Scope for Header Functions - Assume defined elsewhere, e..g., index.js) ---
-const CART_KEY = "he_she_cart";
-const WISHLIST_KEY = "he_she_wishlist";
-const REVIEWS_KEY = "he_she_reviews";
-const SELECTED_REGION_KEY = "he_she_selected_region";
+var CART_KEY = "he_she_cart";
+var WISHLIST_KEY = "he_she_wishlist";
+var REVIEWS_KEY = "he_she_reviews";
+var SELECTED_REGION_KEY = "he_she_selected_region";
 
 // --- Ensure EXCHANGE_RATES includes flags (Prices stored in USD) ---
-const EXCHANGE_RATES = {
+var EXCHANGE_RATES = EXCHANGE_RATES || {
     ca: { rate: 1.33, symbol: "CA$", flag: 'https://flagcdn.com/w20/ca.png' }, // USD to CAD (1 USD = 1.33 CAD)
     us: { rate: 1.0, symbol: "US$", flag: 'https://flagcdn.com/w20/us.png' }  // USD to USD (no conversion)
 };
 
 // --- Global Helper Functions needed by Header ---
-function getWishlist() { return JSON.parse(localStorage.getItem(WISHLIST_KEY)) || []; }
-function getCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { console.error("Error parsing cart:", e); localStorage.removeItem(CART_KEY); return []; } }
-function getReviews() { try { const stored = localStorage.getItem(REVIEWS_KEY); return stored ? JSON.parse(stored) : []; } catch (e) { console.error("Error parsing reviews:", e); localStorage.removeItem(REVIEWS_KEY); return []; } }
+// --- User Scope Logic (Global) ---
+window.currentUserId = null; // Default to null (guest)
+window.getStorageKey = function (key) {
+    if (window.currentUserId) {
+        return `${key}_${window.currentUserId}`;
+    }
+    return key; // Default legacy/guest key
+};
+
+// --- Helper Functions to Access Storage ---
+function getWishlist() {
+    try {
+        const list = JSON.parse(localStorage.getItem(window.getStorageKey(WISHLIST_KEY))) || [];
+        return Array.isArray(list) ? list.filter(item => item && item.id) : [];
+    } catch (e) {
+        console.error("Error parsing wishlist:", e);
+        return [];
+    }
+}
+function getCart() {
+    try {
+        const list = JSON.parse(localStorage.getItem(window.getStorageKey(CART_KEY))) || [];
+        return Array.isArray(list) ? list.filter(item => item && item.id) : [];
+    } catch (e) {
+        console.error("Error parsing cart:", e);
+        localStorage.removeItem(window.getStorageKey(CART_KEY));
+        return [];
+    }
+}
+function getReviews() { try { const stored = localStorage.getItem(window.getStorageKey(REVIEWS_KEY)); return stored ? JSON.parse(stored) : []; } catch (e) { console.error("Error parsing reviews:", e); localStorage.removeItem(window.getStorageKey(REVIEWS_KEY)); return []; } }
+
 function getSelectedRegion() { return localStorage.getItem(SELECTED_REGION_KEY) || 'ca'; }
 function setSelectedRegion(region) { if (EXCHANGE_RATES[region]) { localStorage.setItem(SELECTED_REGION_KEY, region); } else { console.error("Invalid region selected:", region); } }
 function convertUsdToTargetCurrency(priceUsdStr, region) {
@@ -498,7 +526,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let baseUrl = document.body.dataset.headerUrl || '/api/header/';
     const headerUrl = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
     console.log("Loading header from:", headerUrl);
-    fetch(headerUrl)
+    fetch(headerUrl, { credentials: 'include' })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -522,6 +550,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 const headerContent = tempDiv.innerHTML.replace(/<style[\s\S]*?<\/style>/gi, '');
                 headerPlaceholder.innerHTML = headerContent;
                 setupHoverSubcategoryNavigation();
+
+                // --- MODIFICATION: Sync User Identity ---
+                const userIdentityEl = document.getElementById('user-identity');
+                if (userIdentityEl) {
+                    const uid = userIdentityEl.dataset.userId;
+                    window.currentUserId = uid ? uid : null;
+                    console.log("User Identified for Storage keys:", window.currentUserId);
+                    // Dispatch event so other scripts (like cart.js) can re-render with correct data
+                    document.dispatchEvent(new CustomEvent('userIdentified'));
+                }
+                // --- END MODIFICATION ---
 
                 console.log("Header loaded successfully");
                 console.log("Header content length:", headerContent.length);
@@ -555,6 +594,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Initialize running banners (promo bar) after header HTML inserted
                 if (typeof initRunningBanners === 'function') initRunningBanners();
+
+                // Dispatch headerLoaded event so other scripts can update header elements
+                document.dispatchEvent(new CustomEvent('headerLoaded'));
 
                 // Re-set active nav link based on current page
                 const navLinks = document.querySelectorAll(".main-nav li");
@@ -675,10 +717,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const initialRegion = getSelectedRegion();
 
     // --- Wishlist Update (Scoped for index page context) ---
-    function updateWishlistLocal(productData, isAdding) { /* ... (keep as before, calls global updateWishlistCount) ... */
-        let list = getWishlist(); const currentRegion = getSelectedRegion(); const priceInr = convertDisplayedToInr(productData.price, currentRegion); const itemToStore = { ...productData, price: priceInr.toString() };
-        if (isAdding) { if (!list.some(item => item.id === itemToStore.id)) list.push(itemToStore); } else { list = list.filter(item => item.id !== itemToStore.id); }
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(list)); updateWishlistCount();
+    function updateWishlistLocal(productData, isAdding) {
+        let list = getWishlist(); // Already robust
+
+        // Convert displayed price back to USD for consistent storage
+        // productData.price is the displayed price string (e.g., "CA$10.00" or "US$10.00")
+        const currentRegion = getSelectedRegion();
+        const priceDisplayed = parseFloat(productData.price.replace(/[^0-9.]/g, ''));
+
+        // Convert back to USD (reverse the conversion)
+        const exchangeRate = EXCHANGE_RATES[currentRegion]?.rate || 1.0;
+        const priceUSD = priceDisplayed / exchangeRate;
+
+        // Store in the same format as product.js and wishlist.js expect
+        const itemToStore = {
+            id: productData.id,
+            name: productData.name,
+            priceUSD: priceUSD, // ✅ Store as priceUSD to match wishlist.js expectations
+            image: productData.image
+        };
+
+        if (isAdding) {
+            if (!list.some(item => item.id === itemToStore.id)) {
+                list.push(itemToStore);
+            }
+        } else {
+            list = list.filter(item => item.id !== itemToStore.id);
+        }
+
+        localStorage.setItem(window.getStorageKey(WISHLIST_KEY), JSON.stringify(list));
+        updateWishlistCount();
     }
 
     // --- Initialize Wishlist Hearts (Scoped) ---

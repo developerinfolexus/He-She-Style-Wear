@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // --- Constants for Local Storage Keys ---
-    const CART_KEY = "he_she_cart";
-    const WISHLIST_KEY = "he_she_wishlist"; // Needed for header count update
-    const SELECTED_REGION_KEY = "he_she_selected_region";
+    // --- Constants (Global Scope for Header Functions) ---
+    var CART_KEY = "he_she_cart";
+    var WISHLIST_KEY = "he_she_wishlist"; // Needed for header count update
+    var SELECTED_REGION_KEY = "he_she_selected_region";
 
     // --- Exchange Rates & Currency Symbols (Prices stored in USD) ---
-    const EXCHANGE_RATES = {
+    var EXCHANGE_RATES = EXCHANGE_RATES || {
         ca: { rate: 1.33, symbol: "CA$" }, // USD to CAD (1 USD = 1.33 CAD)
         us: { rate: 1.0, symbol: "US$" }   // USD to USD (no conversion)
     };
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         const headerUrl = document.body.dataset.headerUrl || '/api/header/';
-        fetch(headerUrl)
+        fetch(headerUrl, { credentials: 'include' })
             .then(response => response.text())
             .then(data => {
                 const headerPlaceholder = document.getElementById('header-placeholder');
@@ -82,6 +82,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (typeof setupProfileDropdown === 'function') setupProfileDropdown();
                     if (typeof setupNavDropdowns === 'function') setupNavDropdowns();
                     if (typeof setupRegionFlagDropdown === 'function') setupRegionFlagDropdown();
+
+                    // --- Fix: Sync User Identity ---
+                    const userIdentityEl = document.getElementById('user-identity');
+                    if (userIdentityEl) {
+                        const uid = userIdentityEl.dataset.userId;
+                        window.currentUserId = uid ? uid : null;
+                        // Dispatch event so other scripts (like cart.js) can re-render with correct data
+                        document.dispatchEvent(new CustomEvent('userIdentified'));
+                    }
 
                     // --- MODIFICATION START ---
                     // Must call count functions *after* header HTML is loaded
@@ -132,18 +141,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Helper Functions ---
+    // --- Helper Functions ---
+    // Use window.getStorageKey if available (defined in index.js)
+    function getCartKey() {
+        return (window.getStorageKey && typeof window.getStorageKey === 'function')
+            ? window.getStorageKey(CART_KEY)
+            : CART_KEY;
+    }
+
     function getCart() {
         try {
-            return JSON.parse(localStorage.getItem(CART_KEY)) || [];
-        } catch (e) { console.error("Error parsing cart data:", e); localStorage.removeItem(CART_KEY); return []; }
+            return JSON.parse(localStorage.getItem(getCartKey())) || [];
+        } catch (e) { console.error("Error parsing cart data:", e); localStorage.removeItem(getCartKey()); return []; }
     }
 
     function saveCart(cart) {
         try {
-            localStorage.setItem(CART_KEY, JSON.stringify(cart));
+            const cartStr = JSON.stringify(cart);
+            localStorage.setItem(getCartKey(), cartStr);
+
+            // Sync with sessionStorage backup
+            if (cart.length === 0) {
+                // Clear cart backup when cart is empty
+                // NOTE: Do NOT clear buy_now_item here - it's independent of regular cart
+                sessionStorage.removeItem('cart_backup');
+                console.log('saveCart: Cart is empty, cleared cart_backup');
+            } else {
+                // Update backup with current cart
+                sessionStorage.setItem('cart_backup', cartStr);
+            }
+
             updateHeaderCounts(); // Update header count when cart changes
         } catch (e) { console.error("Error saving cart data:", e); }
     }
+
+    // --- Listen for User Identification (from index.js -> header load) ---
+    document.addEventListener('userIdentified', () => {
+        console.log("Cart Page: User identified, refreshing cart view...");
+        updateHeaderCounts();
+        renderCartPage();
+    });
+
+    // --- Listen for Header Loaded event to update counts ---
+    document.addEventListener('headerLoaded', () => {
+        console.log("Cart Page: Header loaded, updating counts...");
+        updateHeaderCounts();
+    });
 
     // --- Update Header Counts (Needed by cart actions) ---
     function updateHeaderCounts() {

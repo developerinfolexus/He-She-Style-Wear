@@ -289,6 +289,7 @@
 
 
 <header class="main-header container" style="max-width: 1500px">
+  <div id="user-identity" data-user-id="{{ request.user.id|default:'' }}" style="display:none;"></div>
   <div class="header-left-group">
     <button id="mobile-menu-toggle" aria-label="Open menu">
       <i class="fas fa-bars"></i>
@@ -667,6 +668,11 @@
       <a href="{% url 'wishlist' %}"><i class="far fa-heart"></i></a>
       <span class="wishlist-count" id="wishlistCount">0</span>
     </div>
+
+    <!-- Hidden element to pass user ID to JS for storage key syncing -->
+    {% if request.user.is_authenticated %}
+    <div id="user-identity" data-user-id="{{ request.user.id }}" style="display:none;"></div>
+    {% endif %}
   </div>
 </header>
 

@@ -618,14 +618,44 @@ document.addEventListener('DOMContentLoaded', () => {
             if (genderRadio) genderRadio.checked = true;
         }
 
-        if (product.sizes && Array.isArray(product.sizes)) {
-            // Uncheck all first
-            document.querySelectorAll('input[name="sizes"]').forEach(el => el.checked = false);
-            product.sizes.forEach(size => {
-                const sizeCheckbox = document.querySelector(`input[name="sizes"][value="${size}"]`);
-                if (sizeCheckbox) sizeCheckbox.checked = true;
-            });
+        // 🚀 UPDATED SIZE POPULATION (Variant Type)
+        let isFreeSize = false;
+        if (product.sizes) {
+            // Handle both array and string
+            const sizesArr = Array.isArray(product.sizes) ? product.sizes : String(product.sizes).split(',');
+            if (sizesArr.some(s => s.trim().toLowerCase() === 'free size')) {
+                isFreeSize = true;
+            }
         }
+
+        if (isFreeSize) {
+            const freeRadio = document.querySelector('input[name="variantType"][value="free"]');
+            if (freeRadio) freeRadio.checked = true;
+
+            // Populate Free Size inputs
+            const setEl = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = (val !== undefined && val !== null) ? val : '';
+            };
+
+            setEl('free_stock', product.stock_s);
+            setEl('free_price', product.price_s);
+            setEl('free_discount', product.discount_s);
+            setEl('free_sale_label', product.sale_label_s);
+
+            const freeSaleToggle = document.getElementById('free_is_sale');
+            if (freeSaleToggle) {
+                const isSale = product.is_sale_s === true || product.is_sale_s === 'on' || product.is_sale_s === 'true' || product.is_sale_s === 1;
+                freeSaleToggle.checked = isSale;
+            }
+
+        } else {
+            const sizedRadio = document.querySelector('input[name="variantType"][value="sized"]');
+            if (sizedRadio) sizedRadio.checked = true;
+        }
+
+        // Trigger visibility update
+        if (typeof updateVariantVisibility === 'function') updateVariantVisibility();
 
         // 🟢 SIZE-WISE SALE LABELS (Population)
         const sizes = ['s', 'm', 'l', 'xl', 'xxl'];
@@ -787,8 +817,82 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------------------
 
 
+    // ----------------------------------------------------------------------
+    // 🚀 START: VARIANT TYPE SWITCHER LOGIC
+    // ----------------------------------------------------------------------
+    const variantRadios = document.querySelectorAll('input[name="variantType"]');
+    const sizeBasedContainer = document.getElementById('sizeBasedContainer');
+    const freeSizeContainer = document.getElementById('freeSizeContainer');
+    const sizesInput = document.getElementById('sizesInput');
+
+    // Free Size Toggle Logic
+    const freeSaleToggle = document.getElementById('free_is_sale');
+    const freeSaleLabel = document.getElementById('free_sale_label');
+    if (freeSaleToggle && freeSaleLabel) {
+        freeSaleToggle.addEventListener('change', () => {
+            freeSaleLabel.disabled = !freeSaleToggle.checked;
+        });
+    }
+
+    function updateVariantVisibility() {
+        const selected = document.querySelector('input[name="variantType"]:checked').value;
+        if (selected === 'free') {
+            if (sizeBasedContainer) sizeBasedContainer.style.display = 'none';
+            if (freeSizeContainer) freeSizeContainer.style.display = 'block';
+
+            // Disable Size Based inputs
+            if (sizeBasedContainer) sizeBasedContainer.querySelectorAll('input').forEach(el => el.disabled = true);
+
+            // Enable Free Size inputs
+            if (freeSizeContainer) {
+                freeSizeContainer.querySelectorAll('input').forEach(el => {
+                    if (el.id === 'free_sale_label') {
+                        // Respect the toggle state
+                        el.disabled = !freeSaleToggle.checked;
+                    } else {
+                        el.disabled = false;
+                    }
+                });
+            }
+
+            if (sizesInput) sizesInput.value = 'Free Size';
+
+        } else {
+            if (sizeBasedContainer) sizeBasedContainer.style.display = 'block';
+            if (freeSizeContainer) freeSizeContainer.style.display = 'none';
+
+            // Enable Size Based inputs
+            if (sizeBasedContainer) {
+                sizeBasedContainer.querySelectorAll('input').forEach(el => el.disabled = false);
+                // Re-apply sale toggle states for S-XXL
+                ['s', 'm', 'l', 'xl', 'xxl'].forEach(size => {
+                    const toggle = document.getElementById(`saleToggle_${size}`);
+                    const label = document.getElementById(`saleLabel_${size}`);
+                    if (toggle && label) {
+                        label.disabled = !toggle.checked;
+                    }
+                });
+            }
+
+            // Disable Free Size inputs
+            if (freeSizeContainer) freeSizeContainer.querySelectorAll('input').forEach(el => el.disabled = true);
+
+            if (sizesInput) sizesInput.value = 'S,M,L,XL,XXL';
+        }
+    }
+
+    variantRadios.forEach(r => r.addEventListener('change', updateVariantVisibility));
+    // Initial call
+    updateVariantVisibility();
+
+    // ----------------------------------------------------------------------
+    // 🚀 END: VARIANT TYPE SWITCHER LOGIC
+    // ----------------------------------------------------------------------
+
     // --- File Input Event Listeners ---
     if (dropZone && fileInput && fileNameSpan && previewContainer) {
+        // ... (existing code for file inputs)
+
 
         // 1. "Browse" button REPLACES all images
         fileInput.addEventListener('change', () => {
@@ -980,8 +1084,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('styleFit', safeGetValue('styleFit'));
                 formData.append('shippingReturn', safeGetValue('shippingReturn'));
 
-                // Helper for safe query selector
+                // Helper for safe query selector - MODIFIED to prefer enabled inputs
                 const safeQueryValue = (selector, fallback = '') => {
+                    // Try to find an enabled version first (for when duplicate names exist)
+                    const elEnabled = document.querySelector(`${selector}:not(:disabled)`);
+                    if (elEnabled) return elEnabled.value;
+
                     const el = document.querySelector(selector);
                     return el ? el.value : fallback;
                 };
@@ -1009,13 +1117,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 🟢 SIZE-WISE SALE LABELS
                 const appendSaleInfo = (size) => {
-                    const isSale = document.getElementById(`saleToggle_${size}`)?.checked;
+                    // MODIFIED: Find the enabled checkbox for this size (handles Free Size vs Sized)
+                    const checkbox = document.querySelector(`input[name="is_sale_${size}"]:not(:disabled)`);
+                    const isSale = checkbox ? checkbox.checked : false;
+
                     formData.append(`is_sale_${size}`, isSale ? 'on' : '');
                     formData.append(`sale_label_${size}`, isSale ? safeQueryValue(`input[name="sale_label_${size}"]`) : '');
                 };
                 ['s', 'm', 'l', 'xl', 'xxl'].forEach(appendSaleInfo);
-
-
 
 
                 // Category and gender
@@ -1028,11 +1137,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     formData.append('gender', gender);
                 }
 
-                // Sizes
-                const sizes = getCheckedValues('sizes');
-                sizes.forEach(size => {
-                    formData.append('sizes', size);
-                });
+                // Sizes - MODIFIED to pick up hidden input
+                const sizesInput = document.getElementById('sizesInput');
+                if (sizesInput && sizesInput.value) {
+                    formData.append('sizes', sizesInput.value);
+                }
+                // Fallback for old checkbox logic (if any remains) or multiple sizes
+                // const sizes = getCheckedValues('sizes'); 
+                // sizes.forEach(size => formData.append('sizes', size));
 
                 // ... (pricing logic follows) ...
 
@@ -1049,9 +1161,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     return amount;  //new
                 }
+
+                // Helper to get price via safeQueryValue
                 const getPrice = (name) => {
-                    const el = document.querySelector(`input[name="${name}"]`);
-                    return el ? parseFloat(el.value) || 0 : 0; //old
+                    return parseFloat(safeQueryValue(`input[name="${name}"]`)) || 0;
                 };
 
                 // const priceS = getPrice('price_s');

@@ -257,6 +257,22 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Helper Functions ---
     function getCart() {
         try {
+            // --- BUY NOW FIX: Check for Buy Now item first ---
+            const buyNowItemStr = sessionStorage.getItem('buy_now_item');
+            if (buyNowItemStr && buyNowItemStr !== 'null' && buyNowItemStr !== 'undefined') {
+                try {
+                    const buyNowItem = JSON.parse(buyNowItemStr);
+                    if (buyNowItem && buyNowItem.id) {
+                        console.log('getCart: Buy Now item found, using exclusively:', buyNowItem);
+                        // Return only the Buy Now item (not the regular cart)
+                        return [buyNowItem];
+                    }
+                } catch (e) {
+                    console.warn('getCart: Error parsing buy_now_item:', e);
+                }
+            }
+            // --- END BUY NOW FIX ---
+
             // First check localStorage
             let cartStr = localStorage.getItem(CART_KEY);
             console.log('getCart: Raw localStorage value for key "' + CART_KEY + '":', cartStr);
@@ -314,9 +330,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const verify = localStorage.getItem(CART_KEY);
             console.log('saveCart: Verification - localStorage now contains:', verify);
 
-            // Also save to sessionStorage as backup
-            sessionStorage.setItem('cart_backup', cartStr);
-            console.log('saveCart: Also saved to sessionStorage backup');
+            // Also save to sessionStorage as backup (or clear if empty)
+            // NOTE: Do NOT clear buy_now_item here - it's independent of regular cart
+            if (cart.length === 0) {
+                sessionStorage.removeItem('cart_backup');
+                console.log('saveCart: Cart is empty, cleared cart_backup');
+            } else {
+                sessionStorage.setItem('cart_backup', cartStr);
+                console.log('saveCart: Also saved to sessionStorage backup');
+            }
         } catch (e) {
             console.error('saveCart: Error saving cart:', e);
         }
@@ -325,6 +347,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Update a single cart item by cartId to a new quantity (handles removal when qty<=0)
     function updateCartItem(cartId, newQty) {
         try {
+            // Check if we're in Buy Now mode
+            const buyNowItemStr = sessionStorage.getItem('buy_now_item');
+            const isBuyNowMode = buyNowItemStr && buyNowItemStr !== 'null' && buyNowItemStr !== 'undefined';
+
             let cart = getCart();
             const idx = cart.findIndex(i => (i.cartId || i.id) === cartId);
             if (idx === -1) return;
@@ -355,11 +381,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (newQty <= 0) {
-                cart.splice(idx, 1);
+                // Removing item
+                if (isBuyNowMode) {
+                    // Clear Buy Now item and redirect to home or show empty cart
+                    sessionStorage.removeItem('buy_now_item');
+                    console.log('updateCartItem: Buy Now item removed, cleared sessionStorage');
+                } else {
+                    cart.splice(idx, 1);
+                    saveCart(cart);
+                }
             } else {
-                cart[idx].quantity = newQty;
+                // Updating quantity
+                if (isBuyNowMode) {
+                    // Update the Buy Now item in sessionStorage
+                    cart[idx].quantity = newQty;
+                    sessionStorage.setItem('buy_now_item', JSON.stringify(cart[idx]));
+                    console.log('updateCartItem: Buy Now item quantity updated to', newQty);
+                } else {
+                    cart[idx].quantity = newQty;
+                    saveCart(cart);
+                }
             }
-            saveCart(cart);
             renderCheckoutPage();
             updateCartCount();
         } catch (e) {
@@ -1510,17 +1552,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const stateLabel = document.getElementById('billing-state-label');
     const stateInput = document.getElementById('billing-state');
 
-    function updateAddressLabels() {
+    function updateAddressLabels(shouldSyncToRegion = false) {
         if (!countrySelect || !postalLabel || !postalInput) return;
 
-        // Use global region as source of truth
-        const currentRegion = typeof getSelectedRegion === 'function' ? getSelectedRegion() : 'us';
+        // Sync Dropdown to Global Region ONLY if requested and editable
+        if (shouldSyncToRegion && !countrySelect.disabled) {
+            const currentRegion = typeof getSelectedRegion === 'function' ? getSelectedRegion() : 'us';
+            const regionToCountryCode = { 'us': 'US', 'ca': 'CA' };
+            countrySelect.value = regionToCountryCode[currentRegion] || 'US';
+        }
 
-        // Sync Dropdown
-        const regionToCountryCode = { 'us': 'US', 'ca': 'CA' };
-        countrySelect.value = regionToCountryCode[currentRegion] || 'US';
-
-        if (currentRegion === 'us') {
+        // Update Labels based on CURRENT value of the dropdown
+        if (countrySelect.value === 'US') {
             // US Settings
             postalLabel.textContent = 'Zip Code';
             postalInput.placeholder = 'Zip Code (e.g., 10001)';
@@ -1529,7 +1572,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (stateLabel) stateLabel.textContent = 'State';
             if (stateInput) stateInput.placeholder = 'State';
-        } else if (currentRegion === 'ca') {
+        } else if (countrySelect.value === 'CA') {
             // CA Settings
             postalLabel.textContent = 'Postal Code';
             postalInput.placeholder = 'Postal Code (e.g., A1A 1A1)';
@@ -1550,31 +1593,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Initial load
-    updateAddressLabels();
+    // Initial load - Sync with region (unless disabled/saved)
+    updateAddressLabels(true);
 
-    // Listen for global region changes
+    // Listen for global region changes - Sync
     document.addEventListener('regionChanged', () => {
         console.log("Region change detected in checkout.js -> updating postal label");
-        updateAddressLabels();
+        updateAddressLabels(true);
     });
 
-    // If user manually changes dropdown, we might want to respect it or revert it.
-    // For now, let's allow it to validly switch the form state, but note it might desync from global header until page reload.
-    // Ideally, changing this should update the global region? 
     if (countrySelect) {
         countrySelect.addEventListener('change', () => {
-            // If user explicitly changes country dropdown, update the UI logic
-            // But simpler to just re-run our logic which enforces global. 
-            // IF the requirement is "Country selection is now done globally", then the dropdown should probably be disabled or strictly follow global.
-            // We will let the dropdown visually update the label locally for now, assuming the user might want to ship to a different country than their currency view.
-            // WAIT, user requirement: "The Zip/Postal Code label must change automatically based on the selected country flag"
-            // So global flag -> drives local form.
-
-            // If we want to allow mixed states (Shop in USD, Ship to Canada), we need logic for that.
-            // But usually on these sites, region = shipping country.
-            // Let's force-sync for now based on the "Override existing dropdown-based logic" instruction.
-            updateAddressLabels();
+            // Manual change - DO NOT sync to region, just update labels
+            updateAddressLabels(false);
         });
     }
 
@@ -2164,6 +2195,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // alert("Payment Confirmed! Your order has been placed.");
             localStorage.removeItem(CART_KEY);
+            // Clear all cart-related sessionStorage items
+            sessionStorage.removeItem('buy_now_item');
+            sessionStorage.removeItem('cart_backup');
+            console.log('Order placed: Cleared cart and all sessionStorage backups');
 
             // Use Custom Modal instead of alert
             showOrderSuccessModal(newOrderId, () => {

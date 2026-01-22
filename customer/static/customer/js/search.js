@@ -11,9 +11,20 @@ const EXCHANGE_RATES = {
 };
 
 // --- GLOBAL HELPER FUNCTIONS (From index.js) ---
-function getWishlist() { return JSON.parse(localStorage.getItem(WISHLIST_KEY)) || []; }
-function getCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { console.error("Error parsing cart:", e); localStorage.removeItem(CART_KEY); return []; } }
-function getReviews() { try { const stored = localStorage.getItem(REVIEWS_KEY); return stored ? JSON.parse(stored) : []; } catch (e) { console.error("Error parsing reviews:", e); localStorage.removeItem(REVIEWS_KEY); return []; } }
+// --- GLOBAL HELPER FUNCTIONS (From index.js) ---
+function getWishlistKey() {
+    return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(WISHLIST_KEY) : WISHLIST_KEY;
+}
+function getCartKey() {
+    return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(CART_KEY) : CART_KEY;
+}
+function getReviewsKey() {
+    return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(REVIEWS_KEY) : REVIEWS_KEY;
+}
+
+function getWishlist() { return JSON.parse(localStorage.getItem(getWishlistKey())) || []; }
+function getCart() { try { return JSON.parse(localStorage.getItem(getCartKey())) || []; } catch (e) { console.error("Error parsing cart:", e); localStorage.removeItem(getCartKey()); return []; } }
+function getReviews() { try { const stored = localStorage.getItem(getReviewsKey()); return stored ? JSON.parse(stored) : []; } catch (e) { console.error("Error parsing reviews:", e); localStorage.removeItem(getReviewsKey()); return []; } }
 function getSelectedRegion() { return localStorage.getItem(SELECTED_REGION_KEY) || 'ca'; }
 // *** ADDED/MODIFIED: Setter for Region ***
 function setSelectedRegion(region) { if (EXCHANGE_RATES[region]) { localStorage.setItem(SELECTED_REGION_KEY, region); } else { console.error("Invalid region selected:", region); } }
@@ -342,7 +353,7 @@ function updateWishlist(productData, isAdding) {
     } else {
         list = list.filter(item => item.id !== itemToStore.id);
     }
-    localStorage.setItem(WISHLIST_KEY, JSON.stringify(list)); // Save updated list
+    localStorage.setItem(getWishlistKey(), JSON.stringify(list)); // Save updated list
     updateWishlistCount(); // Update header count (assumes global)
 }
 
@@ -639,6 +650,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     updateCartCount();
     updateWishlistCount();
+
+    // Listen for user identification (from header load)
+    document.addEventListener('userIdentified', () => {
+        console.log("Search Page: User identified, refreshing header counts...");
+        updateCartCount();
+        updateWishlistCount();
+    });
 
     const mobileFilterOverlay = document.getElementById('mobile-filter-overlay');
     const mobileFilterDrawer = document.getElementById('mobile-filter-drawer');

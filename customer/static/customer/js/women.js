@@ -377,15 +377,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     // (Initial mapping block removed. loadProducts() handles this transformation now.)
 
     // --- Helper Functions (Storage Access - Assume defined globally) ---
-    function getWishlist() { /* ... return JSON.parse(localStorage.getItem(WISHLIST_KEY)) ... */
-        const stored = localStorage.getItem(WISHLIST_KEY); return stored ? JSON.parse(stored) : [];
+    function getWishlistKey() {
+        return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(WISHLIST_KEY) : WISHLIST_KEY;
     }
-    function getCart() { /* ... return JSON.parse(localStorage.getItem(CART_KEY)) ... */
-        return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+    function getCartKey() {
+        return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(CART_KEY) : CART_KEY;
     }
-    function getReviews() { /* ... return JSON.parse(localStorage.getItem(REVIEWS_KEY)) ... */
-        try { const stored = localStorage.getItem(REVIEWS_KEY); return stored ? JSON.parse(stored) : []; }
-        catch (e) { console.error("Error parsing reviews:", e); localStorage.removeItem(REVIEWS_KEY); return []; }
+    function getReviewsKey() {
+        return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(REVIEWS_KEY) : REVIEWS_KEY;
+    }
+
+    function getWishlist() {
+        const stored = localStorage.getItem(getWishlistKey()); return stored ? JSON.parse(stored) : [];
+    }
+    function getCart() {
+        return JSON.parse(localStorage.getItem(getCartKey())) || [];
+    }
+    function getReviews() {
+        try { const stored = localStorage.getItem(getReviewsKey()); return stored ? JSON.parse(stored) : []; }
+        catch (e) { console.error("Error parsing reviews:", e); localStorage.removeItem(getReviewsKey()); return []; }
     }
     // updateCartCount, updateWishlistCount assumed defined globally and called by header script
 
@@ -398,7 +408,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (isAdding) { if (!list.some(item => item.id === itemToStore.id)) { list.push(itemToStore); } }
         else { list = list.filter(item => item.id !== itemToStore.id); }
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+        localStorage.setItem(getWishlistKey(), JSON.stringify(list));
         updateWishlistCount(); // Call global count update function
     }
 
@@ -974,7 +984,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.addEventListener('regionChanged', () => {
         updateDisplayedPricesLocal(); // Update prices on THIS page's grid
         filterWomenProductsFromDB();
+    });
 
+    // --- Listen for user identification ---
+    document.addEventListener('userIdentified', () => {
+        console.log("Women Page: User identified, refreshing hearts...");
+        initializeWishlistHeartsLocal();
+        updateWishlistCount();
     });
 
     // ✅ Add filter event listeners here (Consolidated)

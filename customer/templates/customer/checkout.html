@@ -75,67 +75,87 @@
 
 
                 <section class="billing-address-section checkout-step-section hidden" id="billing-step">
-                    <h2>Billing & address</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                        <h2>Billing & address</h2>
+                        {% if saved_address and saved_address.address %}
+                        <div class="address-actions" style="display:flex; gap:10px;">
+                            <button type="button" id="change-address-btn"
+                                style="background:none; border:none; color:#007bff; cursor:pointer; font-weight:600; text-decoration:underline;">Change
+                                Address</button>
+                            <button type="button" id="save-address-btn"
+                                style="background:none; border:none; color:#28a745; cursor:pointer; font-weight:600; text-decoration:underline; display:none;">Save
+                                Address</button>
+                        </div>
+                        {% endif %}
+                    </div>
                     <form id="billing-address-form" novalidate>
                         <div class="form-group">
                             <label for="billing-email">Email</label>
                             <input type="email" id="billing-email" name="billing-email" placeholder="Enter your email"
-                                value="{% if user.is_authenticated %}{{ user.email }}{% endif %}" required>
+                                value="{% if saved_address.email %}{{ saved_address.email }}{% elif user.is_authenticated %}{{ user.email }}{% endif %}"
+                                required {% if saved_address and saved_address.address %} readonly {% endif %}>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="billing-first-name">First Name</label>
                                 <input type="text" id="billing-first-name" name="billing-first-name"
                                     placeholder="First Name"
-                                    value="{% if user.is_authenticated %}{{ user.first_name }}{% endif %}" required>
+                                    value="{% if saved_address.first_name %}{{ saved_address.first_name }}{% elif user.is_authenticated %}{{ user.first_name }}{% endif %}"
+                                    required {% if saved_address and saved_address.address %} readonly {% endif %}>
                             </div>
                             <div class="form-group">
                                 <label for="billing-last-name">Last Name</label>
                                 <input type="text" id="billing-last-name" name="billing-last-name"
                                     placeholder="Last Name"
-                                    value="{% if user.is_authenticated %}{{ user.last_name }}{% endif %}" required>
+                                    value="{% if saved_address.last_name %}{{ saved_address.last_name }}{% elif user.is_authenticated %}{{ user.last_name }}{% endif %}"
+                                    required {% if saved_address and saved_address.address %} readonly {% endif %}>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="billing-address">Address</label>
                             <input type="text" id="billing-address" name="billing-address" placeholder="Street address"
-                                required>
+                                value="{{ saved_address.address|default:'' }}" required {% if saved_address and saved_address.address %} readonly {% endif %}>
                         </div>
                         <div class="form-group">
                             <label for="billing-apartment" class="visually-hidden">Apartment, suite, etc.
                                 (optional)</label>
                             <input type="text" id="billing-apartment" name="billing-apartment"
-                                placeholder="Apartment, suite, etc. (optional)">
+                                placeholder="Apartment, suite, etc. (optional)" {% if saved_address and saved_address.address %} readonly {% endif %}>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="billing-city">City</label>
-                                <input type="text" id="billing-city" name="billing-city" placeholder="City" required>
+                                <input type="text" id="billing-city" name="billing-city" placeholder="City"
+                                    value="{{ saved_address.city|default:'' }}" required {% if saved_address and saved_address.address %} readonly {% endif %}>
                             </div>
                             <div class="form-group">
                                 <label for="billing-state" id="billing-state-label">State / Province</label>
                                 <input type="text" id="billing-state" name="billing-state"
-                                    placeholder="State / Province" required>
+                                    placeholder="State / Province" required value="{{ saved_address.state|default:'' }}"
+                                    {% if saved_address and saved_address.address %} readonly {% endif %}>
                             </div>
                             <div class="form-group">
                                 <label for="billing-postal" id="billing-postal-label">Postal Code</label>
                                 <input type="text" id="billing-postal" name="billing-postal" placeholder="Postal Code"
                                     required maxlength="10"
                                     pattern="^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$|^\d{5}(-\d{4})?$"
-                                    title="Enter a valid Canadian (A1A 1A1) or US (12345 or 12345-6789) postal/zip code">
+                                    title="Enter a valid Canadian (A1A 1A1) or US (12345 or 12345-6789) postal/zip code"
+                                    value="{{ saved_address.pincode|default:'' }}" {% if saved_address and saved_address.address %} readonly {% endif %}>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="billing-country">Country</label>
-                            <select id="billing-country" name="billing-country" required>
-                                <option value="CA">Canada</option>
-                                <option value="US">United States</option>
+                            <select id="billing-country" name="billing-country" required {% if saved_address and saved_address.address %} disabled {% endif %}>
+                                <option value="CA" {% if saved_address.country == 'CA' %}selected{% endif %}>Canada
+                                </option>
+                                <option value="US" {% if saved_address.country == 'US' %}selected{% endif %}>United States
+                                </option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="billing-phone">Phone</label>
-                            <input type="tel" id="billing-phone" name="billing-phone" placeholder="Phone number"
-                                inputmode="numeric">
+                            <input type="tel" id="billing-phone" name="billing-phone" placeholder="Phone number" required
+                                inputmode="numeric" value="{{ saved_address.phone|default:'' }}" {% if saved_address and saved_address.address %} readonly {% endif %}>
                         </div>
 
                         <div class="billing-actions">
@@ -367,7 +387,7 @@
     </script>
 
     <script>
-window.isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+        window.isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
     </script>
 
     <script>
@@ -393,6 +413,81 @@ window.isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
             border: 0;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var changeBtn = document.getElementById('change-address-btn');
+            var saveBtn = document.getElementById('save-address-btn');
+            var form = document.getElementById('billing-address-form');
+            var countrySelect = document.getElementById('billing-country');
+
+            // --- Change Address Logic ---
+            if (changeBtn) {
+                changeBtn.addEventListener('click', function () {
+                    if (!form) return;
+
+                    // Enable all inputs
+                    var inputs = form.querySelectorAll('input');
+                    inputs.forEach(function (input) {
+                        input.removeAttribute('readonly');
+                    });
+
+                    // Enable selects (especially Country)
+                    var selects = form.querySelectorAll('select');
+                    selects.forEach(function (select) {
+                        select.removeAttribute('disabled');
+                    });
+
+                    // Hide Change, Show Save
+                    this.style.display = 'none';
+                    if (saveBtn) saveBtn.style.display = 'inline-block';
+
+                    // Focus on first input
+                    var firstInput = form.querySelector('input:not([type="hidden"])');
+                    if (firstInput) firstInput.focus();
+                });
+            }
+
+            // --- Save Address Logic (Client-Side Only) ---
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function () {
+                    if (!form) return;
+
+                    // Validate form
+                    if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
+                    }
+
+                    // Disable inputs (make readonly)
+                    var inputs = form.querySelectorAll('input');
+                    inputs.forEach(function (input) {
+                        input.setAttribute('readonly', true);
+                    });
+
+                    // Disable selects
+                    var selects = form.querySelectorAll('select');
+                    selects.forEach(function (select) {
+                        select.setAttribute('disabled', true);
+                    });
+
+                    // Hide Save, Show Change
+                    this.style.display = 'none';
+                    if (changeBtn) changeBtn.style.display = 'inline-block';
+                });
+            }
+
+            // --- Fix for Country Dropdown / Region Logic ---
+            // Ensure that when we are in "Change" mode (dropdown enabled), 
+            // external logic (like region selector) triggers correctly update the dropdown if needed,
+            // BUT we must allow the user to manually change it too.
+            // The key issue "dropdown works only the first time" implies state wasn't resetting correctl or 
+            // logic in checkout.js was guarding it.
+            // By properly removing 'disabled' attribute, it should work. 
+            // We also need to ensure that when we click "Save" and disable it, the value is preserved.
+
+            // Important: checkout.js reads countrySelect.value. If it's disabled, .value property is still valid in DOM.
+        });
+    </script>
 </body>
 
 </html>

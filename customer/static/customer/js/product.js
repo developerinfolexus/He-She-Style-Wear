@@ -1,15 +1,55 @@
 document.addEventListener("DOMContentLoaded", () => {
     // --- Constants ---
-    const CART_KEY = "he_she_cart";
-    const WISHLIST_KEY = "he_she_wishlist";
-    const REVIEWS_KEY = "he_she_reviews"; // <<< Key for reviews
-    const SELECTED_REGION_KEY = "he_she_selected_region"; // Key to store selected region
+    var CART_KEY = "he_she_cart";
+    var WISHLIST_KEY = "he_she_wishlist";
+    var REVIEWS_KEY = "he_she_reviews"; // <<< Key for reviews
+    var SELECTED_REGION_KEY = "he_she_selected_region"; // Key to store selected region
 
     // --- Exchange Rates & Currency Symbols (Prices stored in USD) ---
-    const EXCHANGE_RATES = {
+    var EXCHANGE_RATES = EXCHANGE_RATES || {
         ca: { rate: 1.33, symbol: "CA$" }, // USD to CAD (1 USD = 1.33 CAD)
         us: { rate: 1.0, symbol: "US$" }   // USD to USD (no conversion)
     };
+
+    // --- Global Storage Key Helpers (Delegate to index.js logic) ---
+    function getWishlistKey() {
+        return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(WISHLIST_KEY) : WISHLIST_KEY;
+    }
+    function getCartKey() {
+        return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(CART_KEY) : CART_KEY;
+    }
+
+    // --- Helper Functions to Access Storage ---
+    function getWishlist() {
+        try {
+            const list = JSON.parse(localStorage.getItem(getWishlistKey())) || [];
+            return Array.isArray(list) ? list.filter(item => item && item.id) : [];
+        } catch (e) {
+            console.error("Error parsing wishlist:", e);
+            return [];
+        }
+    }
+    function getCart() {
+        try {
+            const list = JSON.parse(localStorage.getItem(getCartKey())) || [];
+            return Array.isArray(list) ? list.filter(item => item && item.id) : [];
+        } catch (e) {
+            console.error("Error parsing cart:", e);
+            return [];
+        }
+    }
+    function saveCart(cart) {
+        localStorage.setItem(getCartKey(), JSON.stringify(cart));
+        // Also update header counts via index.js functions if available
+        if (typeof updateCartCount === 'function') updateCartCount();
+    }
+
+    // --- Legacy Helper: Calculate cart total items ---
+    function getMainProductCartId() {
+        // This logic depends on the product implementation details
+        // For now, simpler to just access cart directly
+        return null;
+    }
 
 
     const originalAllProductsUSD = [
@@ -218,6 +258,273 @@ document.addEventListener("DOMContentLoaded", () => {
         return convertDisplayedToUsd(priceDisplayedStr, region);
     }
 
+    // --- Added to Cart Confirmation Popup ---
+    function showAddedToCartPopup() {
+        console.log('DEBUG: showAddedToCartPopup called');
+
+        // Remove existing modal if any
+        const existingModal = document.getElementById('added-to-cart-modal');
+        if (existingModal) existingModal.remove();
+
+        // Create modal HTML
+        const modalHTML = `
+            <div id="added-to-cart-modal" class="custom-alert-overlay">
+                <div class="custom-alert-box added-to-cart-box">
+                    <div class="custom-alert-header">
+                        <div class="success-icon-circle">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h3>Success!</h3>
+                    </div>
+                    <div class="custom-alert-body">
+                        <p>Item added to your cart successfully.</p>
+                    </div>
+                    <div class="custom-alert-footer vertical-actions">
+                        <button class="custom-alert-btn primary-btn" id="popup-go-to-cart">Go to Cart</button>
+                        <button class="custom-alert-btn secondary-btn" id="popup-continue-shopping">Continue Shopping</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Inject styles if not already present (extending custom-alert-styles)
+        if (!document.getElementById('added-to-cart-styles')) {
+            const styles = document.createElement('style');
+            styles.id = 'added-to-cart-styles';
+            styles.textContent = `
+                /* Base modal overlay styles */
+                .custom-alert-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 999999;
+                    opacity: 1;
+                }
+                .custom-alert-box {
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                    min-width: 320px;
+                    max-width: 400px;
+                    overflow: hidden;
+                    transform: scale(1);
+                    animation: popupScaleIn 0.2s ease forwards;
+                }
+                @keyframes popupScaleIn {
+                    from { transform: scale(0.9); opacity: 0; }
+                    to { transform: scale(1); opacity: 1; }
+                }
+                .custom-alert-header {
+                    padding: 20px 24px 16px;
+                }
+                .custom-alert-header h3 {
+                    margin: 0;
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #333;
+                }
+                .custom-alert-body {
+                    padding: 10px 24px 24px;
+                }
+                .custom-alert-body p {
+                    margin: 0;
+                    font-size: 15px;
+                    line-height: 1.5;
+                    color: #666;
+                }
+                .custom-alert-btn {
+                    padding: 12px 24px;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+                /* Added to cart specific styles */
+                .added-to-cart-box {
+                    text-align: center;
+                    padding-bottom: 30px;
+                }
+                .success-icon-circle {
+                    width: 50px;
+                    height: 50px;
+                    background-color: #27ae60;
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    margin: 0 auto 15px;
+                }
+                .vertical-actions {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: stretch;
+                    padding: 0 40px 30px;
+                }
+                .primary-btn {
+                    background-color: #000;
+                    color: white;
+                    border: 1px solid #000;
+                }
+                .primary-btn:hover {
+                    background-color: #333;
+                }
+                .secondary-btn {
+                    background-color: white;
+                    color: #333;
+                    border: 1px solid #ccc;
+                }
+                .secondary-btn:hover {
+                    background-color: #f5f5f5;
+                    border-color: #bbb;
+                }
+                @media (max-width: 480px) {
+                    .vertical-actions {
+                        padding: 0 20px 25px;
+                    }
+                }
+            `;
+            document.head.appendChild(styles);
+        }
+
+        // Add modal to page
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Get modal elements
+        const modal = document.getElementById('added-to-cart-modal');
+        const goToCartBtn = document.getElementById('popup-go-to-cart');
+        const continueBtn = document.getElementById('popup-continue-shopping');
+
+        // Close modal function
+        const closeModal = () => {
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 200);
+        };
+
+        // Event listeners
+        goToCartBtn.addEventListener('click', () => {
+            window.location.href = '/cart/';
+        });
+
+        continueBtn.addEventListener('click', closeModal);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // Close on Escape key
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+
+        // Focus on "Go to Cart" button for accessibility
+        setTimeout(() => goToCartBtn.focus(), 100);
+    }
+
+    // --- Removed from Cart Confirmation Popup ---
+    function showRemovedFromCartPopup() {
+        console.log('DEBUG: showRemovedFromCartPopup called');
+
+        // Remove existing modal if any
+        const existingModal = document.getElementById('removed-from-cart-modal');
+        if (existingModal) existingModal.remove();
+
+        // Create modal HTML
+        const modalHTML = `
+            <div id="removed-from-cart-modal" class="custom-alert-overlay">
+                <div class="custom-alert-box removed-from-cart-box">
+                    <div class="custom-alert-header">
+                        <div class="remove-icon-circle">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                        <h3>Removed!</h3>
+                    </div>
+                    <div class="custom-alert-body">
+                        <p>Item has been removed from your cart.</p>
+                    </div>
+                    <div class="custom-alert-footer single-action">
+                        <button class="custom-alert-btn primary-btn" id="popup-continue-after-remove">Continue Shopping</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Inject styles if not already present
+        if (!document.getElementById('removed-from-cart-styles')) {
+            const styles = document.createElement('style');
+            styles.id = 'removed-from-cart-styles';
+            styles.textContent = `
+                .removed-from-cart-box {
+                    text-align: center;
+                    padding-bottom: 30px;
+                }
+                .remove-icon-circle {
+                    width: 50px;
+                    height: 50px;
+                    background-color: #e74c3c;
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 22px;
+                    margin: 0 auto 15px;
+                }
+                .single-action {
+                    display: flex;
+                    justify-content: center;
+                    padding: 0 40px 30px;
+                }
+            `;
+            document.head.appendChild(styles);
+        }
+
+        // Add modal to page
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Get modal elements
+        const modal = document.getElementById('removed-from-cart-modal');
+        const continueBtn = document.getElementById('popup-continue-after-remove');
+
+        // Close modal function
+        const closeModal = () => {
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 200);
+        };
+
+        // Event listeners
+        continueBtn.addEventListener('click', closeModal);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // Close on Escape key
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+
+        // Focus on button for accessibility
+        setTimeout(() => continueBtn.focus(), 100);
+    }
+
 
     // But wait until DOM is ready to access elements
     const pathParts = window.location.pathname.split('/').filter(p => p);
@@ -340,6 +647,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.addEventListener('regionChanged', () => {
                         updateDisplayedPrices();
                         updateSearchPopupPrices();
+                    });
+
+                    // Listen for user identification
+                    document.addEventListener('userIdentified', () => {
+                        console.log("Product Page: User identified, refreshing header counts...");
+                        updateCartCount();
+                        updateWishlistCount();
                     });
                 } else {
                     console.error('No products found in API response');
@@ -591,10 +905,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // --- Helper Functions ---
-    function getWishlist() { return JSON.parse(localStorage.getItem(WISHLIST_KEY)) || []; }
+    function getCartKey() {
+        return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(CART_KEY) : CART_KEY;
+    }
+    function getWishlistKey() {
+        return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(WISHLIST_KEY) : WISHLIST_KEY;
+    }
+    function getReviewsKey() {
+        return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(REVIEWS_KEY) : REVIEWS_KEY;
+    }
+
+    function getWishlist() { return JSON.parse(localStorage.getItem(getWishlistKey())) || []; }
     function getCart() {
         try {
-            const cartStr = localStorage.getItem(CART_KEY);
+            const cartStr = localStorage.getItem(getCartKey());
             const cart = JSON.parse(cartStr || '[]');
             return Array.isArray(cart) ? cart : [];
         } catch (e) {
@@ -645,14 +969,20 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const cartStr = JSON.stringify(validatedCart);
-            localStorage.setItem(CART_KEY, cartStr);
+            localStorage.setItem(getCartKey(), cartStr);
             // Verify immediately
             const verify = getCart();
             console.log('saveCart (product.js): Verification - cart now has', verify.length, 'items');
 
-            // Also save to sessionStorage as backup
-            sessionStorage.setItem('cart_backup', cartStr);
-            console.log('saveCart (product.js): Also saved to sessionStorage backup');
+            // Also save to sessionStorage as backup (or clear if empty)
+            // NOTE: Do NOT clear buy_now_item here - it's independent of regular cart
+            if (validatedCart.length === 0) {
+                sessionStorage.removeItem('cart_backup');
+                console.log('saveCart (product.js): Cart is empty, cleared cart_backup');
+            } else {
+                sessionStorage.setItem('cart_backup', cartStr);
+                console.log('saveCart (product.js): Also saved to sessionStorage backup');
+            }
 
             // If we clamped quantities, surface a transient message for the user
             if (clamped) {
@@ -663,20 +993,32 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     function getReviews() {
-        try { const stored = localStorage.getItem(REVIEWS_KEY); return stored ? JSON.parse(stored) : []; }
-        catch (e) { console.error("Error parsing reviews:", e); localStorage.removeItem(REVIEWS_KEY); return []; }
+        try { const stored = localStorage.getItem(getReviewsKey()); return stored ? JSON.parse(stored) : []; }
+        catch (e) { console.error("Error parsing reviews:", e); localStorage.removeItem(getReviewsKey()); return []; }
     }
-    function saveReviews(reviews) { localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); }
+    function saveReviews(reviews) { localStorage.setItem(getReviewsKey(), JSON.stringify(reviews)); }
 
     // --- Header Count Updates ---
     function updateWishlistCount() {
-        const count = getWishlist().length; const el = document.getElementById("wishlistCount");
+        const count = getWishlist().length;
+        const el = document.getElementById("wishlistCount");
+        console.log("updateWishlistCount called. Count:", count, "Element found:", !!el);
         if (el) { el.textContent = count; el.style.display = count > 0 ? "flex" : "none"; }
     }
     function updateCartCount() {
-        const cart = getCart(); const total = cart.reduce((s, i) => s + (i.quantity || 0), 0);
-        const el = document.getElementById("cartCount"); if (el) { el.textContent = total; el.style.display = total > 0 ? "flex" : "none"; }
+        const cart = getCart();
+        const total = cart.reduce((s, i) => s + (i.quantity || 0), 0);
+        const el = document.getElementById("cartCount");
+        console.log("updateCartCount called. Total:", total, "Element found:", !!el);
+        if (el) { el.textContent = total; el.style.display = total > 0 ? "flex" : "none"; }
     }
+
+    // Listen for header loaded event (registered immediately so it catches the event)
+    document.addEventListener('headerLoaded', () => {
+        console.log("Product Page: Header loaded, refreshing counts...");
+        updateCartCount();
+        updateWishlistCount();
+    });
 
     // --- Wishlist Update Logic ---
     function updateWishlist(productData, isAdding) {
@@ -691,7 +1033,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isAdding) { if (!list.some(item => item.id === itemToStore.id)) list.push(itemToStore); }
         else { list = list.filter(item => item.id !== itemToStore.id); }
 
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+        localStorage.setItem(getWishlistKey(), JSON.stringify(list));
         updateWishlistCount();
     }
 
@@ -805,15 +1147,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Generate Sale/New Labels ---
-  function generateLabelsHTML(product) {
-    // Explicitly ignore NEW label everywhere
-    if (product.onSale) {
-        return `<div class="product-labels">
+    function generateLabelsHTML(product) {
+        // Explicitly ignore NEW label everywhere
+        if (product.onSale) {
+            return `<div class="product-labels">
                     <span class="product-label-sale">SALE</span>
                 </div>`;
+        }
+        return '';
     }
-    return '';
-}
 
 
 
@@ -895,10 +1237,29 @@ document.addEventListener("DOMContentLoaded", () => {
         const showSizes = product.size_data && Object.keys(product.size_data).length > 0;
         let selSize = 'N/A';
         const qtyDisplay = document.getElementById('pdp-quantity'); // This is now an input
-        if (showSizes) { const sel = document.querySelector('.size-option.selected'); if (!sel) { cartBtn.textContent = "ADD TO CART"; cartBtn.classList.remove('in-cart'); if (qtyDisplay) qtyDisplay.value = 1; return; } selSize = sel.textContent; }
-        const cart = getCart(); const item = cart.find(i => i.id === product.id && i.size === selSize);
-        if (item) { cartBtn.textContent = "REMOVE FROM CART"; cartBtn.classList.add('in-cart'); if (qtyDisplay) qtyDisplay.value = item.quantity || 1; }
-        else { cartBtn.textContent = "ADD TO CART"; cartBtn.classList.remove('in-cart'); if (qtyDisplay) qtyDisplay.value = 1; }
+        if (showSizes) {
+            const sel = document.querySelector('.size-option.selected');
+            if (!sel) {
+                cartBtn.textContent = "ADD TO CART";
+                cartBtn.classList.remove('in-cart');
+                if (qtyDisplay) qtyDisplay.value = 1;
+                return;
+            }
+            // Use dataset.size if available, otherwise textContent
+            selSize = (sel.dataset.size && sel.dataset.size.trim() !== '') ? sel.dataset.size.trim() : sel.textContent.trim();
+        }
+        const cart = getCart();
+        const item = cart.find(i => i.id === product.id && i.size === selSize);
+        console.log('DEBUG updateCartButtonState: selSize =', selSize, ', item found =', !!item, ', cart =', cart);
+        if (item) {
+            cartBtn.textContent = "REMOVE FROM CART";
+            cartBtn.classList.add('in-cart');
+            if (qtyDisplay) qtyDisplay.value = item.quantity || 1;
+        } else {
+            cartBtn.textContent = "ADD TO CART";
+            cartBtn.classList.remove('in-cart');
+            if (qtyDisplay) qtyDisplay.value = 1;
+        }
     };
 
     // --- Setup Size Chart Modal Logic ---
@@ -1047,14 +1408,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // --- AUTO-SELECT FIRST AVAILABLE SIZE BUTTON ---
-
-        setTimeout(() => {
-            const firstAvailableBtn = document.querySelector(".size-option:not(.disabled)");
-            if (firstAvailableBtn) {
-                firstAvailableBtn.click();  // 👈 Triggers same logic as user click
-            }
-        }, 100);
+        // NOTE: Auto-select logic moved to setupPDPInteractivity() to run after DOM is ready
 
         const currentRegion = getSelectedRegion(); // Get region for formatting
 
@@ -1062,16 +1416,15 @@ document.addEventListener("DOMContentLoaded", () => {
         let sizeData = product.size_data; // 👉 Comes from backend
 
         // Determine if sizes should be shown
-        // MODIFIED: If we have size data with valid stock/prices, show it.
-        // This allows Sarees, Hoodies, etc. to all show sizes if configured.
-        const showSizes = sizeData && Object.keys(sizeData).length > 0;
+        if (sizeData) sizes = Object.keys(sizeData);
 
-        if (showSizes) {
-            sizes = Object.keys(sizeData); // Use real sizes
-        }
+        // Check if "Free Size" is the only option
+        const isFreeSize = sizes.length === 1 && sizes[0].trim().toLowerCase() === 'free size';
+        const showSizes = sizes.length > 0; // Fix ReferenceError
 
-        const sizeHTML = (sizeData && Object.keys(sizeData).length > 0) ? `
-<div class="size-selector">
+        // MODIFIED: If Free Size, we still render buttons (so auto-select works) but hide the UI.
+        const sizeHTML = (sizes.length > 0) ? `
+<div class="size-selector" style="${isFreeSize ? 'display:none!important;' : ''}">
     <h3>Select Size:</h3>
     <div class="size-options">
         ${Object.entries(sizeData).map(([size, data]) => `
@@ -1088,11 +1441,10 @@ document.addEventListener("DOMContentLoaded", () => {
             </button>
         `).join('')}
     </div>
-    <p id="price-display"></p>
-    <p id="stock-display"></p>
     <input type="hidden" id="selected-size">
     <input type="hidden" id="selected-price">
 </div>
+<p id="stock-display" class="stock-status-display"></p>
 ` : '';
         // --- MODIFICATION: Calculate review data here ---
         const initialRevs = getReviews().filter(r => r.productId === productId);
@@ -1212,18 +1564,31 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${generateLabelsHTML(product)}
                     
                     <div class="product-price"> 
-                        ${product.discount_price && parseFloat(product.discount_price) > 0
-                ? `<div class="price-top-line">
-                       <span class="current-price">${formatCurrency(convertInrToTargetCurrency(product.price, currentRegion), currentRegion)}</span>
-                   </div>
-                   <div class="price-bottom-line">
-                       <span class="original-price">${formatCurrency(product.regularPriceConverted, currentRegion)}</span>
-                       <span class="discount-badge">(${Math.round((1 - (parseFloat(product.price) / parseFloat(product.regularPriceConverted || product.price))) * 100)}% OFF)</span>
-                   </div>`
-                : `<div class="price-top-line">
-                       <span class="current-price">${formatCurrency(convertInrToTargetCurrency(product.price, currentRegion), currentRegion)}</span>
-                   </div>`
-            }
+                        ${(() => {
+                const hasDiscount = product.discount_price && parseFloat(product.discount_price) > 0;
+                const priceVal = parseFloat(product.price || 0);
+                const discountPriceVal = hasDiscount ? parseFloat(product.discount_price) : 0;
+
+                const regularPriceConv = convertInrToTargetCurrency(priceVal, currentRegion);
+                const discountPriceConv = convertInrToTargetCurrency(discountPriceVal, currentRegion);
+
+                if (hasDiscount) {
+                    const discountPercent = Math.round((1 - (discountPriceVal / priceVal)) * 100);
+                    return `
+                                <div class="price-top-line">
+                                    <span class="current-price">${formatCurrency(discountPriceConv, currentRegion)}</span>
+                                </div>
+                                <div class="price-bottom-line">
+                                    <span class="original-price">${formatCurrency(regularPriceConv, currentRegion)}</span>
+                                    <span class="discount-badge">(${discountPercent}% OFF)</span>
+                                </div>`;
+                } else {
+                    return `
+                                <div class="price-top-line">
+                                   <span class="current-price">${formatCurrency(regularPriceConv, currentRegion)}</span>
+                               </div>`;
+                }
+            })()}
                     </div>
                    
                     ${generateRatingHTML(initialAvg, product.id)}
@@ -1647,7 +2012,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 newCartBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    console.log('Add to Cart clicked');
+                    e.stopPropagation(); // Stop event from bubbling up
+                    console.log('Add to Cart clicked - preventing default and propagation');
 
                     let size = 'N/A';
                     const qty = parseInt(qtyDisp?.value || '1');
@@ -1690,6 +2056,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     let cart = getCart();
                     const idx = cart.findIndex(i => i.id === product.id && i.size === size);
                     const isAdding = !newCartBtn.classList.contains('in-cart');
+                    console.log('DEBUG Add to Cart: isAdding =', isAdding, ', hasInCartClass =', newCartBtn.classList.contains('in-cart'));
 
                     // Use size-specific price if available, otherwise use product price
                     // Prices are stored in USD, so no conversion needed
@@ -1746,13 +2113,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     updateCartButtonState();
                     renderCartItems();
 
-                    // Show feedback
+                    // Show confirmation popup
+                    console.log('DEBUG: About to check isAdding for popup. isAdding =', isAdding);
                     if (isAdding) {
-                        const originalText = newCartBtn.textContent;
-                        newCartBtn.textContent = 'ADDED TO CART!';
-                        setTimeout(() => {
-                            newCartBtn.textContent = originalText;
-                        }, 1000);
+                        console.log('DEBUG: Calling showAddedToCartPopup NOW');
+                        showAddedToCartPopup();
+                    } else {
+                        console.log('DEBUG: Calling showRemovedFromCartPopup NOW');
+                        showRemovedFromCartPopup();
                     }
                 });
             } else {
@@ -1877,86 +2245,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log('Buy Now: Cart item price field:', cartItem.price);
                     console.log('Buy Now: Cart item discount_price field:', cartItem.discount_price);
 
-                    if (idx === -1) {
-                        cart.push(cartItem);
-                        console.log('Buy Now: Added product to cart:', cartItem);
-                    } else {
-                        // Merge and ensure stock is present/updated
-                        cart[idx] = { ...cart[idx], ...cartItem, quantity: qty, stock: cartItem.stock };
-                        console.log('Buy Now: Updated existing cart item quantity:', qty);
-                    }
+                    // --- BUY NOW FIX: Store ONLY this item for checkout, don't add to regular cart ---
+                    // Store the Buy Now item in sessionStorage for exclusive checkout
+                    sessionStorage.setItem('buy_now_item', JSON.stringify(cartItem));
+                    console.log('Buy Now: Stored item in sessionStorage for exclusive checkout');
 
-                    saveCart(cart);
-                    console.log('Buy Now: Cart saved to localStorage. Cart items:', cart.length);
-
-                    // Verify cart was saved - check multiple times
-                    let verifyAttempts = 0;
-                    const maxVerifyAttempts = 5;
-                    const verifyInterval = setInterval(() => {
-                        verifyAttempts++;
-                        const verifyCart = getCart();
-                        console.log(`Buy Now: Verification attempt ${verifyAttempts}:`, verifyCart.length, 'items');
-                        console.log('Buy Now: Verification cart contents:', JSON.stringify(verifyCart));
-
-                        if (verifyCart.length > 0 || verifyAttempts >= maxVerifyAttempts) {
-                            clearInterval(verifyInterval);
-                            if (verifyCart.length === 0) {
-                                console.error('Buy Now: Cart verification failed - cart is empty after save!');
-                            }
-                        }
-                    }, 50);
-
-                    // Force sync localStorage multiple times
-                    if (typeof Storage !== 'undefined') {
-                        for (let i = 0; i < 3; i++) {
-                            localStorage.setItem(CART_KEY, JSON.stringify(cart));
-                            const syncCheck = localStorage.getItem(CART_KEY);
-                            console.log(`Buy Now: Sync check ${i + 1} - localStorage contains:`, syncCheck);
-                            if (syncCheck && syncCheck !== '[]') {
-                                break;
-                            }
-                        }
-                    }
-
-                    updateCartCount();
-                    renderCartItems();
-
-                    // Increased delay to ensure localStorage is fully saved before redirect
-                    setTimeout(() => {
-                        // Double-check cart before redirect
-                        const finalCheck = getCart();
-                        console.log('Buy Now: Final cart check before redirect:', finalCheck.length, 'items');
-                        console.log('Buy Now: Final cart contents:', JSON.stringify(finalCheck));
-
-                        if (finalCheck.length === 0) {
-                            console.error('Buy Now: Cart is empty! Not redirecting.');
-                            alert('Error: Cart is empty. Please try again.');
-                            return;
-                        }
-
-                        // Verify final cart item has all required fields
-                        const finalCartItem = finalCheck[0];
-                        if (!finalCartItem.id || !finalCartItem.name || !finalCartItem.price) {
-                            console.error('Buy Now: Cart item missing required fields:', finalCartItem);
-                            alert('Error: Cart item is incomplete. Please try again.');
-                            return;
-                        }
-
-                        // Store cart in sessionStorage as backup MULTIPLE times
-                        for (let i = 0; i < 3; i++) {
-                            sessionStorage.setItem('cart_backup', JSON.stringify(finalCheck));
-                            const backupVerify = sessionStorage.getItem('cart_backup');
-                            console.log(`Buy Now: Backup ${i + 1} - sessionStorage contains:`, backupVerify);
-                            if (backupVerify && backupVerify !== '[]') {
-                                break;
-                            }
-                        }
-                        console.log('Buy Now: Cart backed up to sessionStorage');
-
-                        // Redirect to checkout - use Django URL pattern
-                        console.log('Buy Now: Redirecting to checkout...');
-                        window.location.href = '/checkout/';
-                    }, 500); // Increased delay to 500ms
+                    // Redirect to checkout immediately
+                    console.log('Buy Now: Redirecting to checkout...');
+                    window.location.href = '/checkout/';
                 });
             } else {
                 console.warn('Buy Now button or product not found:', { buyBtn: !!buyBtn, product: !!product });
@@ -1990,7 +2286,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                     // Save & update header count
-                    localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
+                    localStorage.setItem(getWishlistKey(), JSON.stringify(wishlist));
                     updateWishlistCount();
 
                     // ❌ Removed redirect — stays on product page
@@ -2026,6 +2322,112 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
             // --- END MODIFICATION ---
+
+            // --- AUTO-SELECT AND FREE SIZE HANDLING ---
+            // Check if product has Free Size (only one size and it's "Free Size")
+            const sizeData = product?.size_data;
+            const sizeKeys = sizeData ? Object.keys(sizeData) : [];
+            const isFreeSize = sizeKeys.length === 1 && sizeKeys[0].trim().toLowerCase() === 'free size';
+
+            if (isFreeSize) {
+                // For Free Size products: directly display stock, price, discount, sale label on page load
+                const freeSizeData = sizeData[sizeKeys[0]];
+                const stockDisplay = document.getElementById('stock-display');
+                const priceDisplay = document.getElementById('price-display');
+                const selectedSizeInput = document.getElementById('selected-size');
+                const selectedPriceInput = document.getElementById('selected-price');
+                const qtyInput = document.getElementById('pdp-quantity');
+
+                // Set hidden inputs for cart/buy operations
+                if (selectedSizeInput) selectedSizeInput.value = sizeKeys[0];
+                if (selectedPriceInput) selectedPriceInput.value = freeSizeData.discounted_price || freeSizeData.price;
+
+                // Display stock
+                if (stockDisplay) {
+                    const stock = parseInt(freeSizeData.stock || 0, 10);
+                    if (stock <= 0) {
+                        stockDisplay.textContent = 'Out of Stock';
+                        stockDisplay.style.color = '#e74c3c';
+                    } else if (stock <= 5) {
+                        stockDisplay.textContent = `Only ${stock} left`;
+                        stockDisplay.style.color = '#e67e22';
+                    } else {
+                        stockDisplay.textContent = `${stock} left`;
+                        stockDisplay.style.color = '#27ae60';
+                    }
+                    // Set max quantity
+                    if (qtyInput) qtyInput.max = stock > 0 ? stock : 1;
+                }
+
+                // Display price with discount if applicable
+                const currentRegion = (typeof getSelectedRegion === 'function') ? getSelectedRegion() : 'ca';
+                const priceINR = parseFloat(freeSizeData.price) || 0;
+                const discountPercent = parseInt(freeSizeData.discount || 0, 10);
+                const storedDiscountedPrice = parseFloat(freeSizeData.discounted_price);
+
+                let finalPriceINR = priceINR;
+                if (!isNaN(storedDiscountedPrice) && storedDiscountedPrice > 0) {
+                    finalPriceINR = storedDiscountedPrice;
+                } else if (discountPercent > 0) {
+                    finalPriceINR = priceINR - (priceINR * discountPercent / 100);
+                }
+
+                const convertedOriginal = (typeof convertInrToTargetCurrency === 'function') ? convertInrToTargetCurrency(priceINR, currentRegion) : priceINR;
+                const formattedOriginal = (typeof formatCurrency === 'function') ? formatCurrency(convertedOriginal, currentRegion) : `₹${convertedOriginal}`;
+                const convertedFinal = (typeof convertInrToTargetCurrency === 'function') ? convertInrToTargetCurrency(finalPriceINR, currentRegion) : finalPriceINR;
+                const formattedFinal = (typeof formatCurrency === 'function') ? formatCurrency(convertedFinal, currentRegion) : `₹${convertedFinal}`;
+
+                // Update main price display
+                const mainPriceContainer = document.querySelector('.product-info-section .product-price');
+                if (mainPriceContainer) {
+                    if (discountPercent > 0) {
+                        mainPriceContainer.innerHTML = `
+                            <div class="price-top-line">
+                                <span class="current-price">${formattedFinal}</span>
+                            </div>
+                            <div class="price-bottom-line">
+                                <span class="original-price">${formattedOriginal}</span>
+                                <span class="discount-badge">(${discountPercent}% OFF)</span>
+                            </div>`;
+                    }
+                }
+
+                // Update sale label if exists
+                const isSale = freeSizeData.is_sale === true || freeSizeData.is_sale === 'true';
+                const saleLabel = freeSizeData.sale_label || 'SALE';
+                if (isSale) {
+                    const titleHeader = document.querySelector('.product-title-header');
+                    let labelsContainer = document.querySelector('.product-labels');
+                    if (!labelsContainer && titleHeader) {
+                        labelsContainer = document.createElement('div');
+                        labelsContainer.className = 'product-labels';
+                        titleHeader.insertAdjacentElement('afterend', labelsContainer);
+                    }
+                    if (labelsContainer) {
+                        // Check if NEW label exists, preserve it
+                        const hasNew = labelsContainer.querySelector('.product-label-new');
+                        let content = hasNew ? '<span class="product-label-new">NEW</span>' : '';
+                        content += `<span class="product-label-sale">${saleLabel}</span>`;
+                        labelsContainer.innerHTML = content;
+                        labelsContainer.style.display = 'block';
+                    }
+                }
+
+                // Mark the hidden Free Size button as selected for cart operations
+                const freeSizeBtn = document.querySelector('.size-option[data-size="Free Size"], .size-option[data-size="free size"]');
+                if (freeSizeBtn) {
+                    freeSizeBtn.classList.add('selected');
+                }
+
+                console.log('Free Size product: auto-displayed stock, price, discount, sale label');
+            } else {
+                // For normal sized products: auto-select first available size button
+                const firstAvailableBtn = document.querySelector('.size-option:not(.disabled)');
+                if (firstAvailableBtn) {
+                    firstAvailableBtn.click();  // Triggers size click handler to update stock, price, etc.
+                }
+            }
+            // --- END AUTO-SELECT AND FREE SIZE HANDLING ---
         }, 100); // Small delay to ensure DOM is ready
     }
 

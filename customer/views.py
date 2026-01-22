@@ -51,7 +51,22 @@ def get_product_detail(request, slug):
         "category": product.category or '',
         "style_fit": product.style_fit or '',
         "shipping_return": product.shipping_return or '',
-        "size_data": {
+    }
+
+    # Handle Free Size vs Standard Sizes
+    if product.sizes and 'Free Size' in product.sizes:
+        data["size_data"] = {
+            "Free Size": {
+                "price": float(product.price_s) if product.price_s is not None else None,
+                "stock": product.stock_s if product.stock_s is not None else 0,
+                "discount": product.discount_s or 0,
+                "discounted_price": float(product.discounted_price_s) if product.discounted_price_s is not None else None,
+                "is_sale": getattr(product, 'is_sale_s', False),
+                "sale_label": getattr(product, 'sale_label_s', '')
+            }
+        }
+    else:
+        data["size_data"] = {
             "S": {
                 "price": float(product.price_s) if product.price_s is not None else None,
                 "stock": product.stock_s if product.stock_s is not None else 0,
@@ -92,9 +107,9 @@ def get_product_detail(request, slug):
                 "is_sale": getattr(product, 'is_sale_xxl', False),
                 "sale_label": getattr(product, 'sale_label_xxl', '')
             },
-        },
-        "rating_data": product.get_rating_data(),
-    }
+        }
+
+    data["rating_data"] = product.get_rating_data()
 
     return JsonResponse(data)
 
@@ -981,7 +996,24 @@ def get_order_detail_api(request, order_id):
         return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
 def checkout(request):
-    return render(request, "customer/checkout.html")
+    context = {}
+    if request.user.is_authenticated:
+        try:
+            customer = Customer.objects.get(user=request.user)
+            context['saved_address'] = {
+                'first_name': customer.first_name,
+                'last_name': customer.last_name,
+                'email': customer.user.email if customer.user.email else customer.email,
+                'phone': customer.phone,
+                'address': customer.address,
+                'city': customer.city,
+                'state': customer.state,
+                'country': customer.country,
+                'pincode': customer.pincode,
+            }
+        except Customer.DoesNotExist:
+            pass
+    return render(request, "customer/checkout.html", context)
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -1438,7 +1470,8 @@ def create_order(request):
                             size_val = str(size_raw).strip().upper()
                             size_field_map = {
                                 'S': 'stock_s', 'M': 'stock_m', 'L': 'stock_l', 'XL': 'stock_xl', 'XXL': 'stock_xxl',
-                                'SMALL': 'stock_s', 'MEDIUM': 'stock_m', 'LARGE': 'stock_l', 'EXTRA LARGE': 'stock_xl', '2XL': 'stock_xxl'
+                                'SMALL': 'stock_s', 'MEDIUM': 'stock_m', 'LARGE': 'stock_l', 'EXTRA LARGE': 'stock_xl', '2XL': 'stock_xxl',
+                                'FREE SIZE': 'stock_s', 'FREESIZE': 'stock_s', 'FREE': 'stock_s'  # Free Size uses stock_s
                             }
                             field_name = size_field_map.get(size_val)
                             
@@ -2138,7 +2171,7 @@ def cancel_order_api(request):
                 
                 # Restore stock based on size
                 if size:
-                    size_upper = size.upper()
+                    size_upper = size.upper().strip()
                     if size_upper == 'S' and hasattr(product, 'stock_s'):
                         product.stock_s = (product.stock_s or 0) + quantity_to_restore
                     elif size_upper == 'M' and hasattr(product, 'stock_m'):
@@ -2149,6 +2182,9 @@ def cancel_order_api(request):
                         product.stock_xl = (product.stock_xl or 0) + quantity_to_restore
                     elif size_upper == 'XXL' and hasattr(product, 'stock_xxl'):
                         product.stock_xxl = (product.stock_xxl or 0) + quantity_to_restore
+                    elif size_upper in ('FREE SIZE', 'FREESIZE', 'FREE') and hasattr(product, 'stock_s'):
+                        # Free Size products use stock_s
+                        product.stock_s = (product.stock_s or 0) + quantity_to_restore
                 
                 # ALWAYS restore general stock (since it is always decremented)
                 product.stock = (product.stock or 0) + quantity_to_restore

@@ -723,25 +723,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- MODIFIED: Add delegated listeners for dynamic buttons ---
     function addDynamicButtonListeners(container) {
-        container.addEventListener('click', (e) => {
+        console.log("DEBUG: addDynamicButtonListeners called on container:", container);
+        
+        // Remove existing listener before adding new one to prevent duplicates
+        container.removeEventListener('click', container._orderClickHandler);
+        
+        container._orderClickHandler = (e) => {
+            console.log("DEBUG: Click event fired, target:", e.target, "classes:", e.target.className);
+            
             // Check for track button
-            if (e.target.classList.contains('track-btn')) {
+            const trackBtn = e.target.closest('.track-btn');
+            if (trackBtn) {
+                console.log("DEBUG: Track button clicked");
                 e.preventDefault(); // Prevent link navigation if button is inside <a>
-                const orderId = e.target.dataset.orderId;
-                const orderStatus = e.target.dataset.orderStatus; // Get the status
+                const orderId = trackBtn.dataset.orderId;
+                const orderStatus = trackBtn.dataset.orderStatus; // Get the status
 
                 // --- REPLACED ALERT WITH MODAL ---
                 showTrackingModal(orderId, orderStatus);
             }
             // Check for invoice button
-            if (e.target.classList.contains('invoice-btn')) {
+            const invoiceBtn = e.target.closest('.invoice-btn');
+            if (invoiceBtn) {
+                console.log("DEBUG: Invoice button clicked");
                 e.preventDefault(); // Prevent link navigation
-                const orderId = e.target.dataset.orderId;
+                const orderId = invoiceBtn.dataset.orderId;
                 alert(`Invoice for Order ${orderId} is not available.`);
             }
 
             // --- Open Review Modal ---
             if (e.target.closest('.open-review-modal-btn')) {
+                console.log("DEBUG: Review button clicked");
                 e.preventDefault();
                 const btn = e.target.closest('.open-review-modal-btn');
                 const productId = btn.dataset.productId;
@@ -752,9 +764,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             // --- Cancel Order Modal Logic (for non-delivered orders) ---
-            if (e.target.classList.contains('cancel-btn')) {
+            const cancelBtn = e.target.closest('.cancel-btn');
+            console.log("DEBUG: Cancel button check - cancelBtn found:", cancelBtn);
+            if (cancelBtn) {
+                console.log("DEBUG: Cancel button clicked for order:", cancelBtn.dataset.orderId);
                 e.preventDefault();
-                const orderId = e.target.dataset.orderId;
+                const orderId = cancelBtn.dataset.orderId;
 
                 // Remove existing modal if open
                 document.getElementById('cancel-modal-overlay')?.remove();
@@ -785,12 +800,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.body.insertAdjacentHTML('beforeend', modalHTML);
 
                 const overlay = document.getElementById('cancel-modal-overlay');
-                const cancelBtn = overlay.querySelector('.return-cancel-btn');
+                const closeBtn = overlay.querySelector('.return-cancel-btn');
                 const submitBtn = overlay.querySelector('.return-submit-btn');
                 const reasonCheckboxes = overlay.querySelectorAll('#cancel-reasons input[type="checkbox"]');
 
                 // Close button
-                cancelBtn.addEventListener('click', () => overlay.remove());
+                closeBtn.addEventListener('click', () => overlay.remove());
 
                 // Submit button
                 submitBtn.addEventListener('click', async () => {
@@ -847,9 +862,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             // --- Return Order Modal Logic (for delivered orders) ---
-            if (e.target.classList.contains('return-btn')) {
+            const returnBtn = e.target.closest('.return-btn');
+            console.log("DEBUG: Return button check - returnBtn found:", returnBtn);
+            if (returnBtn) {
+                console.log("DEBUG: Return button clicked for order:", returnBtn.dataset.orderId);
                 e.preventDefault();
-                const orderId = e.target.dataset.orderId;
+                const orderId = returnBtn.dataset.orderId;
 
                 // Remove existing modal if open
                 document.getElementById('return-modal-overlay')?.remove();
@@ -888,7 +906,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.body.insertAdjacentHTML('beforeend', modalHTML);
 
                 const overlay = document.getElementById('return-modal-overlay');
-                const cancelBtn = overlay.querySelector('.return-cancel-btn');
+                const closeBtn = overlay.querySelector('.return-cancel-btn');
                 const submitBtn = overlay.querySelector('.return-submit-btn');
                 const reasonCheckboxes = overlay.querySelectorAll('#return-reasons input[type="checkbox"]');
                 const conditionsBox = overlay.querySelector('#return-conditions');
@@ -902,7 +920,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 // Close button
-                cancelBtn.addEventListener('click', () => overlay.remove());
+                closeBtn.addEventListener('click', () => overlay.remove());
 
                 // Submit button
                 submitBtn.addEventListener('click', async () => {
@@ -989,7 +1007,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
             // --- END MODIFICATION ---
-        });
+        };
+        
+        // Add the click event listener
+        container.addEventListener('click', container._orderClickHandler);
     }
 
     // --- Helper for CSRF Token ---

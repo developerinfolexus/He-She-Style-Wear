@@ -55,8 +55,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     // --- Helper Functions (Storage Access - Scoped) ---
-    function getWishlistLocal() { return getWishlist(); } // Use global getter
-    function getReviewsLocal() { return getReviews(); } // Use global getter
+    function getWishlistKey() { return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(WISHLIST_KEY) : WISHLIST_KEY; }
+    function getCartKey() { return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(CART_KEY) : CART_KEY; }
+
+    function getWishlistLocal() { return JSON.parse(localStorage.getItem(getWishlistKey())) || []; }
+    function getReviewsLocal() { return getReviews(); } // Use global getter logic if available
 
     // --- Wishlist Update (Scoped) ---
     function updateWishlistLocal(productData, isAdding) {
@@ -67,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (isAdding) { if (!list.some(item => item.id === itemToStore.id)) { list.push(itemToStore); } }
         else { list = list.filter(item => item.id !== itemToStore.id); }
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+        localStorage.setItem(getWishlistKey(), JSON.stringify(list));
         updateWishlistCount(); // Call global count update function
     }
 
@@ -721,6 +724,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.addEventListener('regionChanged', () => {
         updateDisplayedPricesLocal(); // Update prices on THIS page's grid
         filterAndSortProductsLocal(); // Re-apply filters which might depend on converted price ranges
+    });
+
+    // --- Listen for user identification ---
+    document.addEventListener('userIdentified', () => {
+        console.log("Kids Page: User identified, refreshing hearts...");
+        initializeWishlistHeartsLocal();
+        updateWishlistCount();
     });
 
     // --- Initial Header Count Update ---

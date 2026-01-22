@@ -25,14 +25,67 @@
     /* .reviews-modal-overlay { ... */
     /* .reviews-modal { ... */
     /* .whatsapp-float { ... */
+
+    /* Loading spinner animation */
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Dialog slide down animation */
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Button hover effects */
+    #clear-wishlist-btn:hover {
+      background: #c0392b !important;
+    }
+
+    #confirm-clear-btn:hover {
+      background: #c0392b !important;
+    }
+
+    #cancel-clear-btn:hover {
+      background: #e0e0e0 !important;
+    }
   </style>
 </head>
 
 <body data-header-url="{% url 'api_header' %}">
   <div id="header-placeholder"></div>
-  <main class="container">
-    <div class="listing-header">
-      <h2>My Wishlist</h2>
+
+  <!-- Loading Overlay -->
+  <div id="wishlist-loading-overlay"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+    <div style="text-align: center;">
+      <div
+        style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #333; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;">
+      </div>
+      <p style="color: #666; font-size: 14px;">Loading your wishlist...</p>
+    </div>
+  </div>
+
+  <main class="container" id="wishlist-content" style="opacity: 0; transition: opacity 0.3s ease;">
+    <div class="listing-header"
+      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+      <h2 style="margin: 0;">My Wishlist</h2>
+      <button id="clear-wishlist-btn"
+        style="padding: 6px 14px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: background 0.3s ease;">Clear
+        All</button>
     </div>
 
     <div class="product-grid" id="wishlist-grid">
@@ -41,6 +94,24 @@
     <div id="empty-message-container">
     </div>
   </main>
+
+  <!-- Custom Confirmation Dialog -->
+  <div id="clear-wishlist-dialog"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div
+      style="background: white; border-radius: 8px; padding: 30px; max-width: 400px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.15); animation: slideDown 0.3s ease;">
+      <h3 style="margin: 0 0 15px 0; font-size: 20px; color: #333;">Clear Wishlist?</h3>
+      <p style="margin: 0 0 25px 0; color: #666; font-size: 14px; line-height: 1.5;">Are you sure you want to remove all
+        items from your wishlist? This action cannot be undone.</p>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="cancel-clear-btn"
+          style="padding: 10px 20px; background: #f0f0f0; color: #333; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.3s ease;">Cancel</button>
+        <button id="confirm-clear-btn"
+          style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.3s ease;">Clear
+          All</button>
+      </div>
+    </div>
+  </div>
 
   {% include 'customer/footer.html' %}
 
@@ -68,37 +139,8 @@
 
 
   <script>
-    const headerUrl = document.body.dataset.headerUrl || '/api/header/';
-    fetch(headerUrl)
-      .then(response => response.text())
-      .then(data => {
-        const headerPlaceholder = document.getElementById('header-placeholder');
-        if (headerPlaceholder) {
-          headerPlaceholder.innerHTML = data;
-
-          // Re-initialize dynamic header parts handled by index.js:
-          if (typeof setupSearchFunctionality === 'function') setupSearchFunctionality();
-          if (typeof setupProfileDropdown === 'function') setupProfileDropdown();
-          if (typeof setupNavDropdowns === 'function') setupNavDropdowns();
-          if (typeof setupRegionFlagDropdown === 'function') setupRegionFlagDropdown();
-          if (typeof updateCartCount === 'function') updateCartCount();
-          if (typeof updateWishlistCount === 'function') updateWishlistCount();
-
-          // --- THIS IS THE FIX ---
-          // This function call must be *after* header.html is loaded.
-          if (typeof setupMobileMenuToggle === 'function') setupMobileMenuToggle();
-          // --- END FIX ---
-
-          // Remove active class from all nav links on wishlist page
-          const navLinks = document.querySelectorAll(".main-nav li");
-          navLinks.forEach(link => {
-            link.classList.remove('active');
-          });
-        } else {
-          console.error('Header placeholder element not found.');
-        }
-      })
-      .catch(error => console.error('Error loading header:', error));
+    // Header loading is handled by static/customer/js/index.js
+    // ensuring single source of truth and no race conditions.
   </script>
 
 </body>
