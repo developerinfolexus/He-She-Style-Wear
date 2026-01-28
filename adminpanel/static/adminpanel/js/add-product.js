@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (submitButton) submitButton.textContent = 'Update Product';
 
         // Load product from database API
-        fetch(`/admin/api/products/`)
+        fetch(`/admin/api/products/?t=${Date.now()}`)
             .then(response => response.json())
             .then(data => {
                 if (data.products && data.products.length > 0) {
@@ -77,7 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const editId = parseInt(editProductId, 10);
                     const productFromDB = data.products.find(p => parseInt(p.id, 10) === editId);
                     if (productFromDB) {
-                        console.log('Product found for editing:', productFromDB);
+                        console.log('Product found for editing (DB):', productFromDB);
+                        console.log('Product size_chart_type:', productFromDB.size_chart_type);
                         // Convert API format to expected format
                         productToEdit = {
                             id: productFromDB.id,
@@ -123,7 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             discount_xxl: productFromDB.discount_xxl || 0,
 
                             // 🟢 IMAGES STRUCTURE
-                            images_structure: productFromDB.images_structure || {}
+                            images_structure: productFromDB.images_structure || {},
+
+                            // 🟢 SIZE CHART TYPE
+                            sizeChartType: productFromDB.size_chart_type || 'none'
                         };
                         // Populate form with product data
                         populateForm(productToEdit).then(() => {
@@ -299,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
     // --- Event Listeners for Adding New Sub-Category ---
     // const addSubCategoryBtn = document.getElementById('addSubCategoryBtn');
     // const newSubCategoryContainer = document.getElementById('newSubCategoryContainer');
@@ -306,6 +311,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // const cancelSubCategoryBtn = document.getElementById('cancelSubCategoryBtn');
     // const newSubCategoryInput = document.getElementById('newSubCategoryInput');
 
+    // COMMENTED OUT: Add sub-category functionality removed from UI
+    /*
     if (addSubCategoryBtn && newSubCategoryContainer && saveSubCategoryBtn && cancelSubCategoryBtn && newSubCategoryInput) {
 
         // Show input
@@ -340,6 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    */
 
     // ------------ FABRIC SECTION ------------
     const fabricOptionsData = {
@@ -606,6 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         safeSetValue('productColors', product.productColors);
         safeSetValue('productTags', product.productTags);
+        safeSetValue('sizeChartType', product.sizeChartType || 'none');
 
         // Prices are now stored in USD, display directly
         // Prices are now stored in USD, display directly
@@ -1083,6 +1092,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('tags', safeGetValue('productTags'));
                 formData.append('styleFit', safeGetValue('styleFit'));
                 formData.append('shippingReturn', safeGetValue('shippingReturn'));
+                // Append Size Chart Type
+                formData.append('sizeChartType', safeGetValue('sizeChartType'));
 
                 // Helper for safe query selector - MODIFIED to prefer enabled inputs
                 const safeQueryValue = (selector, fallback = '') => {

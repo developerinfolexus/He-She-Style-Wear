@@ -11,6 +11,139 @@ document.addEventListener("DOMContentLoaded", () => {
         us: { rate: 1.0, symbol: "US$" }   // USD to USD (no conversion)
     };
 
+    const WOMENS_SIZE_CHART_IN_HTML = `
+        <table style="width:100%; border-collapse: collapse; text-align: center; font-size: 0.9em;">
+            <thead>
+                <tr style="background-color: #f8f9fa; border-bottom: 2px solid #eee;">
+                    <th style="padding: 10px;">Size</th>
+                    <th style="padding: 10px;">Bust (in)</th>
+                    <th style="padding: 10px;">Front Length (in)</th>
+                    <th style="padding: 10px;">Sleeve Length (in)</th>
+                    <th style="padding: 10px;">To Fit Waist (in)</th>
+                    <th style="padding: 10px;">Waist (in)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">S</td><td>36.0</td><td>46.0</td><td>17.0</td><td>30.0</td><td>33.0</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">M</td><td>38.0</td><td>46.0</td><td>17.0</td><td>32.0</td><td>35.0</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">L</td><td>40.0</td><td>46.0</td><td>17.0</td><td>34.0</td><td>37.0</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XL</td><td>42.0</td><td>46.0</td><td>17.0</td><td>36.0</td><td>39.0</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XXL</td><td>44.0</td><td>46.0</td><td>17.0</td><td>38.0</td><td>41.0</td></tr>
+            </tbody>
+        </table>
+    `;
+
+    const WOMENS_SIZE_CHART_CM_HTML = `
+        <table style="width:100%; border-collapse: collapse; text-align: center; font-size: 0.9em;">
+            <thead>
+                <tr style="background-color: #f8f9fa; border-bottom: 2px solid #eee;">
+                    <th style="padding: 10px;">Size</th>
+                    <th style="padding: 10px;">Bust (cm)</th>
+                    <th style="padding: 10px;">Front Length (cm)</th>
+                    <th style="padding: 10px;">Sleeve Length (cm)</th>
+                    <th style="padding: 10px;">To Fit Waist (cm)</th>
+                    <th style="padding: 10px;">Waist (cm)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">S</td><td>91</td><td>117</td><td>43</td><td>76</td><td>84</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">M</td><td>97</td><td>117</td><td>43</td><td>81</td><td>89</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">L</td><td>102</td><td>117</td><td>43</td><td>86</td><td>94</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XL</td><td>107</td><td>117</td><td>43</td><td>91</td><td>99</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XXL</td><td>112</td><td>117</td><td>43</td><td>97</td><td>104</td></tr>
+            </tbody>
+        </table>
+    `;
+
+    const WOMENS_BLOUSE_CHART_HTML = `
+        <table style="width:100%; border-collapse: collapse; text-align: center; font-size: 0.9em;">
+            <thead>
+                <tr style="background-color: #f8f9fa; border-bottom: 2px solid #eee;">
+                    <th style="padding: 10px;">Size</th>
+                    <th style="padding: 10px;">To Fit Bust (in)</th>
+                    <th style="padding: 10px;">Front Length (in)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">S</td><td>33.0</td><td>13.5</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">M</td><td>35.0</td><td>14.0</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">L</td><td>37.0</td><td>14.5</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XL</td><td>39.0</td><td>14.5</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XXL</td><td>41.0</td><td>15.0</td></tr>
+            </tbody>
+        </table>
+    `;
+
+    const WOMENS_BLOUSE_CHART_CM_HTML = `
+        <table style="width:100%; border-collapse: collapse; text-align: center; font-size: 0.9em;">
+            <thead>
+                <tr style="background-color: #f8f9fa; border-bottom: 2px solid #eee;">
+                    <th style="padding: 10px;">Size</th>
+                    <th style="padding: 10px;">To Fit Bust (cm)</th>
+                    <th style="padding: 10px;">Front Length (cm)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">S</td><td>84</td><td>34</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">M</td><td>89</td><td>36</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">L</td><td>94</td><td>37</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XL</td><td>99</td><td>37</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XXL</td><td>104</td><td>38</td></tr>
+            </tbody>
+        </table>
+    `;
+
+    const KIDS_SIZE_CHART_IN_HTML = `
+        <table style="width:100%; border-collapse: collapse; text-align: center; font-size: 0.9em;">
+            <thead>
+                <tr style="background-color: #f8f9fa; border-bottom: 2px solid #eee;">
+                    <th style="padding: 10px;">Size</th>
+                    <th style="padding: 10px;">Age Range</th>
+                    <th style="padding: 10px;">Height (in)</th>
+                    <th style="padding: 10px;">Weight (kg)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">S</td><td>2–4Y</td><td>32.7 – 42.5</td><td>12 – 13</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">M</td><td>4–6Y</td><td>38.6 – 47.2</td><td>15 – 17</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">L</td><td>6–8Y</td><td>44.9 – 53.5</td><td>19 – 21.5</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XL</td><td>8–10Y</td><td>50.4 – 57.5</td><td>23.5</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XXL</td><td>10–14Y</td><td>55.9 – 59.8+</td><td>29 – 32</td></tr>
+            </tbody>
+        </table>
+    `;
+
+    const KIDS_SIZE_CHART_CM_HTML = `
+        <table style="width:100%; border-collapse: collapse; text-align: center; font-size: 0.9em;">
+            <thead>
+                <tr style="background-color: #f8f9fa; border-bottom: 2px solid #eee;">
+                    <th style="padding: 10px;">Size</th>
+                    <th style="padding: 10px;">Age Range</th>
+                    <th style="padding: 10px;">Height (cm)</th>
+                    <th style="padding: 10px;">Weight (lbs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">S</td><td>2–4Y</td><td>83 – 108</td><td>26.5 – 28.7</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">M</td><td>4–6Y</td><td>98 – 120</td><td>33 – 37.5</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">L</td><td>6–8Y</td><td>114 – 136</td><td>42 – 47.4</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XL</td><td>8–10Y</td><td>128 – 146</td><td>51.8</td></tr>
+                <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">XXL</td><td>10–14Y</td><td>142 – 152+</td><td>64 – 70.5</td></tr>
+            </tbody>
+        </table>
+    `;
+
+    // Toggle Wrapper with Unit Switch
+    const SIZE_CHART_WRAPPER_HTML = `
+        <div class="size-chart-controls" style="text-align:center; margin-bottom:15px;">
+            <div style="display:inline-flex; border:1px solid #000; border-radius:4px; overflow:hidden;">
+                <button type="button" id="size-chart-unit-in" class="unit-toggle-btn active" style="padding:8px 16px; border:none; background:#000; color:#fff; cursor:pointer; font-size:14px; font-weight:600; border-right:1px solid #444;">Inches</button>
+                <button type="button" id="size-chart-unit-cm" class="unit-toggle-btn" style="padding:8px 16px; border:none; background:#fff; color:#000; cursor:pointer; font-size:14px; font-weight:600;">CM</button>
+            </div>
+        </div>
+        <div id="size-chart-table-container"></div>
+    `;
+
     // --- Global Storage Key Helpers (Delegate to index.js logic) ---
     function getWishlistKey() {
         return (window.getStorageKey && typeof window.getStorageKey === 'function') ? window.getStorageKey(WISHLIST_KEY) : WISHLIST_KEY;
@@ -591,6 +724,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         thumbnail3: apiProduct.thumbnail3 || null,
                         description: apiProduct.description || '',
                         category: apiProduct.category || '',
+                        gender: apiProduct.gender || '',
+                        size_chart_type: apiProduct.size_chart_type || 'none', // Added
                         rating: apiProduct.rating_data ? apiProduct.rating_data.rating : 4.5,
                         isNew: apiProduct.rating_data ? apiProduct.rating_data.is_new : false,
                         onSale: apiProduct.discount_price && parseFloat(apiProduct.discount_price) > 0,
@@ -1264,8 +1399,156 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Setup Size Chart Modal Logic ---
     function setupSizeChartModal() {
-        const overlay = document.getElementById('size-chart-modal-overlay'), open = document.getElementById('view-size-chart-btn'), close = document.querySelector('#size-chart-modal-overlay .close-modal-btn');
-        if (overlay && open && close) { open.addEventListener('click', () => overlay.classList.add('active')); close.addEventListener('click', () => overlay.classList.remove('active')); overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); }); }
+        const overlay = document.getElementById('size-chart-modal-overlay');
+        const open = document.getElementById('view-size-chart-btn');
+        const close = document.querySelector('#size-chart-modal-overlay .close-modal-btn');
+
+        if (overlay && open && close) {
+            open.addEventListener('click', () => {
+                const body = overlay.querySelector('.size-chart-body');
+                if (body && typeof product !== 'undefined') {
+                    const chartType = product.size_chart_type || 'none';
+
+                    // Clear previous content
+                    body.innerHTML = '';
+
+                    if (chartType === 'women_general') {
+                        // Inject Wrapper
+                        body.innerHTML = SIZE_CHART_WRAPPER_HTML;
+
+                        // Elements
+                        const container = body.querySelector('#size-chart-table-container');
+                        const btnIn = body.querySelector('#size-chart-unit-in');
+                        const btnCm = body.querySelector('#size-chart-unit-cm');
+
+                        // Initial Render (Inches)
+                        if (container) container.innerHTML = WOMENS_SIZE_CHART_IN_HTML;
+
+                        // Event Listeners for Toggle
+                        if (btnIn && btnCm && container) {
+                            btnIn.addEventListener('click', () => {
+                                // Switch to Inches
+                                container.innerHTML = WOMENS_SIZE_CHART_IN_HTML;
+
+                                // Update Styles
+                                btnIn.classList.add('active');
+                                btnIn.style.background = '#000';
+                                btnIn.style.color = '#fff';
+
+                                btnCm.classList.remove('active');
+                                btnCm.style.background = '#fff';
+                                btnCm.style.color = '#000';
+                            });
+
+                            btnCm.addEventListener('click', () => {
+                                // Switch to CM
+                                container.innerHTML = WOMENS_SIZE_CHART_CM_HTML;
+
+                                // Update Styles
+                                btnCm.classList.add('active');
+                                btnCm.style.background = '#000';
+                                btnCm.style.color = '#fff';
+
+                                btnIn.classList.remove('active');
+                                btnIn.style.background = '#fff';
+                                btnIn.style.color = '#000';
+                            });
+                        }
+                    } else if (chartType === 'women_blouse') {
+                        // Inject Wrapper
+                        body.innerHTML = `<h3 style="text-align:center;">Blouse Size Chart</h3>${SIZE_CHART_WRAPPER_HTML}`;
+
+                        // Elements
+                        const container = body.querySelector('#size-chart-table-container');
+                        const btnIn = body.querySelector('#size-chart-unit-in');
+                        const btnCm = body.querySelector('#size-chart-unit-cm');
+
+                        // Initial Render (Inches)
+                        if (container) container.innerHTML = WOMENS_BLOUSE_CHART_HTML;
+
+                        // Event Listeners for Toggle
+                        if (btnIn && btnCm && container) {
+                            btnIn.addEventListener('click', () => {
+                                // Switch to Inches
+                                container.innerHTML = WOMENS_BLOUSE_CHART_HTML;
+
+                                // Update Styles
+                                btnIn.classList.add('active');
+                                btnIn.style.background = '#000';
+                                btnIn.style.color = '#fff';
+
+                                btnCm.classList.remove('active');
+                                btnCm.style.background = '#fff';
+                                btnCm.style.color = '#000';
+                            });
+
+                            btnCm.addEventListener('click', () => {
+                                // Switch to CM
+                                container.innerHTML = WOMENS_BLOUSE_CHART_CM_HTML;
+
+                                // Update Styles
+                                btnCm.classList.add('active');
+                                btnCm.style.background = '#000';
+                                btnCm.style.color = '#fff';
+
+                                btnIn.classList.remove('active');
+                                btnIn.style.background = '#fff';
+                                btnIn.style.color = '#000';
+                            });
+                        }
+                    } else if (chartType === 'kids') {
+                        // Inject Wrapper
+                        body.innerHTML = `<h3 style="text-align:center;">Kids Size Chart</h3>${SIZE_CHART_WRAPPER_HTML}`;
+
+                        // Elements
+                        const container = body.querySelector('#size-chart-table-container');
+                        const btnIn = body.querySelector('#size-chart-unit-in');
+                        const btnCm = body.querySelector('#size-chart-unit-cm');
+
+                        // Set Button Labels (Specific to Kids Requirement)
+                        if (btnIn) btnIn.textContent = "Imperial (In/Kg)";
+                        if (btnCm) btnCm.textContent = "Metric (Cm/Lbs)";
+
+                        // Initial Render (Inches + Kg)
+                        if (container) container.innerHTML = KIDS_SIZE_CHART_IN_HTML;
+
+                        // Event Listeners for Toggle
+                        if (btnIn && btnCm && container) {
+                            btnIn.addEventListener('click', () => {
+                                // Switch to Imperial
+                                container.innerHTML = KIDS_SIZE_CHART_IN_HTML;
+
+                                // Update Styles
+                                btnIn.classList.add('active');
+                                btnIn.style.background = '#000';
+                                btnIn.style.color = '#fff';
+
+                                btnCm.classList.remove('active');
+                                btnCm.style.background = '#fff';
+                                btnCm.style.color = '#000';
+                            });
+
+                            btnCm.addEventListener('click', () => {
+                                // Switch to Metric
+                                container.innerHTML = KIDS_SIZE_CHART_CM_HTML;
+
+                                // Update Styles
+                                btnCm.classList.add('active');
+                                btnCm.style.background = '#000';
+                                btnCm.style.color = '#fff';
+
+                                btnIn.classList.remove('active');
+                                btnIn.style.background = '#fff';
+                                btnIn.style.color = '#000';
+                            });
+                        }
+                    }
+                }
+                overlay.classList.add('active');
+            });
+            close.addEventListener('click', () => overlay.classList.remove('active'));
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); });
+        }
     }
 
 
@@ -1423,6 +1706,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const showSizes = sizes.length > 0; // Fix ReferenceError
 
         // MODIFIED: If Free Size, we still render buttons (so auto-select works) but hide the UI.
+
+        // --- Size Chart Visibility Logic ---
+        // Use the explicit size_chart_type from backend
+        // If it's 'none' (default), don't show. If it has a value (women_general, women_blouse, kids), show it.
+        const showSizeChartBtn = product.size_chart_type && product.size_chart_type !== 'none';
+
         const sizeHTML = (sizes.length > 0) ? `
 <div class="size-selector" style="${isFreeSize ? 'display:none!important;' : ''}">
     <h3>Select Size:</h3>
@@ -1602,7 +1891,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <button class="quantity-btn increase-qty" id="pdp-increase-qty">+</button>
                             </div>
                         </div>
-                        ${showSizes ? `<button id="view-size-chart-btn" style="background:none;border:none;font-size:0.9rem;color:#777;text-decoration:underline;cursor:pointer;padding:0;line-height:1;">SIZE CHART</button>` : ''}
+                        ${showSizes && showSizeChartBtn ? `<button id="view-size-chart-btn" style="background:none;border:none;font-size:0.9rem;color:#777;text-decoration:underline;cursor:pointer;padding:0;line-height:1;">SIZE CHART</button>` : ''}
                     </div>
                     <div class="action-buttons"><button class="action-btn add-to-cart-btn">ADD TO CART</button><button class="action-btn buy-now-btn">BUY NOW</button></div>
                     

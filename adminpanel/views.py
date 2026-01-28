@@ -582,7 +582,12 @@ def add_product(request):
             # JS sends 'fabric', HTML sends 'productFabric'
             product.fabric = request.POST.get('fabric') or request.POST.get('productFabric') or None
             
+            product.fabric = request.POST.get('fabric') or request.POST.get('productFabric') or None
+            
             product.gender = request.POST.get('gender') or None
+            
+            # Save Size Chart Type
+            product.size_chart_type = request.POST.get('sizeChartType', 'none')
 
             # --- SIZE-WISE STOCK ---
             product.stock_s = int(request.POST.get('stock_s') or 0)
@@ -707,7 +712,9 @@ def get_products_json(request):
             'colors': product.colors or '',
             'style_fit': product.style_fit or '',
             'shipping_return': product.shipping_return or '',
+            'shipping_return': product.shipping_return or '',
             'gender': getattr(product, 'gender', None),
+            'size_chart_type': getattr(product, 'size_chart_type', 'none'),
             
             # Images Structure for Edit Form
             'images_structure': {

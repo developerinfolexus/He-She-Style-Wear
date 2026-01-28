@@ -51,6 +51,8 @@ def get_product_detail(request, slug):
         "category": product.category or '',
         "style_fit": product.style_fit or '',
         "shipping_return": product.shipping_return or '',
+        "gender": product.gender or '',
+        "size_chart_type": getattr(product, 'size_chart_type', 'none'),
     }
 
     # Handle Free Size vs Standard Sizes

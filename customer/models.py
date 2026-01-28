@@ -24,6 +24,14 @@ class Product(models.Model):
     name = models.CharField(max_length=500)
     slug = models.SlugField(max_length=255,unique=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    
+    SIZE_CHART_CHOICES = [
+        ('none', 'No Size Chart'),
+        ('women_general', 'Women - General Size Chart'),
+        ('women_blouse', 'Women - Blouse Size Chart'),
+        ('kids', 'Kids - Size Chart'),
+    ]
+    size_chart_type = models.CharField(max_length=50, choices=SIZE_CHART_CHOICES, default='none')
 
     sub_category = models.CharField(max_length=100, blank=True, null=True)
 

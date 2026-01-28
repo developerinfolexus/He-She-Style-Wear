@@ -108,7 +108,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = 'harishjharish2004@gmail.com'
-EMAIL_HOST_PASSWORD = 'msrp cdgo kakx xzyl'
+EMAIL_HOST_USER = 'heshestylewear@gmail.com'
+EMAIL_HOST_PASSWORD = 'vqeo mlps lwot ferb'
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = 'He She Style Wear <heshestylewear@gmail.com>'
