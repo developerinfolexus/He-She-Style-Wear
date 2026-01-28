@@ -3,15 +3,15 @@
     --primary-color: #136dec;
     --primary-darker: p;
     --primary-hover-bg: rgba(19, 109, 236, 0.1);
-    
+
     --bg-light: #f6f7f8;
     --surface-light: #ffffff;
-    
+
     --text-primary: #111418;
     --text-secondary: #617289;
-    
+
     --border-light: #dbe0e6;
-    
+
     --green: #22c55e;
     --orange: #f97316;
     --blue-tag-bg: #e0eefd;
@@ -31,7 +31,13 @@ body {
     box-sizing: border-box;
 }
 
-h1, h2, h3, h4, h5, h6, p {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
     margin: 0;
 }
 
@@ -67,7 +73,8 @@ h1, h2, h3, h4, h5, h6, p {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: var(--border-light); /* Placeholder color */
+    background-color: var(--border-light);
+    /* Placeholder color */
     object-fit: cover;
 }
 
@@ -123,14 +130,22 @@ h1, h2, h3, h4, h5, h6, p {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     font-size: 20px;
 }
+
 .nav-item.active .material-symbols-outlined.filled {
     font-variation-settings: 'FILL' 1;
 }
+
 .admin-count .material-symbols-outlined.filled {
-     font-variation-settings: 'FILL' 1;
+    font-variation-settings: 'FILL' 1;
 }
-.admin-count .green { color: var(--green); }
-.admin-count .orange { color: var(--orange); }
+
+.admin-count .green {
+    color: var(--green);
+}
+
+.admin-count .orange {
+    color: var(--orange);
+}
 
 
 
@@ -219,8 +234,9 @@ h1, h2, h3, h4, h5, h6, p {
     gap: 16px;
 }
 
-.card-body.toggle-list > p {
-    margin-bottom: 4px; /* Space between text and first toggle */
+.card-body.toggle-list>p {
+    margin-bottom: 4px;
+    /* Space between text and first toggle */
 }
 
 
@@ -244,19 +260,34 @@ h1, h2, h3, h4, h5, h6, p {
 }
 
 /* --- Toggle Switch --- */
+/* --- Toggle Switch Item (Refined) --- */
 .toggle-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--bg-light);
-    padding: 16px;
-    border-radius: 8px;
+    background-color: transparent;
+    /* Removed gray box */
+    padding: 16px 0;
+    /* Reduced horizontal padding */
+    border-bottom: 1px solid var(--border-light);
+    /* Added separator */
+}
+
+.toggle-item:last-child {
+    border-bottom: none;
 }
 
 .toggle-item h4 {
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
+    /* Slightly larger */
     color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.toggle-item p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
 }
 
 /* * This .switch style from settings.css is different from global.css.
@@ -266,8 +297,10 @@ h1, h2, h3, h4, h5, h6, p {
 .switch {
     position: relative;
     display: inline-block;
-    width: 44px; /* w-11 */
-    height: 24px; /* h-6 */
+    width: 44px;
+    /* w-11 */
+    height: 24px;
+    /* h-6 */
 }
 
 .switch input {
@@ -291,22 +324,24 @@ h1, h2, h3, h4, h5, h6, p {
 .slider:before {
     position: absolute;
     content: "";
-    height: 20px; /* h-5 */
-    width: 20px; /* w-5 */
+    height: 20px;
+    /* h-5 */
+    width: 20px;
+    /* w-5 */
     left: 2px;
     bottom: 2px;
     background-color: white;
     border-radius: 50%;
     transition: .3s;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-input:checked + .slider {
+input:checked+.slider {
     background-color: var(--primary-color);
 }
 
-input:checked + .slider:before {
-    transform: translateX(20px); 
+input:checked+.slider:before {
+    transform: translateX(20px);
 }
 
 /* --- Assign Form --- */
@@ -314,7 +349,8 @@ input:checked + .slider:before {
     font-size: 1.125rem;
     font-weight: 700;
 }
-.form-column > .card > .card-body > p {
+
+.form-column>.card>.card-body>p {
     margin-top: 4px;
     margin-bottom: 24px;
 }
@@ -430,20 +466,24 @@ input:checked + .slider:before {
     /* Stacks the two-column grid into a single column */
     /* This rule is fine and does not conflict */
     .content-grid {
-        grid-template-columns: 1fr; /* Single column */
-        gap: 24px; /* Slightly smaller gap */
+        grid-template-columns: 1fr;
+        /* Single column */
+        gap: 24px;
+        /* Slightly smaller gap */
     }
 
     /* Removes the sticky behavior from the form on mobile */
     /* This rule is fine and does not conflict */
     .form-column .sticky-form {
-        position: static; /* Disable sticky positioning */
+        position: static;
+        /* Disable sticky positioning */
         top: auto;
     }
 
     /* Reduces the main title size */
     .page-header h1 {
-        font-size: 1.5rem; /* Smaller heading */
+        font-size: 1.5rem;
+        /* Smaller heading */
     }
 
     /* Reduces padding inside cards */
